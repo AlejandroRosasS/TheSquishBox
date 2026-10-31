@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es-PE">
+<head>
+<meta charset="utf-8">
+<title>Pedidos · Panel The Squish Box</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./bloom.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Nunito:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="adm" style="width: 100%;">
+  <div class="a-shell">
+    <div class="a-top">
+      <div class="row g3"><span class="logo sm" role="img" aria-label="Logo The Squish Box"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></span><b>Pedidos</b></div>
+      <a class="a-btn ghost sm" href="A-Notificaciones.dc.html" aria-label="Notificaciones"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></a>
+    </div>
+    <aside class="a-side" aria-label="Menú del panel">
+      <div class="a-brand"><span class="logo sm" role="img" aria-label="Logo The Squish Box"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></span><div><b>The Squish Box</b><p class="a-cap">Panel de la tienda</p></div></div>
+      <nav class="a-nav stack g1" aria-label="Secciones">
+        <a href="A-Inicio.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-6h4v6"/></svg>Inicio</a>
+        <a class="on" href="A-Pedidos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 14h5l1 2h4l1-2h5"/></svg>Pedidos<span class="cnt">3</span></a>
+        <a href="A-Solicitudes.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>Pedidos para fiestas<span class="cnt">2</span></a>
+        <a href="A-Productos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>Productos</a>
+        <a href="A-Importar.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".8"/></svg>Instagram<span class="cnt">4</span></a>
+        <a href="A-Ventas.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Ventas y márgenes</a>
+        <p class="a-navlabel">Configuración</p>
+        <a href="A-Notificaciones.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>Notificaciones</a>
+        <a href="A-Ajustes.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>Ajustes</a>
+        <a href="A-Apariencia.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.5-.8 1.5-1.5 0-1-.8-1.3-.8-2.2 0-.8.7-1.3 1.5-1.3H17a4 4 0 0 0 4-4C21 6.5 17 3 12 3z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7" r="1"/></svg>Apariencia</a>
+      </nav>
+    </aside>
+
+    <main class="a-main">
+      <div class="a-head">
+        <div class="stack g1"><h1 class="a-h1">Pedidos</h1><p class="a-sub">{{subtitle}}</p></div>
+        <div class="a-search"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/></svg><input placeholder="Buscar por N.º, cliente o celular" aria-label="Buscar pedidos"></div>
+      </div>
+      <div class="a-scroll-x" role="group" aria-label="Filtrar por estado">
+        <sc-for list="{{filters}}" as="f" hint-placeholder-count="6">
+          <button class="a-chip {{f.on}}" type="button" onClick="{{f.pick}}">{{f.label}} <span class="n">{{f.n}}</span></button>
+        </sc-for>
+      </div>
+      <section class="a-card flush">
+        <div class="a-table">
+          <div class="a-tr head" style="grid-template-columns: 90px minmax(0, 1.4fr) minmax(0, 1fr) 110px 150px 130px;"><span>Pedido</span><span>Cliente y productos</span><span>Entrega</span><span>Total</span><span>Delivery</span><span>Estado</span></div>
+          <sc-for list="{{rows}}" as="o" hint-placeholder-count="6">
+            <a class="a-tr" href="A-Pedido.dc.html" style="grid-template-columns: 90px minmax(0, 1.4fr) minmax(0, 1fr) 110px 150px 130px;">
+              <span class="c-d" style="font-weight: 700;">#{{o.id}}</span>
+              <span class="stack"><b>{{o.client}}</b><span class="a-cap">{{o.items}}</span><span class="c-m a-cap" style="margin-top: 2px;">#{{o.id}} · {{o.where}} · {{o.date}}</span></span>
+              <span class="c-d stack"><span>{{o.where}}</span><span class="a-cap">{{o.date}}</span></span>
+              <span class="money" style="font-weight: 700; text-align: right;">{{o.total}}<span class="c-m" style="margin-top: 6px;"><span class="st {{o.cls}}">{{o.status}}</span></span></span>
+              <span class="c-d"><span class="st {{o.dcls}}">{{o.dlabel}}</span></span>
+              <span class="c-d"><span class="st {{o.cls}}">{{o.status}}</span></span>
+            </a>
+          </sc-for>
+        </div>
+      </section>
+    </main>
+
+    <nav class="a-tabbar" aria-label="Secciones">
+      <a href="A-Inicio.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-6h4v6"/></svg>Inicio</a>
+      <a class="on" href="A-Pedidos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 14h5l1 2h4l1-2h5"/></svg>Pedidos<span class="cnt">3</span></a>
+      <a href="A-Productos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>Productos</a>
+      <a href="A-Importar.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".8"/></svg>Instagram<span class="cnt">4</span></a>
+      <a href="A-Ajustes.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>Más</a>
+    </nav>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { f: 'all' }; }
+  renderVals() {
+    const S = { nuevo: ['Nuevo', 'nuevo'], prep: ['En preparación', 'prep'], listo: ['Listo', 'listo'], entregado: ['Entregado', 'entregado'], cancelado: ['Cancelado', 'cancelado'] };
+    const D = { ok: ['Sin diferencia', 'pagado'], pend: ['Cobrar S/ 5', 'pend'], pagado: ['Dif. pagada', 'pagado'], dev: ['Devolver S/ 5', 'devuelto'], devuelto: ['Devuelto S/ 5', 'devuelto'], pendconf: ['Por confirmar', 'cancelado'], taller: ['Recojo', 'cancelado'] };
+    const all = [
+      { id: '0123', client: 'Daniela Torres', items: 'The Squish Box ×2 + Mystery Squish', where: 'Miraflores', date: 'Mar 3 nov', total: 'S/ 177.00', s: 'nuevo', d: 'pendconf' },
+      { id: '0122', client: 'Lucía Paredes', items: 'Mini Box Recompra (5 squishies)', where: 'San Isidro', date: 'Lun 2 nov', total: 'S/ 57.00', s: 'nuevo', d: 'pendconf' },
+      { id: '0121', client: 'Andrea Salas', items: 'Mystery Squish ×2', where: 'La Molina', date: 'Mié 4 nov', total: 'S/ 68.00', s: 'prep', d: 'pend' },
+      { id: '0120', client: 'Gabriela Ríos', items: 'The Squish Box', where: 'Recojo coordinado', date: 'Sáb 31 oct', total: 'S/ 69.00', s: 'listo', d: 'taller' },
+      { id: '0119', client: 'María José Vega', items: 'Mini Box Halloween ×4', where: 'Barranco', date: 'Vie 30 oct', total: 'S/ 110.00', s: 'listo', d: 'dev' },
+      { id: '0118', client: 'Carolina Núñez', items: 'Mini Box Recompra (4 squishies)', where: 'Surco', date: 'Jue 29 oct', total: 'S/ 49.00', s: 'entregado', d: 'ok' },
+      { id: '0117', client: 'Fernanda Lazo', items: 'The Squish Box + Mini Box Halloween', where: 'Callao', date: 'Mié 28 oct', total: 'S/ 109.00', s: 'entregado', d: 'pagado' },
+      { id: '0116', client: 'Paola Castro', items: 'Mystery Squish', where: 'Jesús María', date: 'Mar 27 oct', total: 'S/ 39.00', s: 'cancelado', d: 'devuelto' }
+    ];
+    const f = this.state.f;
+    const defs = [['all', 'Todos'], ['nuevo', 'Nuevo'], ['prep', 'En preparación'], ['listo', 'Listo'], ['entregado', 'Entregado'], ['cancelado', 'Cancelado']];
+    const filters = defs.map(([k, label]) => ({ label, n: k === 'all' ? all.length : all.filter(o => o.s === k).length, on: f === k ? 'on' : '', pick: () => this.setState({ f: k }) }));
+    const rows = all.filter(o => f === 'all' || o.s === f).map(o => ({ ...o, status: S[o.s][0], cls: S[o.s][1], dlabel: D[o.d][0], dcls: D[o.d][1] }));
+    return { filters, rows, subtitle: '3 nuevos · 2 diferencias de delivery por resolver' };
+  }
+}
+</script>
+</body>
+</html>

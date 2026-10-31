@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es-PE">
+<head>
+<meta charset="utf-8">
+<title>Catálogo · The Squish Box</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./bloom.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Nunito:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="bloom" data-palette="{{palette}}" style="width: 100%;">
+  <div class="announce">Delivery en Lima · Coordinamos tu entrega por WhatsApp</div>
+  <header class="header">
+    <div class="wrap header-in">
+      <nav class="nav only-d" aria-label="Principal"><a class="on" href="{{h.cat}}">Cajas sorpresa</a><a href="{{h.cat}}">Mystery Squish</a><a href="{{h.medida}}">Para tu fiesta</a></nav>
+      <button class="icon-btn only-m" type="button" aria-label="Abrir menú"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"></path></svg></button>
+      <a class="logo logo-slot" href="{{h.home}}" aria-label="The Squish Box, inicio"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></a>
+      <div class="h-actions">
+        <a class="icon-btn only-d" href="{{h.cat}}" aria-label="Buscar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="m20 20-4.5-4.5"></path></svg></a>
+        <a class="icon-btn" href="{{h.drawer}}" aria-label="Carrito, 1 producto"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg><span class="cart-count">1</span></a>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Ruta"><a href="{{h.home}}">Inicio</a><span>/</span><span>Todas las sorpresas</span></nav>
+    <div class="stack g3" style="padding-bottom: 32px;">
+      <h1 class="h1">Todas las <em>sorpresas</em></h1>
+      <p class="lead" style="max-width: 640px;">Cajas, sobres y mini box con squishies sorpresa. Cada uno viene escondido en su sobre. ¿Cuál te tocará?</p>
+    </div>
+
+    <div class="only-m" style="padding-bottom: 16px;">
+      <div class="chips" role="group" aria-label="Línea">
+        <sc-for list="{{collections}}" as="c" hint-placeholder-count="6">
+          <button class="chip {{c.on}}" type="button" onClick="{{c.pick}}">{{c.label}}</button>
+        </sc-for>
+      </div>
+      <div class="row g3" style="margin-top: 12px;">
+        <button class="btn ghost sm grow" type="button"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"></path></svg>Filtros (1)</button>
+        <label class="grow" style="display: block;"><span class="small muted" style="display: none;">Ordenar</span><select class="select mini-select" style="width: 100%; height: 44px; min-height: 44px;" aria-label="Ordenar"><option>Destacados</option><option>Precio: menor a mayor</option><option>Precio: mayor a menor</option><option>Más nuevos</option></select></label>
+      </div>
+    </div>
+
+    <div class="cat-layout" style="padding-bottom: 96px;">
+      <aside class="filters only-d" aria-label="Filtros">
+        <div class="fgroup">
+          <h3>Línea</h3>
+          <sc-for list="{{collections}}" as="c" hint-placeholder-count="6">
+            <button class="fopt" type="button" onClick="{{c.pick}}"><span class="check {{c.on}}"></span>{{c.label}}<span class="muted small" style="margin-left: auto;">{{c.count}}</span></button>
+          </sc-for>
+        </div>
+        <div class="fgroup">
+          <h3>Ideal para</h3>
+          <button class="fopt" type="button"><span class="check on"></span>Coleccionar</button>
+          <button class="fopt" type="button"><span class="check"></span>Regalo de cumpleaños</button>
+          <button class="fopt" type="button"><span class="check"></span>Invitados de tu fiesta</button>
+        </div>
+        <div class="fgroup">
+          <h3>Precio</h3>
+          <button class="fopt" type="button"><span class="check"></span>Hasta S/ 30</button>
+          <button class="fopt" type="button"><span class="check"></span>S/ 30 – S/ 50</button>
+          <button class="fopt" type="button"><span class="check"></span>Más de S/ 50</button>
+        </div>
+        <div class="fgroup">
+          <h3>Squishies por caja</h3>
+          <button class="fopt" type="button"><span class="check"></span>1 grande</button>
+          <button class="fopt" type="button"><span class="check"></span>2 o 3</button>
+          <button class="fopt" type="button"><span class="check"></span>4 o 5</button>
+        </div>
+        <button class="link" type="button" style="align-self: flex-start;">Limpiar filtros</button>
+      </aside>
+
+      <div class="stack">
+        <div class="toolbar only-d">
+          <span class="small muted">{{countLabel}}</span>
+          <label class="row g3"><span class="small muted">Ordenar por</span><select class="select mini-select"><option>Destacados</option><option>Precio: menor a mayor</option><option>Precio: mayor a menor</option><option>Más nuevos</option></select></label>
+        </div>
+        <div class="pgrid c3">
+          <sc-for list="{{products}}" as="p" hint-placeholder-count="5">
+            <a class="pcard" href="{{p.href}}">
+              <div class="ph r45 {{p.dim}}"><img src="{{p.img}}" alt="{{p.name}}">
+                <sc-if value="{{p.badge}}" hint-placeholder-val="{{false}}"><span class="tag badge {{p.badgeClass}}">{{p.badge}}</span></sc-if>
+              </div>
+              <div class="meta"><p class="coll">{{p.coll}}</p><p class="name">{{p.name}}</p><p class="from">{{p.priceLabel}}</p></div>
+            </a>
+          </sc-for>
+        </div>
+        <div class="primary-band row between wrap-row g4" style="margin-top: 56px; padding: 28px 32px; border-radius: 24px;">
+          <div class="stack g1"><p class="h3">¿Es para un cumpleaños?</p><p class="small">Armamos Mini Box sorpresa para todos tus invitados.</p></div>
+          <a class="btn light" href="{{h.medida}}">Cotizar mi fiesta</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="cols">
+        <div class="stack g4">
+          <span class="logo lg" role="img" aria-label="Logo The Squish Box"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></span>
+          <p class="small" style="max-width: 300px; opacity: .85;">Mystery squishies para coleccionar. Abre, descubre, colecciona e intercambia. Lima, Perú.</p>
+        </div>
+        <div><h4>Tienda</h4><ul><li><a href="{{h.cat}}">Cajas sorpresa</a></li><li><a href="{{h.cat}}">Mystery Squish</a></li><li><a href="{{h.medida}}">Para tu fiesta</a></li></ul></div>
+        <div><h4>Ayuda</h4><ul><li><a href="#">Entregas en Lima</a></li><li><a href="#">Squishy tips</a></li><li><a href="#">Cambios y devoluciones</a></li></ul></div>
+        <div><h4>Contacto</h4><ul><li><a href="https://www.instagram.com/the.squish.box/">@the.squish.box</a></li><li><a href="#">WhatsApp [+51 9XX XXX XXX]</a></li><li>Lima, Perú</li></ul></div>
+      </div>
+      <div class="legal"><span>© 2026 The Squish Box · RUC [N.º de RUC]</span><span>Libro de reclamaciones · Términos · Privacidad</span></div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"palette":{"editor":"enum","options":["original","neon","halloween","pastel","menta"],"default":"original"},"mobile":{"editor":null,"tsType":"boolean"},"$preview":{"width":1440,"height":2200}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { coll: 'all' }; }
+  renderVals() {
+    const m = !!this.props.mobile;
+    const h = m
+      ? { home: 'M-Home.dc.html', cat: 'M-Catalogo.dc.html', pdp: 'M-Producto.dc.html', agotado: 'M-Agotado.dc.html', medida: 'M-Medida.dc.html', drawer: 'M-CarritoDrawer.dc.html' }
+      : { home: 'S-Home.dc.html', cat: 'S-Catalogo.dc.html', pdp: 'S-Producto.dc.html', agotado: 'D-Agotado.dc.html', medida: 'S-Medida.dc.html', drawer: 'D-CarritoDrawer.dc.html' };
+    const all = [
+      { name: 'The Squish Box', coll: 'Cajas', img: '../img/squish-box-contenido.jpg', priceLabel: 'S/ 69', badge: 'Favorito', badgeClass: 'soft' },
+      { name: 'Mystery Squish', coll: 'Mystery', img: '../img/mystery-nina.jpg', priceLabel: 'S/ 29', badge: 'Últimas 3', badgeClass: 'low' },
+      { name: 'Mini Box Sorpresa de Cumple', coll: 'Cumpleaños', img: '../img/mini-caja-sorpresa.jpg', priceLabel: 'Desde S/ 18', badge: '', badgeClass: '' },
+      { name: 'Mini Box Recompra', coll: 'Recompra', img: '../img/mini-caja-recompra.jpg', priceLabel: 'Desde S/ 39', badge: 'Nuevo', badgeClass: 'new' },
+      { name: 'Mini Box Halloween', coll: 'Temporada', img: '../img/halloween-minibox.jpg', priceLabel: 'Agotado · pídela para tu fiesta', badge: 'Agotado', badgeClass: 'sold', sold: true }
+    ].map(p => ({ ...p, href: p.sold ? h.agotado : h.pdp, dim: p.sold ? 'dim' : '' }));
+    const names = [['all', 'Todas'], ['Cajas', 'Cajas'], ['Mystery', 'Mystery'], ['Cumpleaños', 'Cumpleaños'], ['Recompra', 'Recompra'], ['Temporada', 'Temporada']];
+    const sel = this.state.coll;
+    const collections = names.map(([k, label]) => ({ label, on: sel === k ? 'on' : '', count: k === 'all' ? all.length : all.filter(p => p.coll === k).length, pick: () => this.setState({ coll: k }) }));
+    const products = sel === 'all' ? all : all.filter(p => p.coll === sel);
+    return { palette: this.props.palette ?? 'original', h, collections, products, countLabel: products.length + (products.length === 1 ? ' producto' : ' productos') };
+  }
+}
+</script>
+</body>
+</html>

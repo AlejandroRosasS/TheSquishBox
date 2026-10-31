@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es-PE">
+<head>
+<meta charset="utf-8">
+<title>Ajustes · Panel · The Squish Box</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./bloom.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Nunito:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}
+.tabs{display:flex;gap:4px;border-bottom:1px solid #E2E3DD;overflow-x:auto}
+.tabs button{min-height:44px;padding:0 14px;border:0;background:none;font:inherit;font-weight:700;font-size:14px;color:#5C5F58;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.tabs button.on{color:#1D1F1C;border-bottom-color:#1F2A22}
+.rate{display:grid;grid-template-columns:minmax(0,1.3fr) 130px 130px 90px 52px;gap:12px;align-items:center;padding:8px 20px;border-bottom:1px solid #E2E3DD;min-height:60px}
+.rate.head{min-height:40px;background:#F5F5F2;font-size:12px;font-weight:700;color:#5C5F58;text-transform:uppercase;letter-spacing:.05em}
+.rate .a-prefix input{min-height:38px;font-size:14px}
+.rate.off{color:#8A8D85}
+.rate.off .a-prefix{opacity:.5}
+.m-lbl{display:none}
+@container page (max-width:760px){
+ .rate{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 52px;padding:12px 16px;gap:8px}
+ .rate.head{display:none}
+ .rate .nm{grid-column:1 / 3}
+ .rate .swc{grid-column:3;grid-row:1}
+ .rate .mg{grid-column:1 / -1}
+ .m-lbl{display:block;font-size:11px;color:#5C5F58;font-weight:700;margin-bottom:2px}
+}
+</style>
+</helmet>
+<div class="adm" style="width: 100%;">
+  <div class="a-shell">
+    <div class="a-top">
+      <div class="row g3"><span class="logo sm" role="img" aria-label="Logo The Squish Box"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></span><b>Ajustes</b></div>
+      <span></span>
+    </div>
+    <aside class="a-side" aria-label="Menú del panel">
+      <div class="a-brand"><span class="logo sm" role="img" aria-label="Logo The Squish Box"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></span><div><b>The Squish Box</b><p class="a-cap">Panel de la tienda</p></div></div>
+      <nav class="a-nav stack g1" aria-label="Secciones">
+        <a href="A-Inicio.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-6h4v6"/></svg>Inicio</a>
+        <a href="A-Pedidos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 14h5l1 2h4l1-2h5"/></svg>Pedidos<span class="cnt">3</span></a>
+        <a href="A-Solicitudes.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16v9H4zM3 7h18v4H3zM12 7v13"/><path d="M12 7C10 3 6.5 4 7.5 7M12 7c2-4 5.5-3 4.5 0"/></svg>Pedidos para fiestas<span class="cnt">2</span></a>
+        <a href="A-Productos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>Productos</a>
+        <a href="A-Importar.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".8"/></svg>Instagram<span class="cnt">4</span></a>
+        <a href="A-Ventas.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Ventas y márgenes</a>
+        <p class="a-navlabel">Configuración</p>
+        <a href="A-Notificaciones.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>Notificaciones</a>
+        <a class="on" href="A-Ajustes.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>Ajustes</a>
+        <a href="A-Apariencia.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.5-.8 1.5-1.5 0-1-.8-1.3-.8-2.2 0-.8.7-1.3 1.5-1.3H17a4 4 0 0 0 4-4C21 6.5 17 3 12 3z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7" r="1"/></svg>Apariencia</a>
+      </nav>
+    </aside>
+
+    <main class="a-main">
+      <div class="a-head"><div class="stack g1"><h1 class="a-h1">Ajustes</h1><p class="a-sub">Datos de la tienda, conexiones y tarifas de delivery.</p></div></div>
+      <div class="only-m stack g2">
+        <a class="a-btn block" href="A-Notificaciones.dc.html" style="justify-content: space-between;">Notificaciones<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></a>
+        <a class="a-btn block" href="A-Apariencia.dc.html" style="justify-content: space-between;">Apariencia de la tienda<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></a>
+        <a class="a-btn block" href="A-Ventas.dc.html" style="justify-content: space-between;">Ventas y márgenes<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></a>
+        <a class="a-btn block" href="A-Solicitudes.dc.html" style="justify-content: space-between;">Pedidos para fiestas<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></a>
+      </div>
+
+      <section class="a-card flush">
+        <div class="a-card-h" style="flex-wrap: wrap;">
+          <div class="stack g1"><h2 class="a-h2">Tarifas de delivery</h2><p class="a-cap">Lo que cobras (estimado) y lo que te cuesta en promedio. Los distritos inactivos muestran "A coordinar".</p></div>
+          <button class="a-btn sm" type="button">+ Agregar distrito</button>
+        </div>
+        <div class="rate head"><span>Distrito</span><span>Cobro al cliente</span><span>Costo promedio</span><span>Margen</span><span>Activo</span></div>
+        <sc-for list="{{rates}}" as="r" hint-placeholder-count="8">
+          <div class="rate {{r.off}}">
+            <b class="nm">{{r.name}}</b>
+            <div><span class="m-lbl">Cobro</span><div class="a-prefix"><span>S/</span><input value="{{r.fee}}" inputmode="decimal" aria-label="Cobro {{r.name}}"></div></div>
+            <div><span class="m-lbl">Costo</span><div class="a-prefix"><span>S/</span><input value="{{r.cost}}" inputmode="decimal" aria-label="Costo {{r.name}}"></div></div>
+            <span class="mg a-cap" style="font-weight: 700; color: {{r.mColor}};">{{r.margin}}</span>
+            <button class="a-switch swc {{r.on}}" type="button" onClick="{{r.toggle}}" aria-label="Activo {{r.name}}"></button>
+          </div>
+        </sc-for>
+        <div style="padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; background: #FAFAF8;">
+          <div class="row between"><div><b>Recojo en punto de entrega acordado</b><p class="a-cap">Gratis para el cliente · se coordina por WhatsApp</p></div><button class="a-switch on" type="button" aria-label="Recojo activo"></button></div>
+          <div class="a-grid2">
+            <div class="a-field"><label for="t-dir">Punto de entrega</label><input id="t-dir" class="a-input" placeholder="[Punto de entrega, ej.: estación o centro comercial]"></div>
+            <div class="a-field"><label for="t-hor">Horario de recojo</label><input id="t-hor" class="a-input" placeholder="Ej.: lun a sáb, 10 a. m. – 6 p. m."></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="a-cols even">
+        <section class="a-card">
+          <h2 class="a-h2">Datos de la tienda</h2>
+          <div class="a-field"><label for="s-n">Nombre</label><input id="s-n" class="a-input" value="The Squish Box"></div>
+          <div class="a-grid2">
+            <div class="a-field"><label for="s-ruc">RUC</label><input id="s-ruc" class="a-input" placeholder="[RUC]"></div>
+            <div class="a-field"><label for="s-wa">WhatsApp de atención</label><input id="s-wa" class="a-input" placeholder="+51 9XX XXX XXX"></div>
+          </div>
+          <div class="a-field"><label for="s-mail">Correo</label><input id="s-mail" class="a-input" placeholder="hola@[dominio por definir]"></div>
+        </section>
+        <section class="a-card">
+          <h2 class="a-h2">Conexiones</h2>
+          <div class="row g3"><span class="ch-ico" style="width: 40px; height: 40px; border-radius: 10px; background: #F5F5F2; display: flex; align-items: center; justify-content: center;"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".8"/></svg></span><div class="grow"><b>Instagram</b><p class="a-cap">@the.squish.box · sincroniza cada 15 min</p></div><span class="st pagado">Conectado</span></div>
+          <div class="row g3"><span class="ch-ico" style="width: 40px; height: 40px; border-radius: 10px; background: #F5F5F2; display: flex; align-items: center; justify-content: center;"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/></svg></span><div class="grow"><b>Pasarela de pago</b><p class="a-cap">Culqi · Tarjeta y Yape</p></div><span class="st prep">Modo prueba</span></div>
+          <div class="a-banner warn" style="font-size: 13px; padding: 10px 12px;"><span>La pasarela está en modo prueba: no se cobra dinero real. Activa el modo producción antes de lanzar.</span></div>
+          <div class="row g3"><span class="ch-ico" style="width: 40px; height: 40px; border-radius: 10px; background: #F5F5F2; display: flex; align-items: center; justify-content: center;"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/></svg></span><div class="grow"><b>Líneas</b><p class="a-cap">5 líneas (Cajas, Mystery, Cumpleaños, Recompra, Temporada) · se ordenan desde Productos</p></div><a class="a-btn sm" href="A-Productos.dc.html">Ordenar</a></div>
+        </section>
+      </div>
+    </main>
+
+    <nav class="a-tabbar" aria-label="Secciones">
+      <a href="A-Inicio.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-6h4v6"/></svg>Inicio</a>
+      <a href="A-Pedidos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 14h5l1 2h4l1-2h5"/></svg>Pedidos<span class="cnt">3</span></a>
+      <a href="A-Productos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>Productos</a>
+      <a href="A-Importar.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".8"/></svg>Instagram<span class="cnt">4</span></a>
+      <a class="on" href="A-Ajustes.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>Más</a>
+    </nav>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1700}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { rows: [
+      ['Miraflores', 12, 10, true], ['San Isidro', 12, 10, true], ['Barranco', 12, 11, true], ['Surquillo', 10, 8, true],
+      ['Santiago de Surco', 15, 12, true], ['San Borja', 14, 12, true], ['La Molina', 20, 19, true], ['Jesús María', 12, 11, true],
+      ['Lince', 10, 8, true], ['Chorrillos', 18, 17, true], ['Callao', 25, 24, false], ['Ate', 22, 21, false]
+    ] };
+  }
+  renderVals() {
+    const rates = this.state.rows.map((r, i) => {
+      const m = r[1] - r[2];
+      return { name: r[0], fee: r[1], cost: r[2], on: r[3] ? 'on' : '', off: r[3] ? '' : 'off',
+        margin: r[3] ? (m >= 0 ? '+ S/ ' + m : '− S/ ' + Math.abs(m)) : 'A coordinar', mColor: m >= 0 ? '#1F6B35' : '#B42318',
+        toggle: () => { const rows = this.state.rows.map((x, j) => j === i ? [x[0], x[1], x[2], !x[3]] : x); this.setState({ rows }); } };
+    });
+    return { rates };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="es-PE">
+<head>
+<meta charset="utf-8">
+<title>Checkout · The Squish Box</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./bloom.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Nunito:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="bloom" data-palette="{{palette}}" style="width: 100%;">
+  <header class="header">
+    <div class="wrap row between" style="min-height: 76px;">
+      <a class="textlink" href="{{h.cart}}"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6"></path></svg><span class="only-d">Volver al carrito</span></a>
+      <a class="logo sm" href="{{h.home}}" aria-label="The Squish Box, inicio"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></a>
+      <span class="secure"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg><span class="only-d">Pago seguro</span></span>
+    </div>
+  </header>
+
+  <div class="sum-bar only-m flex">
+    <span class="row g2"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg>Resumen · 2 productos</span>
+    <b>{{totalLabel}}</b>
+  </div>
+
+  <div class="wrap" style="padding-block: 40px 96px;">
+    <h1 class="h2" style="margin-bottom: 28px;">Finalizar <em>compra</em></h1>
+    <div class="co-layout">
+      <div class="stack g6">
+
+        <section class="co-block" aria-labelledby="co-1">
+          <div class="co-step"><span class="n">1</span><h2 id="co-1" class="h4">Contacto</h2></div>
+          <div class="field"><label for="c-nom">Nombre y apellido</label><input id="c-nom" class="input" value="Daniela Torres"></div>
+          <div class="grid2">
+            <div class="field"><label for="c-cel">Celular</label><input id="c-cel" class="input" type="tel" value="987 654 321"><span class="hint">Te escribiremos por WhatsApp a este número.</span></div>
+            <div class="field"><label for="c-mail">Correo</label><input id="c-mail" class="input" type="email" value="daniela@correo.com"></div>
+          </div>
+        </section>
+
+        <section class="co-block" aria-labelledby="co-2">
+          <div class="co-step"><span class="n">2</span><h2 id="co-2" class="h4">Entrega</h2></div>
+          <div class="grid2" role="radiogroup" aria-label="Tipo de entrega">
+            <button class="opt {{delivOn}}" type="button" role="radio" aria-checked="{{delivChecked}}" onClick="{{pickDelivery}}"><span class="radio"></span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"></path><circle cx="7" cy="18" r="1.8"></circle><circle cx="17" cy="18" r="1.8"></circle></svg><span class="grow"><b>Delivery</b><br><span class="small muted">Lima Metropolitana</span></span></button>
+            <button class="opt {{pickupOn}}" type="button" role="radio" aria-checked="{{pickupChecked}}" onClick="{{pickPickup}}"><span class="radio"></span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"></path><circle cx="12" cy="9" r="2.5"></circle></svg><span class="grow"><b>Recojo</b><br><span class="small muted">En punto de entrega acordado · Gratis</span></span></button>
+          </div>
+
+          <sc-if value="{{isDelivery}}" hint-placeholder-val="{{true}}">
+            <div class="stack g4">
+              <div class="field"><label for="c-dir">Dirección</label><input id="c-dir" class="input" value="Av. José Pardo 610, dpto. 302"></div>
+              <div class="grid2">
+                <div class="field"><label for="c-dist">Distrito de Lima</label>
+                  <select id="c-dist" class="select" onChange="{{pickDistrict}}">
+                    <sc-for list="{{districts}}" as="d" hint-placeholder-count="8"><option value="{{d.name}}" selected="{{d.sel}}">{{d.name}}</option></sc-for>
+                  </select>
+                </div>
+                <div class="field"><label for="c-ref">Referencia</label><input id="c-ref" class="input" value="Frente al parque, edificio blanco"></div>
+              </div>
+              <div class="est" aria-live="polite">
+                <span class="row g3"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true" style="color: var(--primary);"><path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"></path><circle cx="12" cy="9" r="2.5"></circle></svg><span><b>Delivery estimado a {{district}}</b><br><span class="small muted">El costo final se confirma al coordinar tu entrega.</span></span></span>
+                <b style="white-space: nowrap;">{{estLabel}}</b>
+              </div>
+              <div class="grid2">
+                <div class="field"><label for="c-fecha">Fecha preferida</label><input id="c-fecha" class="input" value="Sáb 14 nov 2026"><span class="hint">Coordinamos la hora por WhatsApp.</span></div>
+                <div class="field"><label for="c-recibe">¿Quién recibe? <span class="muted" style="font-weight: 500;">(opcional)</span></label><input id="c-recibe" class="input" placeholder="Si no eres tú"></div>
+              </div>
+              <div class="field"><label for="c-ded">¿Es un regalo? Déjale un mensaje <span class="muted" style="font-weight: 500;">(opcional)</span></label><textarea id="c-ded" class="textarea" style="min-height: 88px;">¡Feliz cumple, Mati! Que te toque el ajolote. Te quiere, la tía Dani.</textarea><span class="hint">Lo escribimos a mano en una tarjeta. 120 caracteres máx.</span></div>
+            </div>
+          </sc-if>
+          <sc-if value="{{isPickup}}" hint-placeholder-val="{{false}}">
+            <div class="stack g4">
+              <div class="note"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"></path><circle cx="12" cy="9" r="2.5"></circle></svg><span><b>Recojo en punto acordado</b><br>Te escribimos por WhatsApp para coordinar el lugar y la hora en Lima.</span></div>
+              <div class="field"><label for="c-fecha2">Fecha preferida de recojo</label><input id="c-fecha2" class="input" value="Sáb 14 nov 2026"></div>
+            </div>
+          </sc-if>
+        </section>
+
+        <section class="co-block" aria-labelledby="co-3">
+          <div class="co-step"><span class="n">3</span><h2 id="co-3" class="h4">Comprobante</h2></div>
+          <div class="grid2" role="radiogroup" aria-label="Tipo de comprobante">
+            <button class="opt {{boletaOn}}" type="button" role="radio" aria-checked="{{boletaChecked}}" onClick="{{pickBoleta}}"><span class="radio"></span><span class="grow"><b>Boleta</b><br><span class="small muted">Con DNI</span></span></button>
+            <button class="opt {{facturaOn}}" type="button" role="radio" aria-checked="{{facturaChecked}}" onClick="{{pickFactura}}"><span class="radio"></span><span class="grow"><b>Factura</b><br><span class="small muted">Con RUC</span></span></button>
+          </div>
+          <sc-if value="{{isBoleta}}" hint-placeholder-val="{{true}}">
+            <div class="field"><label for="c-dni">DNI</label><input id="c-dni" class="input" inputmode="numeric" placeholder="8 dígitos"></div>
+          </sc-if>
+          <sc-if value="{{isFactura}}" hint-placeholder-val="{{false}}">
+            <div class="grid2">
+              <div class="field"><label for="c-ruc">RUC</label><input id="c-ruc" class="input" inputmode="numeric" placeholder="11 dígitos"></div>
+              <div class="field"><label for="c-rs">Razón social</label><input id="c-rs" class="input" placeholder="Se completa con el RUC"></div>
+            </div>
+          </sc-if>
+        </section>
+
+        <section class="co-block" aria-labelledby="co-4" style="border-bottom: 0;">
+          <div class="co-step"><span class="n">4</span><h2 id="co-4" class="h4">Pago</h2></div>
+          <sc-if value="{{payError}}" hint-placeholder-val="{{false}}">
+            <div class="alert" role="alert">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20L12 3z"></path><path d="M12 10v4M12 17h.01"></path></svg>
+              <div class="stack g1"><b>No pudimos procesar tu pago con Yape</b><span class="small">El código de aprobación venció o es incorrecto. <b>No se realizó ningún cobro.</b> Genera un código nuevo en tu app Yape e inténtalo otra vez, o paga con tarjeta.</span></div>
+            </div>
+          </sc-if>
+          <div class="stack g3" role="radiogroup" aria-label="Medio de pago">
+            <button class="opt {{yapeOn}}" type="button" role="radio" aria-checked="{{yapeChecked}}" onClick="{{pickYape}}"><span class="radio"></span><span class="grow"><b>Yape</b><br><span class="small muted">Con tu celular y código de aprobación</span></span><span class="pay-logo">YAPE</span></button>
+            <sc-if value="{{isYape}}" hint-placeholder-val="{{true}}">
+              <div class="grid2" style="padding: 4px 0 8px;">
+                <div class="field"><label for="c-ycel">Celular de Yape</label><input id="c-ycel" class="input" type="tel" value="987 654 321"></div>
+                <div class="field {{codeErr}}"><label for="c-ycod">Código de aprobación</label><input id="c-ycod" class="input" inputmode="numeric" placeholder="6 dígitos"><span class="hint">Yape › Menú › Código de aprobación</span></div>
+              </div>
+            </sc-if>
+            <button class="opt {{cardOn}}" type="button" role="radio" aria-checked="{{cardChecked}}" onClick="{{pickCard}}"><span class="radio"></span><span class="grow"><b>Tarjeta de crédito o débito</b><br><span class="small muted">Visa, Mastercard, Amex, Diners</span></span><span class="pay-logos"><span class="pay-logo">VISA</span><span class="pay-logo">MC</span></span></button>
+            <sc-if value="{{isCard}}" hint-placeholder-val="{{false}}">
+              <div class="stack g3" style="padding: 4px 0 8px;">
+                <div class="field"><label for="c-cn">Número de tarjeta</label><input id="c-cn" class="input" inputmode="numeric" placeholder="0000 0000 0000 0000"></div>
+                <div class="grid2" style="grid-template-columns: repeat(2, minmax(0, 1fr));"><div class="field"><label for="c-ce">Vence</label><input id="c-ce" class="input" placeholder="MM/AA"></div><div class="field"><label for="c-cv">CVV</label><input id="c-cv" class="input" placeholder="123"></div></div>
+              </div>
+            </sc-if>
+          </div>
+          <p class="small muted">Procesado por Culqi. No guardamos los datos de tu tarjeta.</p>
+        </section>
+      </div>
+
+      <aside class="summary" aria-label="Resumen del pedido" style="position: sticky; top: 24px;">
+        <p class="h4">Tu pedido</p>
+        <div class="row g3"><div class="ph r45" style="width: 56px; flex: none; border-radius: 10px;"><img src="../img/mini-caja-sorpresa.jpg" alt="Mini Box Sorpresa de Cumple"></div><div class="grow"><b style="font-size: 14px;">Mini Box Sorpresa de Cumple</b><p class="small muted">3 squishies · x1</p></div><span class="small strong">S/ 24.00</span></div>
+        <div class="row g3"><div class="ph r45" style="width: 56px; flex: none; border-radius: 10px;"><img src="../img/mini-caja-recompra.jpg" alt="Mini Box Recompra"></div><div class="grow"><b style="font-size: 14px;">Mini Box Recompra</b><p class="small muted">4 squishies · x1</p></div><span class="small strong">S/ 39.00</span></div>
+        <hr class="hr">
+        <div class="sum-row"><span class="muted">Subtotal</span><span>S/ 63.00</span></div>
+        <div class="sum-row"><span class="muted">{{estRowLabel}}</span><span>{{estLabel}}</span></div>
+        <div class="sum-row total"><span>Total</span><span>{{totalLabel}}</span></div>
+        <p class="small muted">{{estNote}}</p>
+        <a class="btn block" href="{{h.ok}}">{{payCta}}</a>
+        <p class="secure"><svg class="ico xs" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>Pago encriptado · Libro de reclamaciones</p>
+      </aside>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"palette":{"editor":"enum","options":["original","neon","halloween","pastel","menta"],"default":"original"},"error":{"editor":"boolean","default":false},"mobile":{"editor":null,"tsType":"boolean"},"$preview":{"width":1440,"height":2000}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { ship: 'delivery', district: 'Miraflores', doc: 'boleta', pay: 'yape' }; }
+  renderVals() {
+    const m = !!this.props.mobile;
+    const h = m
+      ? { home: 'M-Home.dc.html', cart: 'M-Carrito.dc.html', ok: 'M-Confirmacion.dc.html' }
+      : { home: 'S-Home.dc.html', cart: 'S-Carrito.dc.html', ok: 'S-Confirmacion.dc.html' };
+    // Tarifas por distrito: se configuran en Admin › Ajustes (valores de ejemplo)
+    const rates = { 'Barranco': 15, 'Jesús María': 15, 'La Molina': 25, 'Lince': 12, 'Magdalena del Mar': 15, 'Miraflores': 15, 'Pueblo Libre': 18, 'San Borja': 18, 'San Isidro': 15, 'San Miguel': 18, 'Santiago de Surco': 20, 'Surquillo': 12, 'Chorrillos': 25, 'Callao': null, 'Ate': null, 'Los Olivos': null };
+    const s = this.state;
+    const districts = Object.keys(rates).map(name => ({ name, sel: s.district === name }));
+    const isDelivery = s.ship === 'delivery';
+    const rate = isDelivery ? rates[s.district] : 0;
+    const coordinate = isDelivery && rate == null;
+    const subtotal = 63;
+    const total = subtotal + (rate || 0);
+    const fmt = n => 'S/ ' + n.toFixed(2);
+    const payLabel = { yape: 'Pagar con Yape', plin: 'Pagar con Plin', card: 'Pagar con tarjeta' }[s.pay];
+    return {
+      palette: this.props.palette ?? 'original', h, districts, district: s.district,
+      isDelivery, isPickup: !isDelivery,
+      delivOn: isDelivery ? 'on' : '', pickupOn: isDelivery ? '' : 'on', delivChecked: String(isDelivery), pickupChecked: String(!isDelivery),
+      pickDelivery: () => this.setState({ ship: 'delivery' }), pickPickup: () => this.setState({ ship: 'pickup' }),
+      pickDistrict: (e) => this.setState({ district: e && e.target ? e.target.value : 'Miraflores' }),
+      estLabel: !isDelivery ? 'Gratis' : coordinate ? 'A coordinar' : fmt(rate),
+      estRowLabel: isDelivery ? 'Delivery estimado' : 'Recojo acordado',
+      estNote: coordinate ? 'No tenemos tarifa para ' + s.district + ': te escribiremos para coordinar el costo antes de enviar.' : isDelivery ? 'El costo final del delivery se confirma al coordinar tu entrega.' : 'Te escribimos por WhatsApp para coordinar dónde y cuándo recoges.',
+      totalLabel: fmt(total) + (coordinate ? ' + delivery' : ''),
+      isBoleta: s.doc === 'boleta', isFactura: s.doc === 'factura',
+      boletaOn: s.doc === 'boleta' ? 'on' : '', facturaOn: s.doc === 'factura' ? 'on' : '', boletaChecked: String(s.doc === 'boleta'), facturaChecked: String(s.doc === 'factura'),
+      pickBoleta: () => this.setState({ doc: 'boleta' }), pickFactura: () => this.setState({ doc: 'factura' }),
+      isYape: s.pay === 'yape', isCard: s.pay === 'card',
+      yapeOn: s.pay === 'yape' ? 'on' : '', plinOn: s.pay === 'plin' ? 'on' : '', cardOn: s.pay === 'card' ? 'on' : '',
+      yapeChecked: String(s.pay === 'yape'), plinChecked: String(s.pay === 'plin'), cardChecked: String(s.pay === 'card'),
+      pickYape: () => this.setState({ pay: 'yape' }), pickPlin: () => this.setState({ pay: 'plin' }), pickCard: () => this.setState({ pay: 'card' }),
+      payError: !!this.props.error, codeErr: this.props.error ? 'error' : '',
+      payCta: (this.props.error ? 'Reintentar · ' : payLabel + ' · ') + fmt(total)
+    };
+  }
+}
+</script>
+</body>
+</html>

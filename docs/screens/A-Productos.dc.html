@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es-PE">
+<head>
+<meta charset="utf-8">
+<title>Productos · Panel The Squish Box</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./bloom.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Nunito:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}
+.coll-h{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#F5F5F2;border-bottom:1px solid #E2E3DD}
+.ord{width:28px;height:28px;border-radius:8px;background:#1F2A22;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}
+.handle{color:#8A8D85;cursor:grab;display:flex;align-items:center;justify-content:center;width:28px;height:44px;flex:none}
+.mv{display:flex;gap:4px}
+.mv button{width:36px;height:36px;border-radius:8px;border:1px solid #CFD1C9;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#1D1F1C}
+.mv button[disabled]{opacity:.35;cursor:not-allowed}
+.igsrc{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#5C5F58}
+</style>
+</helmet>
+<div class="adm" style="width: 100%;">
+  <div class="a-shell">
+    <div class="a-top">
+      <div class="row g3"><span class="logo sm" role="img" aria-label="Logo The Squish Box"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></span><b>Productos</b></div>
+      <a class="a-btn primary sm" href="A-Importar.dc.html">+ Desde IG</a>
+    </div>
+    <aside class="a-side" aria-label="Menú del panel">
+      <div class="a-brand"><span class="logo sm" role="img" aria-label="Logo The Squish Box"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></span><div><b>The Squish Box</b><p class="a-cap">Panel de la tienda</p></div></div>
+      <nav class="a-nav stack g1" aria-label="Secciones">
+        <a href="A-Inicio.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-6h4v6"/></svg>Inicio</a>
+        <a href="A-Pedidos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 14h5l1 2h4l1-2h5"/></svg>Pedidos<span class="cnt">3</span></a>
+        <a href="A-Solicitudes.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>Pedidos para fiestas<span class="cnt">2</span></a>
+        <a class="on" href="A-Productos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>Productos</a>
+        <a href="A-Importar.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".8"/></svg>Instagram<span class="cnt">4</span></a>
+        <a href="A-Ventas.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Ventas y márgenes</a>
+        <p class="a-navlabel">Configuración</p>
+        <a href="A-Notificaciones.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>Notificaciones</a>
+        <a href="A-Ajustes.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>Ajustes</a>
+        <a href="A-Apariencia.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.5-.8 1.5-1.5 0-1-.8-1.3-.8-2.2 0-.8.7-1.3 1.5-1.3H17a4 4 0 0 0 4-4C21 6.5 17 3 12 3z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7" r="1"/></svg>Apariencia</a>
+      </nav>
+    </aside>
+
+    <main class="a-main">
+      <div class="a-head">
+        <div class="stack g1"><h1 class="a-h1">Productos</h1><p class="a-sub">Agrupados por línea. El orden de aquí es el orden de la tienda.</p></div>
+        <div class="row g2 wrap-row only-d"><button class="a-btn" type="button">+ Nueva línea</button><a class="a-btn primary" href="A-Importar.dc.html"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".8"/></svg>Convertir post en producto</a></div>
+      </div>
+      <div class="filters-bar">
+        <div class="a-search grow"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/></svg><input placeholder="Buscar producto" aria-label="Buscar producto"></div>
+        <button class="a-chip on" type="button">Todos</button><button class="a-chip" type="button">Publicados</button><button class="a-chip" type="button">Borradores <span class="n">1</span></button><button class="a-chip" type="button">Stock bajo / agotado <span class="n">3</span></button>
+      </div>
+
+      <sc-for list="{{colls}}" as="c" hint-placeholder-count="5">
+        <section class="a-card flush" aria-label="Línea {{c.name}}">
+          <div class="coll-h">
+            <span class="handle" aria-hidden="true"><svg class="ico sm" viewBox="0 0 24 24"><circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="18" r="1"/></svg></span>
+            <span class="ord">{{c.pos}}</span>
+            <div class="stack grow" style="gap: 0;"><b style="font-size: 15px;">{{c.name}}</b><span class="a-cap">{{c.meta}}</span></div>
+            <div class="mv"><button type="button" onClick="{{c.up}}" disabled="{{c.first}}" aria-label="Subir línea {{c.name}}"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></button><button type="button" onClick="{{c.down}}" disabled="{{c.last}}" aria-label="Bajar línea {{c.name}}"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div>
+          </div>
+          <div class="a-table">
+            <sc-for list="{{c.items}}" as="p" hint-placeholder-count="2">
+              <a class="a-tr" href="A-Editor.dc.html" style="grid-template-columns: 28px 48px minmax(0, 1.3fr) 190px minmax(0, 1fr) 110px;">
+                <span class="handle c-d" aria-hidden="true"><svg class="ico sm" viewBox="0 0 24 24"><circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="18" r="1"/></svg></span>
+                <span class="row g3" style="grid-column: span 2;"><span class="av"><img src="{{p.img}}" alt=""></span><span class="stack" style="gap: 1px;"><b>{{p.name}}</b><span class="igsrc"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true" style="width: 12px; height: 12px;"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/></svg>Sincronizado con IG</span><span class="c-m a-cap">{{p.price}} · {{p.inv}}</span></span></span>
+                <span class="c-d money">{{p.price}}</span>
+                <span class="c-d"><span class="st {{p.invCls}}">{{p.inv}}</span></span>
+                <span><span class="st {{p.stCls}}">{{p.st}}</span></span>
+              </a>
+            </sc-for>
+          </div>
+        </section>
+      </sc-for>
+    </main>
+
+    <nav class="a-tabbar" aria-label="Secciones">
+      <a href="A-Inicio.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-6h4v6"/></svg>Inicio</a>
+      <a href="A-Pedidos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 14h5l1 2h4l1-2h5"/></svg>Pedidos<span class="cnt">3</span></a>
+      <a class="on" href="A-Productos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>Productos</a>
+      <a href="A-Importar.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".8"/></svg>Instagram<span class="cnt">4</span></a>
+      <a href="A-Ajustes.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>Más</a>
+    </nav>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { order: ['cajas', 'mystery', 'cumple', 'recompra', 'temporada'] }; }
+  move(i, d) { const o = this.state.order.slice(); const j = i + d; if (j < 0 || j >= o.length) return; const t = o[i]; o[i] = o[j]; o[j] = t; this.setState({ order: o }); }
+  renderVals() {
+    const C = {
+      cajas: { name: 'Cajas', note: 'Todo el año', items: [
+        { name: 'The Squish Box', img: '../img/squish-box-contenido.jpg', price: 'S/ 69', inv: 'Stock 18', invCls: 'publicado', st: 'Publicado', stCls: 'publicado' } ] },
+      mystery: { name: 'Mystery', note: 'Todo el año', items: [
+        { name: 'Mystery Squish', img: '../img/mystery-nina.jpg', price: 'S/ 29', inv: 'Stock bajo · quedan 3', invCls: 'bajo', st: 'Publicado', stCls: 'publicado' } ] },
+      cumple: { name: 'Cumpleaños', note: 'Todo el año · también por cantidad para fiestas', items: [
+        { name: 'Mini Box Sorpresa de Cumple', img: '../img/mini-caja-sorpresa.jpg', price: '2 sq. S/ 18 · 3 sq. S/ 24', inv: 'Stock 30 · 4', invCls: 'bajo', st: 'Publicado', stCls: 'publicado' } ] },
+      recompra: { name: 'Recompra', note: 'Exclusiva para quienes tienen su cartilla', items: [
+        { name: 'Mini Box Recompra', img: '../img/mini-caja-recompra.jpg', price: '4 sq. S/ 39 · 5 sq. S/ 47', inv: 'Stock 12 · 9', invCls: 'borrador', st: 'Publicado', stCls: 'publicado' } ] },
+      temporada: { name: 'Temporada', note: 'Halloween 2026', items: [
+        { name: 'Mini Box Halloween', img: '../img/halloween-minibox.jpg', price: 'S/ 25', inv: 'Agotado', invCls: 'agotado', st: 'Publicado', stCls: 'publicado' },
+        { name: 'Producto sin título', img: '../img/caja-regalo.jpg', price: 'Sin precio', inv: 'Sin definir', invCls: 'borrador', st: 'Borrador', stCls: 'borrador' } ] }
+    };
+    const o = this.state.order;
+    const colls = o.map((k, i) => ({ ...C[k], pos: i + 1, meta: C[k].note + ' · ' + C[k].items.length + (C[k].items.length === 1 ? ' producto' : ' productos'), first: i === 0, last: i === o.length - 1, up: () => this.move(i, -1), down: () => this.move(i, 1) }));
+    return { colls };
+  }
+}
+</script>
+</body>
+</html>

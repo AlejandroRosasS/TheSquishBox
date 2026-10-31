@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="es-PE">
+<head>
+<meta charset="utf-8">
+<title>Apariencia · Panel · The Squish Box</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./bloom.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Nunito:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}
+.ap-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:20px;align-items:start}
+@container page (max-width:1100px){.ap-cols{grid-template-columns:minmax(0,1fr)}}
+.prev-frame{border:1px solid #E2E3DD;border-radius:14px;overflow:hidden;background:#EFEFEB;padding:18px;display:flex;justify-content:center}
+.prev{width:100%;border-radius:10px;overflow:hidden;box-shadow:0 10px 30px -12px rgba(0,0,0,.25)}
+.prev.m{width:300px}
+.prev .mini-h{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg)}
+.prev .mini-hero{position:relative;height:200px;overflow:hidden}
+.prev .mini-hero img{width:100%;height:100%;object-fit:cover}
+.prev .mini-hero div{position:absolute;inset:auto 0 0 0;padding:16px;color:#FFFFFF;background:linear-gradient(180deg,rgba(20,16,24,0),rgba(20,16,24,.65))}
+.prev .mini-body{padding:16px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;background:var(--bg)}
+.prev.m .mini-body{grid-template-columns:minmax(0,1fr)}
+.der-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.der-row div{display:flex;flex-direction:column;gap:4px;font-size:11px;color:#5C5F58;font-weight:600}
+.der-row i{height:28px;border-radius:6px;border:1px solid #E2E3DD;display:block}
+</style>
+</helmet>
+<div class="adm" style="width: 100%;">
+  <div class="a-shell">
+    <div class="a-top">
+      <a class="row g2" href="A-Ajustes.dc.html" style="text-decoration: none; min-height: 44px;"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg><b>Apariencia</b></a>
+      <span class="st {{stateCls}}">{{stateLabel}}</span>
+    </div>
+    <aside class="a-side" aria-label="Menú del panel">
+      <div class="a-brand"><span class="logo sm" role="img" aria-label="Logo The Squish Box"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></span><div><b>The Squish Box</b><p class="a-cap">Panel de la tienda</p></div></div>
+      <nav class="a-nav stack g1" aria-label="Secciones">
+        <a href="A-Inicio.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-6h4v6"/></svg>Inicio</a>
+        <a href="A-Pedidos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 14h5l1 2h4l1-2h5"/></svg>Pedidos<span class="cnt">3</span></a>
+        <a href="A-Solicitudes.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16v9H4zM3 7h18v4H3zM12 7v13"/><path d="M12 7C10 3 6.5 4 7.5 7M12 7c2-4 5.5-3 4.5 0"/></svg>Pedidos para fiestas<span class="cnt">2</span></a>
+        <a href="A-Productos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>Productos</a>
+        <a href="A-Importar.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".8"/></svg>Instagram<span class="cnt">4</span></a>
+        <a href="A-Ventas.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Ventas y márgenes</a>
+        <p class="a-navlabel">Configuración</p>
+        <a href="A-Notificaciones.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>Notificaciones</a>
+        <a href="A-Ajustes.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>Ajustes</a>
+        <a class="on" href="A-Apariencia.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.5-.8 1.5-1.5 0-1-.8-1.3-.8-2.2 0-.8.7-1.3 1.5-1.3H17a4 4 0 0 0 4-4C21 6.5 17 3 12 3z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7" r="1"/></svg>Apariencia</a>
+      </nav>
+    </aside>
+
+    <main class="a-main">
+      <div class="a-head">
+        <div class="stack g1"><div class="row g3"><h1 class="a-h1">Apariencia de la tienda</h1><span class="st {{stateCls}} only-d">{{stateLabel}}</span></div><p class="a-sub">Cambia los tonos sin ayuda técnica. El logo y este panel no cambian: siempre se ven igual.</p></div>
+        <button class="a-btn" type="button" onClick="{{restore}}">Restaurar paleta original</button>
+      </div>
+
+      <sc-if value="{{published}}" hint-placeholder-val="{{false}}">
+        <div class="a-banner ok"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7"/></svg><span class="grow"><b>Paleta "{{name}}" publicada.</b> La tienda ya se ve con estos tonos.</span><a class="a-btn sm" href="F2-Tienda.dc.html">Ver tienda actualizada</a></div>
+      </sc-if>
+
+      <section class="a-card">
+        <h2 class="a-h2">Paletas</h2>
+        <div class="pal-grid">
+          <sc-for list="{{presets}}" as="p" hint-placeholder-count="5">
+            <button class="pal-card {{p.on}}" type="button" onClick="{{p.pick}}" aria-pressed="{{p.pressed}}">
+              <span class="swatch-row"><i style="background: {{p.bg}};"></i><i style="background: {{p.primary}};"></i><i style="background: {{p.accent}};"></i><i style="background: {{p.text}};"></i></span>
+              <span class="row between"><b style="font-size: 13px;">{{p.name}}</b><sc-if value="{{p.isOrig}}" hint-placeholder-val="{{false}}"><span class="a-cap">Original</span></sc-if></span>
+            </button>
+          </sc-for>
+        </div>
+      </section>
+
+      <div class="ap-cols">
+        <div class="stack g5">
+          <section class="a-card">
+            <h2 class="a-h2">Personalizar</h2>
+            <p class="a-cap">Elige 3 colores. Los demás tonos se calculan solos.</p>
+            <div class="a-field"><label>Principal <span class="a-cap">(botones, enlaces, badges)</span></label><div class="color-in"><input type="color" value="{{v.primary}}" onChange="{{setPrimary}}" aria-label="Color principal"><input type="text" value="{{v.primary}}" onChange="{{setPrimary}}" aria-label="Código del color principal"></div></div>
+            <div class="a-field"><label>Acento <span class="a-cap">(detalles y subrayados)</span></label><div class="color-in"><input type="color" value="{{v.accent}}" onChange="{{setAccent}}" aria-label="Color de acento"><input type="text" value="{{v.accent}}" onChange="{{setAccent}}" aria-label="Código del color de acento"></div></div>
+            <div class="a-field"><label>Fondo</label><div class="color-in"><input type="color" value="{{v.bg}}" onChange="{{setBg}}" aria-label="Color de fondo"><input type="text" value="{{v.bg}}" onChange="{{setBg}}" aria-label="Código del color de fondo"></div></div>
+            <p class="a-label" style="margin-top: 4px;">Tonos derivados</p>
+            <div class="der-row">
+              <div><i style="background: {{v.surface}};"></i>Superficie</div>
+              <div><i style="background: {{v.hover}};"></i>Hover</div>
+              <div><i style="background: {{v.border}};"></i>Borde</div>
+              <div><i style="background: {{v.on}};"></i>Texto s/ principal</div>
+            </div>
+          </section>
+
+          <section class="a-card">
+            <div class="a-card-h"><h2 class="a-h2">Legibilidad</h2><span class="{{okAllCls}}">{{okAllLabel}}</span></div>
+            <div>
+              <sc-for list="{{checks}}" as="c" hint-placeholder-count="4">
+                <div class="contrast"><span>{{c.label}}</span><span class="row g2"><span class="a-cap money">{{c.ratio}}</span><span class="{{c.cls}}">{{c.verdict}}</span></span></div>
+              </sc-for>
+            </div>
+            <sc-if value="{{blocked}}" hint-placeholder-val="{{false}}">
+              <div class="a-banner err"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg><span>Esta combinación no se lee bien. Ajusta los colores marcados para poder publicar.</span></div>
+            </sc-if>
+          </section>
+        </div>
+
+        <section class="a-card">
+          <div class="a-card-h"><h2 class="a-h2">Vista previa</h2>
+            <div class="a-seg"><button class="{{mOn}}" type="button" onClick="{{setM}}">Móvil</button><button class="{{dOn}}" type="button" onClick="{{setD}}">Desktop</button></div>
+          </div>
+          <div class="prev-frame">
+            <div class="bloom prev {{prevCls}}" style="--bg: {{v.bg}}; --surface: {{v.surface}}; --primary: {{v.primary}}; --on-primary: {{v.on}}; --accent: {{v.accent}}; --text: {{v.text}}; --text-2: {{v.text2}}; --border: {{v.border}}; font-size: 13px;">
+              <div class="announce" style="font-size: 10px; padding: 6px;">Delivery en Lima · Coordinamos por WhatsApp</div>
+              <div class="mini-h"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg><span class="logo sm" style="width: 40px; height: 40px;" role="img" aria-label="Logo The Squish Box"><span class="l-the" style="font-size: 6px;">THE</span><span class="l-squish" style="font-size: 9px;">SQUISH</span><span class="l-box" style="font-size: 9.5px;">BOX</span></span><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></div>
+              <div class="mini-hero"><img src="../img/squish-box-contenido.jpg" alt=""><div><span style="font-family: var(--serif); font-weight: 700; font-size: 26px; line-height: 1;">Abre, descubre y <em>colecciona</em></span></div></div>
+              <div class="mini-body">
+                <div class="pcard"><div class="ph r45" style="max-height: 220px;"><img src="../img/mystery-nina.jpg" alt=""><span class="tag badge low" style="height: 22px; font-size: 10px;"><span class="dot"></span>Últimas 3</span></div><div class="meta"><p class="coll">Mystery</p><p class="name" style="font-size: 18px;">Mystery Squish</p><p class="from"><b>S/ 29</b></p></div></div>
+                <div class="stack g3" style="justify-content: center;">
+                  <div class="seg"><span class="seg-opt on" style="min-height: 52px;"><span class="t" style="font-size: 12px;">2 squishies</span><span class="p" style="font-size: 11px;">S/ 18</span></span><span class="seg-opt" style="min-height: 52px;"><span class="t" style="font-size: 12px;">3 squishies</span><span class="p" style="font-size: 11px;">S/ 24</span></span></div>
+                  <span class="btn" style="min-height: 44px; font-size: 13px;">Agregar al carrito</span>
+                  <span class="btn ghost" style="min-height: 44px; font-size: 13px;">Pedir para mi fiesta</span>
+                  <div class="note" style="font-size: 11px; padding: 10px;">Entrega coordinada por WhatsApp.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="a-sticky">
+        <span class="a-cap">{{footNote}}</span>
+        <div class="row g2"><button class="a-btn" type="button" onClick="{{saveDraft}}">Guardar borrador</button><button class="a-btn primary" type="button" onClick="{{publish}}" disabled="{{blocked}}">Publicar</button></div>
+      </div>
+    </main>
+
+    <nav class="a-tabbar" aria-label="Secciones">
+      <a href="A-Inicio.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-6h4v6"/></svg>Inicio</a>
+      <a href="A-Pedidos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 14h5l1 2h4l1-2h5"/></svg>Pedidos<span class="cnt">3</span></a>
+      <a href="A-Productos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>Productos</a>
+      <a href="A-Importar.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".8"/></svg>Instagram<span class="cnt">4</span></a>
+      <a class="on" href="A-Ajustes.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>Más</a>
+    </nav>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1600}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.P = {
+      original: { name: 'Original', bg: '#FFF6FA', surface: '#FFFFFF', primary: '#D1106B', accent: '#2BB5B8', text: '#1A1320', text2: '#6A5A6E', border: '#F1DCE7' },
+      neon: { name: 'Neón', bg: '#121016', surface: '#1D1A23', primary: '#FF4FA3', accent: '#C6F432', text: '#FFFFFF', text2: '#C9BFD0', border: '#322C3B' },
+      halloween: { name: 'Halloween', bg: '#FFF7EE', surface: '#FFFFFF', primary: '#6A2BD1', accent: '#FF8A1F', text: '#1C1424', text2: '#68596F', border: '#F0E0CF' },
+      pastel: { name: 'Pastel', bg: '#F6F2FF', surface: '#FFFFFF', primary: '#7A3FE0', accent: '#FF7EB9', text: '#1D1729', text2: '#655C75', border: '#E4DCF5' },
+      menta: { name: 'Menta', bg: '#EFFAF8', surface: '#FFFFFF', primary: '#0B6E72', accent: '#FF4FA3', text: '#13211F', text2: '#56666A', border: '#D3ECE8' }
+    };
+    this.state = { key: 'original', custom: null, mode: 'm', status: 'live' };
+  }
+  hex2rgb(h) { const x = (h || '#000000').replace('#', ''); const v = x.length === 3 ? x.split('').map(c => c + c).join('') : x.padEnd(6, '0').slice(0, 6); return [0, 2, 4].map(i => parseInt(v.slice(i, i + 2), 16) || 0); }
+  rgb2hex(r) { return '#' + r.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('').toUpperCase(); }
+  mix(a, b, t) { const A = this.hex2rgb(a), B = this.hex2rgb(b); return this.rgb2hex(A.map((v, i) => v * (1 - t) + B[i] * t)); }
+  lum(h) { return this.hex2rgb(h).map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }).reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0); }
+  cr(a, b) { const x = this.lum(a), y = this.lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+  renderVals() {
+    const s = this.state;
+    const preset = this.P[s.key];
+    const base = { ...preset, ...(s.custom || {}) };
+    const light = '#FFFFFF', dark = '#121016';
+    const on = this.cr(light, base.primary) >= this.cr(dark, base.primary) ? light : dark;
+    const darkBg = this.lum(base.bg) < 0.2;
+    const bgChanged = s.custom && s.custom.bg;
+    const v = { ...base, on,
+      surface: bgChanged ? this.mix(base.bg, darkBg ? '#3A3542' : '#FFFFFF', darkBg ? 0.25 : 0.6) : preset.surface,
+      hover: this.mix(base.primary, '#000000', 0.18),
+      border: bgChanged ? this.mix(base.bg, base.text, 0.12) : preset.border };
+    const defs = [
+      ['Texto sobre botón principal', on, v.primary, 4.5],
+      ['Texto sobre el fondo', v.text, v.bg, 4.5],
+      ['Texto secundario sobre el fondo', v.text2, v.bg, 4.5],
+      ['Enlaces y botones claros (principal sobre fondo)', v.primary, v.bg, 4.5]
+    ];
+    const checks = defs.map(([label, a, b, min]) => { const r = this.cr(a, b); const ok = r >= min; return { label, ratio: r.toFixed(1) + ':1', verdict: ok ? 'Se lee bien' : 'No se lee', cls: ok ? 'ok-pill' : 'bad-pill', ok }; });
+    const blocked = checks.some(c => !c.ok);
+    const setC = (k) => (e) => { const val = e && e.target ? e.target.value : ''; if (!/^#?[0-9a-fA-F]{6}$/.test(val)) return; const hex = (val[0] === '#' ? val : '#' + val).toUpperCase(); this.setState({ custom: { ...(this.state.custom || {}), [k]: hex }, status: 'draft' }); };
+    const presets = Object.keys(this.P).map(k => ({ ...this.P[k], isOrig: k === 'original', on: s.key === k && !s.custom ? 'on' : '', pressed: String(s.key === k && !s.custom), pick: () => this.setState({ key: k, custom: null, status: 'draft' }) }));
+    const stateMap = { live: ['Publicada', 'publicado'], draft: ['Cambios sin publicar', 'pend'], saved: ['Borrador guardado', 'borrador'], published: ['Publicada', 'publicado'] };
+    return {
+      presets, v, checks, blocked, name: s.custom ? 'Personalizada' : this.P[s.key].name,
+      okAllLabel: blocked ? 'Revisa los colores' : 'Todo legible', okAllCls: blocked ? 'bad-pill' : 'ok-pill',
+      setPrimary: setC('primary'), setAccent: setC('accent'), setBg: setC('bg'),
+      mOn: s.mode === 'm' ? 'on' : '', dOn: s.mode === 'd' ? 'on' : '', prevCls: s.mode === 'm' ? 'm' : '',
+      setM: () => this.setState({ mode: 'm' }), setD: () => this.setState({ mode: 'd' }),
+      restore: () => this.setState({ key: 'original', custom: null, status: 'draft' }),
+      saveDraft: () => this.setState({ status: 'saved' }),
+      publish: () => { if (!blocked) this.setState({ status: 'published' }); },
+      published: s.status === 'published',
+      stateLabel: stateMap[s.status][0], stateCls: stateMap[s.status][1],
+      footNote: blocked ? 'No se puede publicar: hay colores que no se leen bien.' : s.status === 'published' ? 'La tienda ya muestra esta paleta.' : 'Los clientes verán los cambios solo al publicar.'
+    };
+  }
+}
+</script>
+</body>
+</html>

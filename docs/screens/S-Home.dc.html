@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es-PE">
+<head>
+<meta charset="utf-8">
+<title>Home · The Squish Box</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./bloom.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Nunito:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="bloom" data-palette="{{palette}}" style="width: 100%;">
+  <div class="announce">Delivery en Lima · Coordinamos tu entrega por WhatsApp</div>
+  <header class="header">
+    <div class="wrap header-in">
+      <nav class="nav only-d" aria-label="Principal"><a href="{{h.cat}}">Cajas sorpresa</a><a href="{{h.cat}}">Mystery Squish</a><a href="{{h.medida}}">Para tu fiesta</a></nav>
+      <button class="icon-btn only-m" type="button" aria-label="Abrir menú"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"></path></svg></button>
+      <a class="logo logo-slot" href="{{h.home}}" aria-label="The Squish Box, inicio"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></a>
+      <div class="h-actions">
+        <a class="icon-btn only-d" href="{{h.cat}}" aria-label="Buscar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="m20 20-4.5-4.5"></path></svg></a>
+        <a class="icon-btn" href="{{h.drawer}}" aria-label="Carrito, 1 producto"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg><span class="cart-count">1</span></a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <img src="../img/patitas.jpg" alt="Patitas squishy de muchos colores sobre una mesa clara">
+    <div class="wrap hero-in stack g4">
+      <p class="eyebrow">Mystery squishies para coleccionar</p>
+      <h1 class="display" style="max-width: 760px;">Abre, descubre, <em>colecciona</em> e intercambia</h1>
+      <p class="lead" style="color: #FFFFFF; opacity: .92; max-width: 560px;">Cada squishy viene escondido en su sobre. Más de 80 modelos para descubrir. ¿Cuál te tocará?</p>
+      <div class="row g3 wrap-row" style="margin-top: 8px;">
+        <a class="btn light" href="{{h.pdp}}">Quiero mi Squish Box</a>
+        <a class="btn" href="{{h.medida}}" style="background: transparent; border-color: #FFFFFF; color: #FFFFFF;">Pedir para mi fiesta</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap stack g7">
+      <nav class="hls" aria-label="Accesos rápidos">
+        <a class="hl" href="#modelos"><span class="c"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"></path></svg></span>Unboxings</a>
+        <a class="hl" href="#tips"><span class="c"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"></path></svg></span>Squishy tips</a>
+        <a class="hl" href="{{h.cat}}"><span class="c"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"></path></svg></span>Mystery Squish</a>
+        <a class="hl" href="{{h.pdp}}"><span class="c"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"></path></svg></span>The Squish Box</a>
+      </nav>
+      <div class="tiles">
+        <a class="tile" href="{{h.cat}}"><img src="../img/caja-regalo.jpg" alt="The Squish Box envuelta con lazo morado"><div class="tile-in"><span class="eyebrow" style="color: #FFFFFF;">4 squishies + cartilla</span><span class="h3">Cajas sorpresa</span></div></a>
+        <a class="tile" href="{{h.medida}}"><img src="../img/mama-pensando.jpg" alt="Mamá pensando qué regalar en un cumpleaños"><div class="tile-in"><span class="eyebrow" style="color: #FFFFFF;">Mini Box para invitados</span><span class="h3">Para cumpleaños</span></div></a>
+        <a class="tile" href="{{h.cat}}"><img src="../img/ajolote.jpg" alt="Ajolote squishy rosado con glitter en una mano"><div class="tile-in"><span class="eyebrow" style="color: #FFFFFF;">1 squishy grande</span><span class="h3">Mystery Squish</span></div></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 32px;">
+    <div class="wrap stack g6">
+      <div class="row between" style="align-items: flex-end; gap: 16px;">
+        <div class="stack g2"><p class="eyebrow">Destacados</p><h2 class="h2">Elige tu <em>sorpresa</em></h2></div>
+        <a class="textlink only-d" href="{{h.cat}}">Ver todo <svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></a>
+      </div>
+      <div class="pgrid">
+        <sc-for list="{{featured}}" as="p" hint-placeholder-count="4">
+          <a class="pcard" href="{{p.href}}">
+            <div class="ph r45 {{p.dim}}"><img src="{{p.img}}" alt="{{p.name}}">
+              <sc-if value="{{p.badge}}" hint-placeholder-val="{{false}}"><span class="tag badge {{p.badgeClass}}">{{p.badge}}</span></sc-if>
+            </div>
+            <div class="meta"><p class="coll">{{p.coll}}</p><p class="name">{{p.name}}</p><p class="from">{{p.priceLabel}}</p></div>
+          </a>
+        </sc-for>
+      </div>
+      <a class="btn ghost block only-m" href="{{h.cat}}">Ver todas las sorpresas</a>
+    </div>
+  </section>
+
+  <section class="section primary-band">
+    <div class="wrap split">
+      <div class="ph r45" style="border-radius: 24px;"><img src="../img/mini-caja-sorpresa.jpg" alt="Niña recibiendo una Mini Box Sorpresa de Cumple"></div>
+      <div class="stack g5">
+        <p class="eyebrow">Para tu fiesta</p>
+        <h2 class="h1">Mini Box sorpresa para <em>todos tus invitados</em></h2>
+        <p class="lead">Mini cajas con 2 o 3 squishies sorpresa y espacio para agregar dulces. Un recuerdo divertido y diferente. Cuéntanos de tu cumple y te enviamos la cotización.</p>
+        <div class="stack g3" style="margin: 8px 0 12px;">
+          <div class="row g3"><span class="badge" style="background: transparent; color: var(--on-primary); border-color: color-mix(in oklab, var(--on-primary) 40%, transparent);">1</span><span>Dinos la fecha y cuántos invitados son</span></div>
+          <div class="row g3"><span class="badge" style="background: transparent; color: var(--on-primary); border-color: color-mix(in oklab, var(--on-primary) 40%, transparent);">2</span><span>Te escribimos por WhatsApp con el precio</span></div>
+          <div class="row g3"><span class="badge" style="background: transparent; color: var(--on-primary); border-color: color-mix(in oklab, var(--on-primary) 40%, transparent);">3</span><span>Pagas con un link y coordinamos la entrega</span></div>
+        </div>
+        <div><a class="btn light" href="{{h.medida}}">Cotizar mi fiesta</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap split">
+      <div class="stack g5">
+        <p class="eyebrow">¿Qué hay dentro?</p>
+        <h2 class="h1">4 squishies sorpresa y <em>tu cartilla</em> para coleccionarlos</h2>
+        <hr class="rule">
+        <p class="lead">Cada The Squish Box trae 1 squishy grande y 3 pequeños, cada uno escondido en su propio sobre. Ábrelos, búscalos en tu cartilla y sigue completando tu colección.</p>
+        <p class="body muted">Más de 80 modelos diferentes para descubrir. ¿Te salió uno repetido? Intercámbialo con tus amigos. Y para seguir llenando la cartilla, está la Mini Box Recompra.</p>
+      </div>
+      <div class="ph r45" style="border-radius: 24px;"><img src="../img/squish-box-contenido.jpg" alt="The Squish Box abierta con sus sobres, squishies y cartilla"></div>
+    </div>
+  </section>
+
+  <section class="section surface" id="modelos">
+    <div class="wrap stack g6">
+      <div class="row between wrap-row" style="align-items: flex-end; gap: 16px;">
+        <div class="stack g2"><p class="eyebrow">Modelos que te pueden tocar</p><h2 class="h2">Demasiado <em>squishy</em> para tener solo uno</h2></div>
+        <a class="textlink" href="https://www.instagram.com/the.squish.box/"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17" cy="7" r=".8"></circle></svg>@the.squish.box</a>
+      </div>
+      <div class="ugc">
+        <div class="ph r11"><img src="../img/ajolote.jpg" alt="Ajolote glitter"></div>
+        <div class="ph r11"><img src="../img/jelly-cubes.jpg" alt="Jelly Cubes con frutas"></div>
+        <div class="ph r11"><img src="../img/mini-butter.jpg" alt="Mini Butter"></div>
+        <div class="ph r11"><img src="../img/gatitos.jpg" alt="Gatitos squishy"></div>
+        <div class="ph r11"><img src="../img/mandarina.jpg" alt="Mandarina squishy"></div>
+        <div class="ph r11"><img src="../img/nina-fresa.jpg" alt="Niña con una fresa squishy"></div>
+      </div>
+      <p class="small muted">Comparte tu unboxing y etiquétanos en Instagram para aparecer aquí.</p>
+    </div>
+  </section>
+
+  <section class="section" id="tips">
+    <div class="wrap stack g6">
+      <div class="stack g2"><p class="eyebrow">Squishy tips</p><h2 class="h2">Un squishy feliz es un squishy <em>bien cuidado</em></h2></div>
+      <div class="tips">
+        <div class="tip"><span class="num">01</span><h3 class="h4">Báñalo suave</h3><p class="small muted">Lávalo con agua tibia y un poquito de jabón suave.</p></div>
+        <div class="tip"><span class="num">02</span><h3 class="h4">Sécalo bien</h3><p class="small muted">Déjalo secar al aire antes de volver a guardarlo.</p></div>
+        <div class="tip"><span class="num">03</span><h3 class="h4">¿Pegajoso?</h3><p class="small muted">Un poquito de maicena o talco y vuelve a estar suavecito.</p></div>
+        <div class="tip"><span class="num">04</span><h3 class="h4">Guárdalo bien</h3><p class="small muted">Lejos del sol y de objetos filosos.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="cols">
+        <div class="stack g4">
+          <span class="logo lg" role="img" aria-label="Logo The Squish Box"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></span>
+          <p class="small" style="max-width: 300px; opacity: .85;">Mystery squishies para coleccionar. Abre, descubre, colecciona e intercambia. Lima, Perú.</p>
+          <div class="social">
+            <a href="https://www.instagram.com/the.squish.box/" aria-label="Instagram"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17" cy="7" r=".8"></circle></svg></a>
+            <a href="#" aria-label="WhatsApp"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1.3-3.8A8 8 0 1 1 8 19z"></path><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8a4 4 0 0 1-2-2l.8-1-1-2z"></path></svg></a>
+          </div>
+        </div>
+        <div><h4>Tienda</h4><ul><li><a href="{{h.cat}}">Cajas sorpresa</a></li><li><a href="{{h.cat}}">Mystery Squish</a></li><li><a href="{{h.medida}}">Para tu fiesta</a></li></ul></div>
+        <div><h4>Ayuda</h4><ul><li><a href="#">Entregas en Lima</a></li><li><a href="#tips">Squishy tips</a></li><li><a href="#">Cambios y devoluciones</a></li></ul></div>
+        <div><h4>Contacto</h4><ul><li><a href="https://www.instagram.com/the.squish.box/">@the.squish.box</a></li><li><a href="#">WhatsApp [+51 9XX XXX XXX]</a></li><li>Lima, Perú</li></ul></div>
+      </div>
+      <div class="legal"><span>© 2026 The Squish Box · RUC [N.º de RUC]</span><span>Libro de reclamaciones · Términos · Privacidad</span></div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"palette":{"editor":"enum","options":["original","neon","halloween","pastel","menta"],"default":"original"},"mobile":{"editor":null,"tsType":"boolean"},"$preview":{"width":1440,"height":4200}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const m = !!this.props.mobile;
+    const h = m
+      ? { home: 'M-Home.dc.html', cat: 'M-Catalogo.dc.html', pdp: 'M-Producto.dc.html', agotado: 'M-Agotado.dc.html', medida: 'M-Medida.dc.html', drawer: 'M-CarritoDrawer.dc.html' }
+      : { home: 'S-Home.dc.html', cat: 'S-Catalogo.dc.html', pdp: 'S-Producto.dc.html', agotado: 'D-Agotado.dc.html', medida: 'S-Medida.dc.html', drawer: 'D-CarritoDrawer.dc.html' };
+    const featured = [
+      { name: 'The Squish Box', coll: 'Cajas', img: '../img/squish-box-contenido.jpg', priceLabel: 'S/ 69', badge: 'Favorito', badgeClass: 'soft', href: h.pdp, dim: '' },
+      { name: 'Mystery Squish', coll: 'Mystery', img: '../img/mystery-nina.jpg', priceLabel: 'S/ 29', badge: 'Últimas 3', badgeClass: 'low', href: h.pdp, dim: '' },
+      { name: 'Mini Box Recompra', coll: 'Recompra', img: '../img/mini-caja-recompra.jpg', priceLabel: 'Desde S/ 39', badge: 'Nuevo', badgeClass: 'new', href: h.pdp, dim: '' },
+      { name: 'Mini Box Halloween', coll: 'Temporada', img: '../img/halloween-minibox.jpg', priceLabel: 'Agotado · pídela para tu fiesta', badge: 'Agotado', badgeClass: 'sold', href: h.agotado, dim: 'dim' }
+    ];
+    return { palette: this.props.palette ?? 'original', h, featured };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="es-PE">
+<head>
+<meta charset="utf-8">
+<title>Design system · The Squish Box</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./bloom.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Nunito:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.ds-sec{display:grid;grid-template-columns:260px minmax(0,1fr);gap:48px;padding:56px 0;border-top:1px solid var(--border)}
+.ds-sec > header{display:flex;flex-direction:column;gap:8px}
+.tok{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--surface)}
+.tok .chip-c{height:96px;border-bottom:1px solid var(--border)}
+.tok .meta{padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.tok code{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--text-2)}
+.der{display:flex;align-items:center;gap:10px;font-size:13px}
+.der i{width:28px;height:28px;border-radius:8px;border:1px solid var(--border);flex:none}
+.spc{display:flex;align-items:flex-end;gap:18px}
+.spc div{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:var(--text-2)}
+.spc b{display:block;background:var(--primary-soft);border:1px solid var(--primary-line)}
+</style>
+</helmet>
+<div class="bloom" data-palette="{{palette}}" style="width: 1440px; min-height: 3300px; padding: 72px 96px 96px;">
+  <div class="row between" style="align-items: flex-start; gap: 40px; padding-bottom: 48px;">
+    <div class="stack g4">
+      <p class="eyebrow">The Squish Box · Design system v1</p>
+      <h1 class="display">Abre, descubre y <em>colecciona</em></h1>
+      <p class="lead" style="max-width: 720px;">Todo color de la tienda sale de 8 tokens. El equipo los cambia desde Admin › Apariencia y el resto de tonos se deriva solo. El logo y los doodles usan colores fijos de marca. Esta hoja usa la paleta <b style="color: var(--text);">{{paletteName}}</b>.</p>
+    </div>
+    <div class="logo lg" role="img" aria-label="Logo The Squish Box"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></div>
+  </div>
+
+  <section class="ds-sec">
+    <header><p class="eyebrow">01</p><h2 class="h3">Color · tokens base</h2><p class="small muted">Los 8 que se editan. Ningún componente usa un color fuera de estos (salvo el logo y los doodles de marca).</p></header>
+    <div class="stack g6">
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px;">
+        <sc-for list="{{tokens}}" as="t" hint-placeholder-count="8">
+          <div class="tok">
+            <div class="chip-c" style="background: {{t.css}};"></div>
+            <div class="meta"><b style="font-size: 14px;">{{t.label}}</b><code>{{t.var}} · {{t.hex}}</code><span class="small muted">{{t.use}}</span></div>
+          </div>
+        </sc-for>
+      </div>
+      <div class="stack g3">
+        <p class="eyebrow">Derivados automáticos (no editables)</p>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px;">
+          <div class="der"><i style="background: var(--primary-hover);"></i><span><b>primary-hover</b><br><span class="muted">principal −18% luz</span></span></div>
+          <div class="der"><i style="background: var(--primary-soft);"></i><span><b>primary-soft</b><br><span class="muted">selección, notas</span></span></div>
+          <div class="der"><i style="background: var(--surface-2);"></i><span><b>surface-2</b><br><span class="muted">fondo de fotos</span></span></div>
+          <div class="der"><i style="background: var(--accent-soft);"></i><span><b>accent-soft</b><br><span class="muted">stock bajo</span></span></div>
+          <div class="der"><i style="background: var(--border-strong);"></i><span><b>border-strong</b><br><span class="muted">bordes de inputs</span></span></div>
+          <div class="der"><i style="background: var(--primary-line);"></i><span><b>primary-line</b><br><span class="muted">bordes suaves</span></span></div>
+          <div class="der"><i style="background: var(--overlay);"></i><span><b>overlay</b><br><span class="muted">fondo de drawer</span></span></div>
+          <div class="der"><i style="background: var(--focus);"></i><span><b>focus</b><br><span class="muted">anillo de foco</span></span></div>
+        </div>
+      </div>
+      <div class="stack g3">
+        <p class="eyebrow">Colores fijos de marca (logo, destacados y doodles)</p>
+        <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px;">
+          <div class="der"><i style="background: var(--brand-ink);"></i><span><b>ink</b><br><span class="muted">#141018 · caja</span></span></div>
+          <div class="der"><i style="background: var(--brand-pink);"></i><span><b>pink</b><br><span class="muted">#E5177B · SQUISH</span></span></div>
+          <div class="der"><i style="background: var(--brand-teal);"></i><span><b>teal</b><br><span class="muted">#36B8B5 · BOX</span></span></div>
+          <div class="der"><i style="background: var(--brand-lime);"></i><span><b>lime</b><br><span class="muted">#C6F432</span></span></div>
+          <div class="der"><i style="background: var(--brand-purple);"></i><span><b>purple</b><br><span class="muted">#7B3FE4</span></span></div>
+          <div class="der"><i style="background: var(--brand-yellow);"></i><span><b>yellow</b><br><span class="muted">#FFD23F</span></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-sec">
+    <header><p class="eyebrow">02</p><h2 class="h3">Tipografía</h2><p class="small muted">Fredoka para títulos y botones (redondeada, como el logo). Nunito para textos e interfaz. El énfasis va en color, como las palabras de colores de los posts.</p></header>
+    <div class="stack g5">
+      <div class="row between" style="align-items: baseline; border-bottom: 1px solid var(--border); padding-bottom: 18px;"><p class="display">¿Cuál te <em>tocará</em>?</p><code class="small muted">Display · 72/46</code></div>
+      <div class="row between" style="align-items: baseline; border-bottom: 1px solid var(--border); padding-bottom: 14px;"><p class="h1">Pequeñas sorpresas, <em>grandes emociones</em></p><code class="small muted">H1 · 50/36</code></div>
+      <div class="row between" style="align-items: baseline; border-bottom: 1px solid var(--border); padding-bottom: 14px;"><p class="h2">Mini Box <em>para tu fiesta</em></p><code class="small muted">H2 · 38/30</code></div>
+      <div class="row between" style="align-items: baseline; border-bottom: 1px solid var(--border); padding-bottom: 14px;"><p class="h3">Mini Box Sorpresa de Cumple</p><code class="small muted">H3 · 27/24</code></div>
+      <div class="row between" style="align-items: baseline; border-bottom: 1px solid var(--border); padding-bottom: 14px;"><p class="eyebrow">Línea Cumpleaños</p><code class="small muted">Eyebrow · 12 · 800 · +14%</code></div>
+      <div class="row between" style="align-items: baseline; border-bottom: 1px solid var(--border); padding-bottom: 14px;"><p class="lead" style="max-width: 720px;">Más de 80 modelos para coleccionar. Si te sale uno repetido, intercámbialo con tus amigos.</p><code class="small muted">Lead · 18/16</code></div>
+      <div class="row between" style="align-items: baseline; border-bottom: 1px solid var(--border); padding-bottom: 14px;"><p class="body" style="max-width: 720px;">Trae 4 squishies sorpresa (1 grande + 3 pequeños), cada uno en su sobre, y tu cartilla para coleccionarlos.</p><code class="small muted">Body · 15</code></div>
+      <div class="row between" style="align-items: baseline;"><p class="price">S/ 69.00</p><code class="small muted">Precio · 16 · 600</code></div>
+    </div>
+  </section>
+
+  <section class="ds-sec">
+    <header><p class="eyebrow">03</p><h2 class="h3">Botones y enlaces</h2><p class="small muted">Alto mínimo 52 px (44 px en pequeño). Forma de píldora, texto en Fredoka.</p></header>
+    <div class="stack g5">
+      <div class="row g4 wrap-row">
+        <button class="btn" type="button">Agregar al carrito</button>
+        <button class="btn ghost" type="button">Pedir para mi fiesta</button>
+        <button class="btn disabled" type="button" disabled="">Agotado</button>
+        <button class="btn sm" type="button">Pequeño</button>
+        <a class="textlink" href="#">Ver la línea <svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></a>
+        <a class="link" href="#">Ver en Instagram</a>
+      </div>
+      <div class="primary-band row g4" style="padding: 28px; border-radius: 16px;">
+        <button class="btn light" type="button">Cotizar mi fiesta</button>
+        <span class="small">Botón claro sobre color principal</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-sec">
+    <header><p class="eyebrow">04</p><h2 class="h3">Formularios</h2><p class="small muted">Inputs de 50 px, etiqueta siempre visible, foco con anillo del color principal.</p></header>
+    <div class="stack g6">
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px;">
+        <div class="field"><label for="ds-n">Nombre</label><input id="ds-n" class="input" placeholder="Tu nombre y apellido"></div>
+        <div class="field"><label for="ds-d">Distrito</label><select id="ds-d" class="select"><option>Miraflores</option></select></div>
+        <div class="field error"><label for="ds-c">Celular (WhatsApp)</label><input id="ds-c" class="input" value="98765"><span class="err-msg"><svg class="ico xs" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16h.01"></path></svg>Ingresa 9 dígitos</span></div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px;">
+        <div class="stack g3">
+          <span class="label">Selector de variante</span>
+          <div class="seg">
+            <button class="seg-opt on" type="button"><span class="t">2 squishies</span><span class="p">S/ 18</span></button>
+            <button class="seg-opt off" type="button"><span class="t">3 squishies</span><span class="p">Agotado</span></button>
+          </div>
+          <span class="label" style="margin-top: 12px;">Opción (radio)</span>
+          <button class="opt on" type="button"><span class="radio"></span><span class="grow"><b>Delivery</b><br><span class="small muted">Lima Metropolitana</span></span></button>
+          <button class="opt" type="button"><span class="radio"></span><span class="grow"><b>Recojo en punto acordado</b><br><span class="small muted">Lo coordinamos por WhatsApp</span></span></button>
+        </div>
+        <div class="stack g4">
+          <span class="label">Foto de la temática</span>
+          <div class="drop"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"></path><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"></path></svg><span class="small"><b style="color: var(--text);">Sube hasta 3 fotos</b> de la temática o colores de tu fiesta</span></div>
+          <div class="row g6 wrap-row">
+            <div class="row g3"><span class="check on"></span><span class="small">Checkbox</span></div>
+            <div class="row g3"><button class="toggle on" type="button" aria-label="Activado"></button><span class="small">Toggle</span></div>
+            <div class="qty"><button type="button" aria-label="Quitar uno"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path></svg></button><span>1</span><button type="button" aria-label="Agregar uno"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button></div>
+          </div>
+          <div class="note"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"></path><circle cx="7" cy="18" r="1.8"></circle><circle cx="17" cy="18" r="1.8"></circle></svg><span>Nota informativa: la entrega se coordina por WhatsApp.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-sec">
+    <header><p class="eyebrow">05</p><h2 class="h3">Badges y cards de producto</h2><p class="small muted">"Agotado" usa texto sobre fondo invertido; stock bajo usa el acento suave. Precios referenciales salvo la Mini Box Halloween.</p></header>
+    <div class="stack g6">
+      <div class="row g3 wrap-row">
+        <span class="badge sold">Agotado</span>
+        <span class="badge low"><span class="dot"></span>Últimas 3</span>
+        <span class="badge new">Nuevo</span>
+        <span class="badge soft">Favorito</span>
+        <span class="badge">Para fiestas</span>
+      </div>
+      <div class="pgrid">
+        <a class="pcard" href="#"><div class="ph r45"><img src="../img/squish-box-contenido.jpg" alt="The Squish Box con sobres, squishies y cartilla"><span class="tag badge soft">Favorito</span></div><div class="meta"><p class="coll">Cajas</p><p class="name">The Squish Box</p><p class="from"><b>S/ 69</b></p></div></a>
+        <a class="pcard" href="#"><div class="ph r45"><img src="../img/mystery-nina.jpg" alt="Mystery Squish"><span class="tag badge low"><span class="dot"></span>Últimas 3</span></div><div class="meta"><p class="coll">Mystery</p><p class="name">Mystery Squish</p><p class="from"><b>S/ 29</b></p></div></a>
+        <a class="pcard" href="#"><div class="ph r45 dim"><img src="../img/halloween-minibox.jpg" alt="Mini Box Halloween"><span class="tag badge sold">Agotado</span></div><div class="meta"><p class="coll">Temporada</p><p class="name">Mini Box Halloween</p><p class="from muted">Agotado · pídela para tu fiesta</p></div></a>
+        <a class="pcard" href="#"><div class="ph r45"><img src="../img/mini-caja-recompra.jpg" alt="Mini Box Recompra"><span class="tag badge new">Nuevo</span></div><div class="meta"><p class="coll">Recompra</p><p class="name">Mini Box Recompra</p><p class="from">Desde <b>S/ 39</b></p></div></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-sec">
+    <header><p class="eyebrow">06</p><h2 class="h3">Espaciado y radios</h2><p class="small muted">Escala de 4 px. Radios generosos y suaves, como un squishy; botones en píldora.</p></header>
+    <div class="row g8 wrap-row" style="gap: 64px;">
+      <div class="spc">
+        <div><b style="width: 4px; height: 4px;"></b>4</div><div><b style="width: 8px; height: 8px;"></b>8</div><div><b style="width: 12px; height: 12px;"></b>12</div><div><b style="width: 16px; height: 16px;"></b>16</div><div><b style="width: 24px; height: 24px;"></b>24</div><div><b style="width: 32px; height: 32px;"></b>32</div><div><b style="width: 48px; height: 48px;"></b>48</div><div><b style="width: 64px; height: 64px;"></b>64</div><div><b style="width: 96px; height: 96px;"></b>96</div>
+      </div>
+      <div class="spc">
+        <div><b style="width: 64px; height: 64px; border-radius: 8px;"></b>8 · sm</div><div><b style="width: 64px; height: 64px; border-radius: 18px;"></b>18 · md</div><div><b style="width: 64px; height: 64px; border-radius: 26px;"></b>26 · lg</div><div><b style="width: 96px; height: 44px; border-radius: 999px;"></b>píldora</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ds-sec">
+    <header><p class="eyebrow">07</p><h2 class="h3">Admin · neutro fijo</h2><p class="small muted">El panel no cambia con la apariencia de la tienda, así siempre es legible. Es el mismo para todas las marcas.</p></header>
+    <div class="adm" style="background: transparent; padding: 0;">
+      <div class="row g3 wrap-row">
+        <span class="st nuevo">Nuevo</span><span class="st prep">En preparación</span><span class="st listo">Listo</span><span class="st entregado">Entregado</span><span class="st cancelado">Cancelado</span>
+        <span class="st pend">Diferencia pendiente</span><span class="st pagado">Pagado</span><span class="st devuelto">Devuelto</span><span class="st bajo">Stock bajo</span><span class="st agotado">Agotado</span><span class="st borrador">Borrador</span>
+      </div>
+      <div class="row g3 wrap-row" style="margin-top: 20px;">
+        <button class="a-btn primary" type="button">Guardar</button><button class="a-btn" type="button">Secundario</button><button class="a-btn wa" type="button">Escribir por WhatsApp</button><button class="a-switch on" type="button" aria-label="Activo"></button><button class="a-switch" type="button" aria-label="Inactivo"></button>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"palette":{"editor":"enum","options":["original","neon","halloween","pastel","menta"],"default":"original"},"$preview":{"width":1440,"height":3300}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const P = {
+      original: { name: 'Original (fucsia)', bg: '#FFF6FA', surface: '#FFFFFF', primary: '#D1106B', on: '#FFFFFF', accent: '#2BB5B8', text: '#1A1320', text2: '#6A5A6E', border: '#F1DCE7' },
+      neon: { name: 'Neón', bg: '#121016', surface: '#1D1A23', primary: '#FF4FA3', on: '#121016', accent: '#C6F432', text: '#FFFFFF', text2: '#C9BFD0', border: '#322C3B' },
+      halloween: { name: 'Halloween', bg: '#FFF7EE', surface: '#FFFFFF', primary: '#6A2BD1', on: '#FFFFFF', accent: '#FF8A1F', text: '#1C1424', text2: '#68596F', border: '#F0E0CF' },
+      pastel: { name: 'Pastel', bg: '#F6F2FF', surface: '#FFFFFF', primary: '#7A3FE0', on: '#FFFFFF', accent: '#FF7EB9', text: '#1D1729', text2: '#655C75', border: '#E4DCF5' },
+      menta: { name: 'Menta', bg: '#EFFAF8', surface: '#FFFFFF', primary: '#0B6E72', on: '#FFFFFF', accent: '#FF4FA3', text: '#13211F', text2: '#56666A', border: '#D3ECE8' }
+    };
+    const key = this.props.palette ?? 'original';
+    const p = P[key] || P.original;
+    const tokens = [
+      { label: 'Fondo', var: '--bg', hex: p.bg, css: 'var(--bg)', use: 'Fondo general de la tienda' },
+      { label: 'Superficie', var: '--surface', hex: p.surface, css: 'var(--surface)', use: 'Cards, inputs, drawer' },
+      { label: 'Principal', var: '--primary', hex: p.primary, css: 'var(--primary)', use: 'Botones, énfasis, bandas' },
+      { label: 'Texto sobre principal', var: '--on-primary', hex: p.on, css: 'var(--on-primary)', use: 'Texto en botones y bandas' },
+      { label: 'Acento', var: '--accent', hex: p.accent, css: 'var(--accent)', use: 'Filetes y detalles (no texto)' },
+      { label: 'Texto', var: '--text', hex: p.text, css: 'var(--text)', use: 'Títulos y cuerpo' },
+      { label: 'Texto secundario', var: '--text-2', hex: p.text2, css: 'var(--text-2)', use: 'Ayudas, metadatos' },
+      { label: 'Borde', var: '--border', hex: p.border, css: 'var(--border)', use: 'Divisores y contornos' }
+    ];
+    return { palette: key, paletteName: p.name, tokens };
+  }
+}
+</script>
+</body>
+</html>

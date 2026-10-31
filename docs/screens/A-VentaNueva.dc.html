@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="es-PE">
+<head>
+<meta charset="utf-8">
+<title>Registrar venta · Panel · The Squish Box</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./bloom.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Nunito:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}
+.chg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.chb{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:12px;border:1px solid #CFD1C9;border-radius:12px;background:#fff;font:inherit;text-align:left;cursor:pointer;color:#1D1F1C;min-height:64px}
+.chb.on{border:2px solid #1F2A22;padding:11px;background:#F3F5F1}
+.ln{display:grid;grid-template-columns:44px minmax(0,1fr) 150px 120px 110px 36px;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid #E2E3DD}
+.qty2{display:inline-flex;align-items:center;border:1px solid #CFD1C9;border-radius:10px;overflow:hidden}
+.qty2 button{width:36px;height:40px;border:0;background:#F5F5F2;font-weight:800;cursor:pointer;color:#1D1F1C}
+.qty2 span{min-width:30px;text-align:center;font-weight:800}
+.sumrow{display:flex;justify-content:space-between;font-size:14px;padding:4px 0}
+.sumrow.big{font-size:17px;font-weight:800;border-top:1px solid #E2E3DD;padding-top:10px;margin-top:4px}
+@container page (max-width:760px){.chg{grid-template-columns:minmax(0,1fr)}.ln{grid-template-columns:44px minmax(0,1fr) 36px}.ln .wide{grid-column:2 / -1}}
+</style>
+</helmet>
+<div class="adm" style="width: 100%;">
+  <div class="a-shell">
+    <div class="a-top">
+      <a class="row g2" href="A-Ventas.dc.html" style="text-decoration: none; min-height: 44px;"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg><b>Registrar venta</b></a>
+      <span></span>
+    </div>
+    <aside class="a-side" aria-label="Menú del panel">
+      <div class="a-brand"><span class="logo sm" role="img" aria-label="Logo The Squish Box"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></span><div><b>The Squish Box</b><p class="a-cap">Panel de la tienda</p></div></div>
+      <nav class="a-nav stack g1" aria-label="Secciones">
+        <a href="A-Inicio.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-6h4v6"/></svg>Inicio</a>
+        <a href="A-Pedidos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 14h5l1 2h4l1-2h5"/></svg>Pedidos<span class="cnt">3</span></a>
+        <a href="A-Solicitudes.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16v9H4zM3 7h18v4H3zM12 7v13"/><path d="M12 7C10 3 6.5 4 7.5 7M12 7c2-4 5.5-3 4.5 0"/></svg>Pedidos para fiestas<span class="cnt">2</span></a>
+        <a href="A-Productos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>Productos</a>
+        <a href="A-Importar.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".8"/></svg>Instagram<span class="cnt">4</span></a>
+        <a class="on" href="A-Ventas.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Ventas y márgenes</a>
+        <p class="a-navlabel">Configuración</p>
+        <a href="A-Notificaciones.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>Notificaciones</a>
+        <a href="A-Ajustes.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>Ajustes</a>
+        <a href="A-Apariencia.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.5-.8 1.5-1.5 0-1-.8-1.3-.8-2.2 0-.8.7-1.3 1.5-1.3H17a4 4 0 0 0 4-4C21 6.5 17 3 12 3z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7" r="1"/></svg>Apariencia</a>
+      </nav>
+    </aside>
+
+    <main class="a-main">
+      <div class="a-head"><div class="stack g1"><a class="a-cap only-d" href="A-Ventas.dc.html" style="text-decoration: none;">← Ventas</a><h1 class="a-h1">Registrar venta</h1><p class="a-sub">Para ventas fuera de la web (DM, ferias, colegios). Las de la web se registran solas.</p></div></div>
+
+      <div class="a-cols">
+        <div class="stack g5">
+          <section class="a-card">
+            <h2 class="a-h2">Canal</h2>
+            <div class="chg" role="radiogroup" aria-label="Canal de venta">
+              <sc-for list="{{chans}}" as="c" hint-placeholder-count="3">
+                <button class="chb {{c.on}}" type="button" role="radio" aria-checked="{{c.checked}}" onClick="{{c.pick}}"><b>{{c.label}}</b><span class="a-cap">{{c.desc}}</span></button>
+              </sc-for>
+            </div>
+            <sc-if value="{{isFeria}}" hint-placeholder-val="{{false}}">
+              <div class="a-grid2">
+                <div class="a-field"><label for="v-feria">Feria</label><select id="v-feria" class="a-select"><option>Feria de Halloween · 24–26 oct</option><option>+ Nueva feria (nombre, fechas, costo de stand)</option></select></div>
+                <div class="a-field"><label for="v-dia">Día</label><select id="v-dia" class="a-select"><option>Sáb 25 oct</option><option>Vie 24 oct</option><option>Dom 26 oct</option></select></div>
+              </div>
+            </sc-if>
+            <div class="a-grid2">
+              <div class="a-field"><label for="v-fecha">Fecha</label><input id="v-fecha" class="a-input" value="Sáb 25 oct 2026"></div>
+              <div class="a-field"><label for="v-cli">Cliente <span class="a-cap">(opcional)</span></label><input id="v-cli" class="a-input" placeholder="Nombre o @usuario"></div>
+            </div>
+          </section>
+
+          <section class="a-card">
+            <div class="a-card-h"><h2 class="a-h2">Productos</h2><button class="a-btn sm" type="button" onClick="{{addLine}}">+ Agregar producto</button></div>
+            <sc-for list="{{lines}}" as="l" hint-placeholder-count="2">
+              <div class="ln">
+                <span class="av" style="width: 44px; height: 44px;"><img src="{{l.img}}" alt=""></span>
+                <div><b>{{l.name}}</b><p class="a-cap">{{l.coll}} · costo S/ {{l.unitCost}} c/u</p></div>
+                <select class="a-select wide" onChange="{{l.setV}}" aria-label="Variante"><sc-for list="{{l.opts}}" as="o" hint-placeholder-count="2"><option value="{{o.v}}" selected="{{o.sel}}">{{o.label}}</option></sc-for></select>
+                <div class="a-prefix wide"><span>S/</span><input value="{{l.price}}" onChange="{{l.setP}}" inputmode="decimal" aria-label="Precio cobrado"></div>
+                <div class="qty2 wide"><button type="button" onClick="{{l.dec}}" aria-label="Restar">−</button><span>{{l.qty}}</span><button type="button" onClick="{{l.inc}}" aria-label="Sumar">+</button></div>
+                <button class="a-btn sm ghost" type="button" onClick="{{l.remove}}" aria-label="Quitar" style="padding: 0; width: 36px;"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+              </div>
+            </sc-for>
+            <div class="row between"><div><b>Descontar del stock</b><p class="a-cap">Recomendado si vendiste cajas del inventario</p></div><button class="a-switch on" type="button" aria-label="Descontar del stock"></button></div>
+          </section>
+
+          <section class="a-card">
+            <div class="row between"><h2 class="a-h2">Delivery</h2><button class="a-switch {{delOn}}" type="button" onClick="{{toggleDel}}" aria-label="Incluye delivery"></button></div>
+            <sc-if value="{{hasDel}}" hint-placeholder-val="{{true}}">
+              <div class="a-grid2">
+                <div class="a-field"><label for="v-dc">Cobrado al cliente</label><div class="a-prefix"><span>S/</span><input id="v-dc" value="{{dIn}}" onChange="{{setDIn}}" inputmode="decimal"></div></div>
+                <div class="a-field"><label for="v-dk">Costo real</label><div class="a-prefix"><span>S/</span><input id="v-dk" value="{{dOut}}" onChange="{{setDOut}}" inputmode="decimal"></div></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{noDel}}" hint-placeholder-val="{{false}}"><p class="a-cap">Sin delivery (entrega en mano o recojo).</p></sc-if>
+            <div class="a-field"><label>Medio de pago</label>
+              <div class="row g2 wrap-row"><sc-for list="{{pays}}" as="p" hint-placeholder-count="5"><button class="a-chip {{p.on}}" type="button" onClick="{{p.pick}}">{{p.label}}</button></sc-for></div>
+            </div>
+          </section>
+        </div>
+
+        <aside class="a-card" style="position: sticky; top: 20px;" aria-label="Resumen">
+          <h2 class="a-h2">Resumen</h2>
+          <div class="sumrow"><span>Ingresos por productos</span><b class="money">{{t.rev}}</b></div>
+          <div class="sumrow"><span>Costo de productos</span><span class="money">− {{t.cost}}</span></div>
+          <div class="sumrow"><span>Delivery (cobrado − costo)</span><span class="money" style="color: {{t.delColor}};">{{t.del}}</span></div>
+          <div class="sumrow big"><span>Contribución</span><span class="money">{{t.contrib}}</span></div>
+          <p class="a-cap">Margen {{t.margin}} · {{t.units}} unidades · canal {{chanLabel}}</p>
+          <a class="a-btn primary block" href="A-Ventas.dc.html">Guardar venta</a>
+          <button class="a-btn block" type="button">Guardar y registrar otra</button>
+        </aside>
+      </div>
+    </main>
+
+    <nav class="a-tabbar" aria-label="Secciones">
+      <a href="A-Inicio.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-6h4v6"/></svg>Inicio</a>
+      <a href="A-Pedidos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 14h5l1 2h4l1-2h5"/></svg>Pedidos<span class="cnt">3</span></a>
+      <a href="A-Productos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>Productos</a>
+      <a class="on" href="A-Ventas.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Ventas</a>
+      <a href="A-Ajustes.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>Más</a>
+    </nav>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    // Precios referenciales (salvo Mini Box Halloween S/ 25). Cada variante: [etiqueta, precio, costo]
+    this.CAT = [
+      { id: 'hallo', name: 'Mini Box Halloween', coll: 'Temporada', img: '../img/halloween-minibox.jpg', vars: { a: ['Única', 25, 12] } },
+      { id: 'mystery', name: 'Mystery Squish', coll: 'Mystery', img: '../img/mystery-nina.jpg', vars: { a: ['Única', 29, 13] } },
+      { id: 'cumple', name: 'Mini Box Sorpresa de Cumple', coll: 'Cumpleaños', img: '../img/mini-caja-sorpresa.jpg', vars: { a: ['2 squishies', 18, 9], b: ['3 squishies', 24, 13] } }
+    ];
+    this.state = { chan: 'feria', lines: [{ i: 0, v: 'a', qty: 6, price: 25 }, { i: 1, v: 'a', qty: 2, price: 29 }], del: false, dIn: 12, dOut: 10, pay: 'efectivo' };
+  }
+  upd(idx, patch) { this.setState({ lines: this.state.lines.map((l, j) => j === idx ? { ...l, ...patch } : l) }); }
+  renderVals() {
+    const s = this.state;
+    const fmt = n => 'S/ ' + Number(n).toFixed(2);
+    const varOf = l => { const p = this.CAT[l.i % this.CAT.length]; return p.vars[l.v] || p.vars.a; };
+    const lines = s.lines.map((l, idx) => {
+      const p = this.CAT[l.i % this.CAT.length];
+      const opts = Object.keys(p.vars).map(k => ({ v: k, label: p.vars[k][0], sel: l.v === k }));
+      return { name: p.name, coll: p.coll, img: p.img, qty: l.qty, price: l.price, unitCost: varOf(l)[2], opts,
+        setV: (e) => { const v = e && e.target ? e.target.value : 'a'; const pv = p.vars[v] || p.vars.a; this.upd(idx, { v, price: pv[1] }); },
+        setP: (e) => this.upd(idx, { price: parseFloat(e && e.target ? e.target.value : '0') || 0 }),
+        inc: () => this.upd(idx, { qty: l.qty + 1 }), dec: () => this.upd(idx, { qty: Math.max(1, l.qty - 1) }),
+        remove: () => this.setState({ lines: s.lines.filter((x, j) => j !== idx) }) };
+    });
+    const rev = s.lines.reduce((a, l) => a + l.price * l.qty, 0);
+    const cost = s.lines.reduce((a, l) => a + varOf(l)[2] * l.qty, 0);
+    const units = s.lines.reduce((a, l) => a + l.qty, 0);
+    const del = s.del ? (s.dIn - s.dOut) : 0;
+    const contrib = rev - cost + del;
+    const C = [['ig', 'Instagram', 'Venta por DM o WhatsApp'], ['feria', 'Feria o evento', 'Asociada a una feria'], ['offline', 'Otros', 'Colegios, referidos, empresas']];
+    const chans = C.map(([k, label, desc]) => ({ label, desc, on: s.chan === k ? 'on' : '', checked: String(s.chan === k), pick: () => this.setState({ chan: k, del: k === 'ig' ? true : s.del }) }));
+    const pays = ['Yape', 'Plin', 'Efectivo', 'Transferencia', 'Tarjeta (POS)'].map(label => { const k = label.toLowerCase(); return { label, on: s.pay === k ? 'on' : '', pick: () => this.setState({ pay: k }) }; });
+    return {
+      chans, isFeria: s.chan === 'feria', chanLabel: C.find(c => c[0] === s.chan)[1], lines, pays,
+      addLine: () => this.setState({ lines: s.lines.concat([{ i: 2, v: 'a', qty: 1, price: 18 }]) }),
+      hasDel: s.del, noDel: !s.del, delOn: s.del ? 'on' : '', toggleDel: () => this.setState({ del: !s.del }),
+      dIn: s.dIn, dOut: s.dOut,
+      setDIn: (e) => this.setState({ dIn: parseFloat(e && e.target ? e.target.value : '0') || 0 }),
+      setDOut: (e) => this.setState({ dOut: parseFloat(e && e.target ? e.target.value : '0') || 0 }),
+      t: { rev: fmt(rev), cost: fmt(cost), del: s.del ? (del >= 0 ? '+ ' : '− ') + fmt(Math.abs(del)) : '—', delColor: del >= 0 ? '#1F6B35' : '#B42318', contrib: fmt(contrib), margin: rev ? Math.round(contrib / rev * 100) + '%' : '—', units }
+    };
+  }
+}
+</script>
+</body>
+</html>

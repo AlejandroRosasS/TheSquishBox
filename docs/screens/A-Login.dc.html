@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es-PE">
+<head>
+<meta charset="utf-8">
+<title>Ingresar al panel · The Squish Box</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./bloom.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Nunito:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="adm" style="width: 100%; min-height: 844px; display: flex; align-items: stretch;">
+  <div style="flex: 1 1 520px; display: flex; align-items: center; justify-content: center; padding: 32px 20px;">
+    <form class="a-card" style="width: 100%; max-width: 400px; padding: 32px; gap: 20px;">
+      <div class="stack g3" style="align-items: center; text-align: center;">
+        <span class="bloom logo" role="img" aria-label="Logo The Squish Box" style="container-type: normal;"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></span>
+        <h1 class="a-h1">Panel de la tienda</h1>
+        <p class="a-sub">Ingresa con tu correo del equipo.</p>
+      </div>
+      <div class="a-field"><label for="l-mail">Correo</label><input id="l-mail" class="a-input" type="email" value="hola@[dominio por definir]"></div>
+      <div class="a-field"><label for="l-pass">Contraseña</label><input id="l-pass" class="a-input" type="password" value="••••••••••"></div>
+      <a class="a-btn primary block" href="A-Inicio.dc.html" style="min-height: 48px;">Ingresar</a>
+      <div class="row g3" style="align-items: center;"><span class="hr" style="flex: 1; height: 1px; background: var(--a-border);"></span><span class="a-cap">o</span><span style="flex: 1; height: 1px; background: var(--a-border);"></span></div>
+      <button class="a-btn block" type="button">Enviarme un enlace al correo</button>
+      <a class="a-cap" href="#" style="text-align: center; text-decoration: underline;">¿Olvidaste tu contraseña?</a>
+    </form>
+  </div>
+  <div class="only-d" style="flex: 1 1 520px; position: relative; min-height: 844px;">
+    <img src="../img/nuestros-productos.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;">
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

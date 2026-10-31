@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="es-PE">
+<head>
+<meta charset="utf-8">
+<title>Carrito · The Squish Box</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./bloom.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Nunito:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="bloom" data-palette="{{palette}}" style="width: 100%;">
+
+  <sc-if value="{{isDrawer}}" hint-placeholder-val="{{false}}">
+    <div class="drawer-stage" style="height: {{stageH}};">
+      <div aria-hidden="true">
+        <div class="announce">Delivery en Lima · Coordinamos tu entrega por WhatsApp</div>
+        <div class="header"><div class="wrap header-in"><span></span><span class="logo logo-slot"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></span><span></span></div></div>
+        <div style="height: 900px; position: relative;"><img src="../img/mini-caja-sorpresa.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover;"></div>
+      </div>
+      <a class="drawer-bg" href="{{h.pdp}}" aria-label="Cerrar carrito"></a>
+      <aside class="drawer" aria-label="Carrito">
+        <div class="drawer-h">
+          <div class="row g2"><p class="h4">Tu carrito</p><span class="small muted">({{count}})</span></div>
+          <a class="icon-btn" href="{{h.pdp}}" aria-label="Cerrar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></a>
+        </div>
+        <div class="note" style="margin: 16px 24px 0; border-radius: 12px;"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7"></path></svg><span>Agregaste <b>Mini Box Sorpresa de Cumple · 3 squishies</b></span></div>
+        <div class="drawer-b">
+          <sc-for list="{{items}}" as="it" hint-placeholder-count="2">
+            <div class="line" style="grid-template-columns: 80px minmax(0, 1fr);">
+              <div class="ph r45" style="width: 80px;"><img src="{{it.img}}" alt="{{it.name}}"></div>
+              <div class="stack g2">
+                <div class="row between g2" style="align-items: flex-start;"><p class="t" style="font-size: 18px;">{{it.name}}</p><span class="price" style="font-size: 14px;">{{it.lineLabel}}</span></div>
+                <select class="select mini-select" aria-label="Presentación" onChange="{{it.setVariant}}"><option value="con" selected="{{it.isCon}}">{{it.labCon}} · S/ {{it.pCon}}</option><option value="sin" selected="{{it.isSin}}">{{it.labSin}} · S/ {{it.pSin}}</option></select>
+                <div class="row between" style="margin-top: 4px;">
+                  <div class="qty" style="height: 38px;"><button type="button" style="height: 36px; width: 38px;" onClick="{{it.dec}}" aria-label="Quitar uno"><svg class="ico xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path></svg></button><span>{{it.qty}}</span><button type="button" style="height: 36px; width: 38px;" onClick="{{it.inc}}" aria-label="Agregar uno"><svg class="ico xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button></div>
+                  <button class="link small" type="button" onClick="{{it.remove}}" style="font-size: 13px; min-height: 44px;">Quitar</button>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div class="drawer-f">
+          <div class="sum-row"><span>Subtotal</span><b>{{subtotalLabel}}</b></div>
+          <p class="small muted">El delivery se calcula en el checkout según tu distrito.</p>
+          <a class="btn block" href="{{h.co}}">Ir a pagar</a>
+          <a class="btn ghost block" href="{{h.cart}}">Ver carrito</a>
+        </div>
+      </aside>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isPageOrEmpty}}" hint-placeholder-val="{{true}}">
+    <div>
+      <div class="announce">Delivery en Lima · Coordinamos tu entrega por WhatsApp</div>
+      <header class="header">
+        <div class="wrap header-in">
+          <nav class="nav only-d" aria-label="Principal"><a href="{{h.cat}}">Cajas sorpresa</a><a href="{{h.cat}}">Mystery Squish</a><a href="{{h.medida}}">Para tu fiesta</a></nav>
+          <button class="icon-btn only-m" type="button" aria-label="Abrir menú"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"></path></svg></button>
+          <a class="logo logo-slot" href="{{h.home}}" aria-label="The Squish Box, inicio"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></a>
+          <div class="h-actions"><a class="icon-btn" href="{{h.cart}}" aria-label="Carrito"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg></a></div>
+        </div>
+      </header>
+
+      <sc-if value="{{isPage}}" hint-placeholder-val="{{true}}">
+        <div class="wrap" style="padding-block: 48px 96px;">
+          <h1 class="h1" style="margin-bottom: 32px;">Tu <em>carrito</em></h1>
+          <div class="cart-layout">
+            <div class="stack" style="border-top: 1px solid var(--border);">
+              <sc-for list="{{items}}" as="it" hint-placeholder-count="2">
+                <div class="line">
+                  <div class="ph r45"><img src="{{it.img}}" alt="{{it.name}}"></div>
+                  <div class="stack g2">
+                    <p class="small muted">{{it.coll}}</p>
+                    <p class="t">{{it.name}}</p>
+                    <select class="select mini-select" aria-label="Presentación" onChange="{{it.setVariant}}" style="align-self: flex-start;"><option value="con" selected="{{it.isCon}}">{{it.labCon}} · S/ {{it.pCon}}</option><option value="sin" selected="{{it.isSin}}">{{it.labSin}} · S/ {{it.pSin}}</option></select>
+                    <div class="row g4" style="margin-top: 6px;">
+                      <div class="qty"><button type="button" onClick="{{it.dec}}" aria-label="Quitar uno"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path></svg></button><span>{{it.qty}}</span><button type="button" onClick="{{it.inc}}" aria-label="Agregar uno"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button></div>
+                      <button class="link" type="button" onClick="{{it.remove}}" style="font-size: 13px; min-height: 44px;">Quitar</button>
+                    </div>
+                  </div>
+                  <span class="price line-price">{{it.lineLabel}}</span>
+                </div>
+              </sc-for>
+              <a class="textlink" href="{{h.cat}}" style="margin-top: 12px;"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6"></path></svg>Seguir comprando</a>
+            </div>
+            <aside class="summary" aria-label="Resumen">
+              <p class="h4">Resumen</p>
+              <div class="sum-row"><span class="muted">Subtotal ({{count}})</span><span>{{subtotalLabel}}</span></div>
+              <div class="sum-row"><span class="muted">Delivery estimado</span><span class="muted">Según distrito</span></div>
+              <div class="sum-row total"><span>Total</span><span>{{subtotalLabel}}</span></div>
+              <a class="btn block" href="{{h.co}}">Ir a pagar</a>
+              <div class="note"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"></path><circle cx="7" cy="18" r="1.8"></circle><circle cx="17" cy="18" r="1.8"></circle></svg><span>Coordinamos fecha y hora de entrega por WhatsApp después de tu compra.</span></div>
+              <div class="row g2" style="justify-content: center;"><span class="pay-logo">VISA</span><span class="pay-logo">MC</span><span class="pay-logo">YAPE</span></div>
+            </aside>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isEmpty}}" hint-placeholder-val="{{false}}">
+        <div class="wrap" style="padding-block: 72px 96px;">
+          <div class="stack g4" style="align-items: center; text-align: center; max-width: 520px; margin: 0 auto;">
+            <span style="width: 96px; height: 96px; border-radius: 50%; background: var(--primary-soft); color: var(--primary); display: flex; align-items: center; justify-content: center;"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="width: 44px; height: 44px; stroke-width: 1.3;"><rect x="3.5" y="9" width="17" height="11.5" rx="1.5"></rect><path d="M2.5 9h19V6.5h-19zM12 6.5v14"></path><path d="M12 6.5C10.5 3.5 7 3.5 7.5 5.5s4.5 1 4.5 1 4-1 4.5-1S13.5 3.5 12 6.5z"></path></svg></span>
+            <h1 class="h2">Tu carrito está <em>vacío</em></h1>
+            <p class="lead">¿Listo para descubrir cuál te toca? Elige tu caja sorpresa o arma las sorpresas de tu fiesta.</p>
+            <div class="row g3 wrap-row" style="justify-content: center;"><a class="btn" href="{{h.cat}}">Ver cajas sorpresa</a><a class="btn ghost" href="{{h.medida}}">Para tu fiesta</a></div>
+          </div>
+          <div class="stack g5" style="margin-top: 72px;">
+            <h2 class="h3">Los más pedidos</h2>
+            <div class="pgrid">
+              <a class="pcard" href="{{h.pdp}}"><div class="ph r45"><img src="../img/squish-box-contenido.jpg" alt="The Squish Box"></div><div class="meta"><p class="coll">Cajas</p><p class="name">The Squish Box</p><p class="from">S/ 69</p></div></a>
+              <a class="pcard" href="{{h.pdp}}"><div class="ph r45"><img src="../img/mystery-nina.jpg" alt="Mystery Squish"></div><div class="meta"><p class="coll">Mystery</p><p class="name">Mystery Squish</p><p class="from">S/ 29</p></div></a>
+              <a class="pcard" href="{{h.pdp}}"><div class="ph r45"><img src="../img/mini-caja-sorpresa.jpg" alt="Mini Box Sorpresa de Cumple"></div><div class="meta"><p class="coll">Cumpleaños</p><p class="name">Mini Box Sorpresa de Cumple</p><p class="from">Desde S/ 18</p></div></a>
+              <a class="pcard" href="{{h.pdp}}"><div class="ph r45"><img src="../img/mini-caja-recompra.jpg" alt="Mini Box Recompra"></div><div class="meta"><p class="coll">Recompra</p><p class="name">Mini Box Recompra</p><p class="from">Desde S/ 39</p></div></a>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <footer class="footer">
+        <div class="wrap">
+          <div class="cols">
+            <div class="stack g4">
+              <span class="logo lg" role="img" aria-label="Logo The Squish Box"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></span>
+              <p class="small" style="max-width: 300px; opacity: .85;">Mystery squishies para coleccionar. Abre, descubre, colecciona e intercambia. Lima, Perú.</p>
+            </div>
+            <div><h4>Tienda</h4><ul><li><a href="{{h.cat}}">Cajas sorpresa</a></li><li><a href="{{h.cat}}">Mystery Squish</a></li><li><a href="{{h.medida}}">Para tu fiesta</a></li></ul></div>
+            <div><h4>Ayuda</h4><ul><li><a href="#">Entregas en Lima</a></li><li><a href="#">Squishy tips</a></li><li><a href="#">Cambios y devoluciones</a></li></ul></div>
+            <div><h4>Contacto</h4><ul><li><a href="https://www.instagram.com/the.squish.box/">@the.squish.box</a></li><li><a href="#">WhatsApp [+51 9XX XXX XXX]</a></li><li>Lima, Perú</li></ul></div>
+          </div>
+          <div class="legal"><span>© 2026 The Squish Box · RUC [N.º de RUC]</span><span>Libro de reclamaciones · Términos · Privacidad</span></div>
+        </div>
+      </footer>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"palette":{"editor":"enum","options":["original","neon","halloween","pastel","menta"],"default":"original"},"mode":{"editor":"enum","options":["page","drawer","empty"],"default":"page"},"mobile":{"editor":null,"tsType":"boolean"},"$preview":{"width":1440,"height":1400}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    // 'con' = primera variante, 'sin' = segunda (claves heredadas del motor)
+    this.state = { items: [
+      { id: 'cumple', name: 'Mini Box Sorpresa de Cumple', coll: 'Cumpleaños', img: '../img/mini-caja-sorpresa.jpg', v: 'sin', labCon: '2 squishies', labSin: '3 squishies', pCon: 18, pSin: 24, qty: 1 },
+      { id: 'recompra', name: 'Mini Box Recompra', coll: 'Recompra', img: '../img/mini-caja-recompra.jpg', v: 'con', labCon: '4 squishies', labSin: '5 squishies', pCon: 39, pSin: 47, qty: 1 }
+    ] };
+  }
+  upd(id, fn) { this.setState({ items: this.state.items.map(x => x.id === id ? fn(x) : x) }); }
+  renderVals() {
+    const m = !!this.props.mobile;
+    const mode = this.props.mode ?? 'page';
+    const h = m
+      ? { home: 'M-Home.dc.html', cat: 'M-Catalogo.dc.html', pdp: 'M-Producto.dc.html', medida: 'M-Medida.dc.html', cart: 'M-Carrito.dc.html', co: 'M-Checkout.dc.html' }
+      : { home: 'S-Home.dc.html', cat: 'S-Catalogo.dc.html', pdp: 'S-Producto.dc.html', medida: 'S-Medida.dc.html', cart: 'S-Carrito.dc.html', co: 'S-Checkout.dc.html' };
+    const fmt = n => 'S/ ' + n.toFixed(2);
+    const items = this.state.items.map(x => {
+      const unit = x.v === 'con' ? x.pCon : x.pSin;
+      return { ...x, isCon: x.v === 'con', isSin: x.v === 'sin', lineLabel: fmt(unit * x.qty),
+        inc: () => this.upd(x.id, y => ({ ...y, qty: y.qty + 1 })),
+        dec: () => this.upd(x.id, y => ({ ...y, qty: Math.max(1, y.qty - 1) })),
+        remove: () => this.setState({ items: this.state.items.filter(y => y.id !== x.id) }),
+        setVariant: (e) => { const val = e && e.target ? e.target.value : 'con'; this.upd(x.id, y => ({ ...y, v: val })); } };
+    });
+    const subtotal = items.reduce((s, x) => s + (x.v === 'con' ? x.pCon : x.pSin) * x.qty, 0);
+    const count = items.reduce((s, x) => s + x.qty, 0);
+    const empty = mode === 'empty' || items.length === 0;
+    return {
+      palette: this.props.palette ?? 'original', h, items, count: count + (count === 1 ? ' producto' : ' productos'),
+      subtotalLabel: fmt(subtotal),
+      isDrawer: mode === 'drawer', isPageOrEmpty: mode !== 'drawer', isPage: mode === 'page' && !empty, isEmpty: mode !== 'drawer' && empty,
+      stageH: m ? '844px' : '900px'
+    };
+  }
+}
+</script>
+</body>
+</html>

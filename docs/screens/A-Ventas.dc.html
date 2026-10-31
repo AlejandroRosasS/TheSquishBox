@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="es-PE">
+<head>
+<meta charset="utf-8">
+<title>Ventas y márgenes · Panel · The Squish Box</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./bloom.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Nunito:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}
+.kpis5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+@container page (max-width:1100px){.kpis5{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@container page (max-width:760px){.kpis5{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.chbar{display:grid;grid-template-columns:130px minmax(0,1fr) 110px;gap:12px;align-items:center;font-size:13px;padding:8px 0}
+.track{height:26px;border-radius:6px;background:#EFEFEB;position:relative;overflow:hidden}
+.track i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:#C9CFC3}
+.track b{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:#1F2A22}
+.legend{display:flex;gap:16px;font-size:12px;color:#5C5F58;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.rk{display:grid;grid-template-columns:28px 44px minmax(0,1fr) 110px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #E2E3DD}
+.rk:last-child{border-bottom:0}
+.rk .n{font-weight:800;color:#5C5F58;text-align:center}
+.rk .bar{height:6px;border-radius:3px;background:#EFEFEB;margin-top:6px;overflow:hidden}
+.rk .bar i{display:block;height:100%;background:#1F2A22;border-radius:3px}
+.fair{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.fair > div{background:#F5F5F2;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.fair b{font-size:18px}
+@container page (max-width:760px){.chbar{grid-template-columns:96px minmax(0,1fr) 84px}.fair{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</helmet>
+<div class="adm" style="width: 100%;">
+  <div class="a-shell">
+    <div class="a-top">
+      <div class="row g3"><span class="logo sm" role="img" aria-label="Logo The Squish Box"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></span><b>Ventas</b></div>
+      <a class="a-btn primary sm" href="A-VentaNueva.dc.html">+ Registrar</a>
+    </div>
+    <aside class="a-side" aria-label="Menú del panel">
+      <div class="a-brand"><span class="logo sm" role="img" aria-label="Logo The Squish Box"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></span><div><b>The Squish Box</b><p class="a-cap">Panel de la tienda</p></div></div>
+      <nav class="a-nav stack g1" aria-label="Secciones">
+        <a href="A-Inicio.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-6h4v6"/></svg>Inicio</a>
+        <a href="A-Pedidos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 14h5l1 2h4l1-2h5"/></svg>Pedidos<span class="cnt">3</span></a>
+        <a href="A-Solicitudes.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16v9H4zM3 7h18v4H3zM12 7v13"/><path d="M12 7C10 3 6.5 4 7.5 7M12 7c2-4 5.5-3 4.5 0"/></svg>Pedidos para fiestas<span class="cnt">2</span></a>
+        <a href="A-Productos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>Productos</a>
+        <a href="A-Importar.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".8"/></svg>Instagram<span class="cnt">4</span></a>
+        <a class="on" href="A-Ventas.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Ventas y márgenes</a>
+        <p class="a-navlabel">Configuración</p>
+        <a href="A-Notificaciones.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>Notificaciones</a>
+        <a href="A-Ajustes.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>Ajustes</a>
+        <a href="A-Apariencia.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.5-.8 1.5-1.5 0-1-.8-1.3-.8-2.2 0-.8.7-1.3 1.5-1.3H17a4 4 0 0 0 4-4C21 6.5 17 3 12 3z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7" r="1"/></svg>Apariencia</a>
+      </nav>
+    </aside>
+
+    <main class="a-main">
+      <div class="a-head">
+        <div class="stack g1"><h1 class="a-h1">Ventas y márgenes</h1><p class="a-sub">Todos los canales en un solo lugar. Montos aproximados según los costos cargados.</p></div>
+        <div class="row g2 wrap-row"><button class="a-btn" type="button">Exportar CSV</button><a class="a-btn primary only-d" href="A-VentaNueva.dc.html">+ Registrar venta</a></div>
+      </div>
+
+      <div class="row g3 wrap-row">
+        <div class="a-seg" role="group" aria-label="Período"><sc-for list="{{periods}}" as="p" hint-placeholder-count="3"><button class="{{p.on}}" type="button" onClick="{{p.pick}}">{{p.label}}</button></sc-for></div>
+        <select class="a-select" style="width: auto; min-width: 200px;" onChange="{{pickColl}}" aria-label="Línea">
+          <sc-for list="{{collOpts}}" as="c" hint-placeholder-count="6"><option value="{{c.v}}" selected="{{c.sel}}">{{c.label}}</option></sc-for>
+        </select>
+      </div>
+      <div class="a-scroll-x" role="group" aria-label="Canal">
+        <sc-for list="{{chans}}" as="c" hint-placeholder-count="5"><button class="a-chip {{c.on}}" type="button" onClick="{{c.pick}}">{{c.label}}</button></sc-for>
+      </div>
+
+      <div class="kpis5">
+        <div class="kpi"><span class="l">Ingresos</span><span class="v money">{{k.rev}}</span><span class="a-cap">{{k.orders}}</span></div>
+        <div class="kpi"><span class="l">Costo de productos</span><span class="v money">{{k.cost}}</span><span class="a-cap">Según costo por variante</span></div>
+        <div class="kpi"><span class="l">Contribución</span><span class="v money">{{k.contrib}}</span><span class="a-cap">Margen {{k.margin}}</span></div>
+        <div class="kpi"><span class="l">Unidades</span><span class="v">{{k.units}}</span><span class="a-cap">Ticket prom. {{k.ticket}}</span></div>
+        <div class="kpi"><span class="l">Resultado delivery</span><span class="v money" style="color: {{k.delColor}};">{{k.del}}</span><span class="a-cap">Cobrado {{k.delIn}} · costó {{k.delOut}}</span></div>
+      </div>
+
+      <div class="a-cols even">
+        <section class="a-card">
+          <div class="a-card-h"><h2 class="a-h2">Por canal</h2><div class="legend"><span><i style="background: #C9CFC3;"></i>Ingresos</span><span><i style="background: #1F2A22;"></i>Contribución</span></div></div>
+          <sc-for list="{{byChan}}" as="c" hint-placeholder-count="4">
+            <div class="chbar"><span><b>{{c.label}}</b><br><span class="a-cap">{{c.units}} u.</span></span><div class="track" role="img" aria-label="{{c.label}}: ingresos {{c.rev}}, contribución {{c.contrib}}"><i style="width: {{c.revW}};"></i><b style="width: {{c.conW}};"></b></div><span class="money" style="text-align: right;"><b>{{c.contrib}}</b><br><span class="a-cap">de {{c.rev}}</span></span></div>
+          </sc-for>
+        </section>
+
+        <section class="a-card">
+          <div class="a-card-h"><h2 class="a-h2">Ranking de productos</h2>
+            <div class="a-seg"><button class="{{rkC}}" type="button" onClick="{{setRkC}}">Top contribución</button><button class="{{rkU}}" type="button" onClick="{{setRkU}}">Top unidades</button></div>
+          </div>
+          <div>
+            <sc-for list="{{rank}}" as="r" hint-placeholder-count="5">
+              <div class="rk"><span class="n">{{r.pos}}</span><span class="av" style="width: 44px; height: 44px;"><img src="{{r.img}}" alt=""></span><div><b>{{r.name}}</b><span class="a-cap"> · {{r.coll}}</span><div class="bar"><i style="width: {{r.w}};"></i></div></div><span class="money" style="text-align: right;"><b>{{r.main}}</b><br><span class="a-cap">{{r.sub}}</span></span></div>
+            </sc-for>
+          </div>
+        </section>
+      </div>
+
+      <section class="a-card">
+        <div class="a-card-h" style="flex-wrap: wrap;">
+          <div class="stack g1"><h2 class="a-h2">Ferias y eventos</h2><p class="a-cap">Para decidir si volver el próximo año.</p></div>
+          <button class="a-btn sm" type="button">+ Nueva feria</button>
+        </div>
+        <div class="row between wrap-row g2"><div><b>Feria de Halloween · [Lugar]</b><p class="a-cap">24 – 26 oct 2026 · 3 días</p></div><span class="{{fairCls}}">{{fairVerdict}}</span></div>
+        <div class="fair">
+          <div><span class="a-cap">Ventas</span><b class="money">{{f.rev}}</b><span class="a-cap">{{f.units}} unidades</span></div>
+          <div><span class="a-cap">Contribución de productos</span><b class="money">{{f.contrib}}</b><span class="a-cap">Margen {{f.margin}}</span></div>
+          <div><span class="a-cap">Costos fijos</span><b class="money">− S/ 300</b><span class="a-cap">Stand S/ 250 · movilidad S/ 50</span></div>
+          <div style="background: #E4F2E7;"><span class="a-cap">Contribución neta</span><b class="money">{{f.net}}</b><span class="a-cap">{{f.perDay}} por día</span></div>
+        </div>
+      </section>
+
+      <section class="a-card flush">
+        <div class="a-card-h"><h2 class="a-h2">Últimas ventas registradas</h2><a class="a-btn sm ghost" href="A-VentaNueva.dc.html">+ Registrar</a></div>
+        <div class="a-table">
+          <div class="a-tr head" style="grid-template-columns: 110px minmax(0, 1.4fr) 150px 110px 110px;"><span>Fecha</span><span>Detalle</span><span>Canal</span><span>Ingreso</span><span>Contribución</span></div>
+          <div class="a-tr" style="grid-template-columns: 110px minmax(0, 1.4fr) 150px 110px 110px;"><span class="c-d">Hoy</span><span class="stack"><b>The Squish Box x1 + Mystery Squish x1</b><span class="a-cap">Pago con Yape · delivery S/ 12 (costó S/ 10)</span><span class="c-m a-cap">Hoy · Instagram</span></span><span class="c-d"><span class="st nuevo">Instagram</span></span><span class="money" style="font-weight: 700;">S/ 110.00</span><span class="c-d money delta-zero">S/ 53.00</span></div>
+          <div class="a-tr" style="grid-template-columns: 110px minmax(0, 1.4fr) 150px 110px 110px;"><span class="c-d">26 oct</span><span class="stack"><b>Mini Box Halloween x6</b><span class="a-cap">Efectivo · sin delivery</span><span class="c-m a-cap">26 oct · Feria</span></span><span class="c-d"><span class="st devuelto">Feria</span></span><span class="money" style="font-weight: 700;">S/ 150.00</span><span class="c-d money delta-zero">S/ 78.00</span></div>
+          <div class="a-tr" style="grid-template-columns: 110px minmax(0, 1.4fr) 150px 110px 110px;"><span class="c-d">25 oct</span><span class="stack"><b>Pedido web #0118</b><span class="a-cap">Automático desde la tienda</span><span class="c-m a-cap">25 oct · Web</span></span><span class="c-d"><span class="st listo">Web</span></span><span class="money" style="font-weight: 700;">S/ 142.00</span><span class="c-d money delta-zero">S/ 70.00</span></div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="a-tabbar" aria-label="Secciones">
+      <a href="A-Inicio.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4l8 7v9H4z"/><path d="M10 20v-6h4v6"/></svg>Inicio</a>
+      <a href="A-Pedidos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 14h5l1 2h4l1-2h5"/></svg>Pedidos<span class="cnt">3</span></a>
+      <a href="A-Productos.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>Productos</a>
+      <a class="on" href="A-Ventas.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Ventas</a>
+      <a href="A-Ajustes.dc.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg>Más</a>
+    </nav>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2000}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { period: 'mes', coll: 'all', chan: 'all', rank: 'c' }; }
+  renderVals() {
+    const B = '../img/';
+    // Precios referenciales (salvo Mini Box Halloween, S/ 25 real). [precio, costo] por variante a / b
+    const P = {
+      box: { name: 'The Squish Box', coll: 'Cajas', img: B + 'squish-box-contenido.jpg', a: [69, 34], b: [69, 34] },
+      mystery: { name: 'Mystery Squish', coll: 'Mystery', img: B + 'mystery-nina.jpg', a: [29, 13], b: [29, 13] },
+      cumple: { name: 'Mini Box Sorpresa de Cumple', coll: 'Cumpleaños', img: B + 'mini-caja-sorpresa.jpg', a: [18, 9], b: [24, 13] },
+      recompra: { name: 'Mini Box Recompra', coll: 'Recompra', img: B + 'mini-caja-recompra.jpg', a: [39, 20], b: [47, 25] },
+      hallo: { name: 'Mini Box Halloween', coll: 'Temporada', img: B + 'halloween-minibox.jpg', a: [25, 12], b: [25, 12] }
+    };
+    // [producto, variante, canal, unidades, deliveryCobrado, deliveryCosto, pedidos]
+    const L = [
+      ['box', 'a', 'web', 14, 72, 60, 12], ['box', 'a', 'ig', 9, 48, 40, 8], ['box', 'a', 'feria', 8, 0, 0, 7],
+      ['mystery', 'a', 'web', 10, 36, 30, 8], ['mystery', 'a', 'ig', 12, 36, 30, 9], ['mystery', 'a', 'feria', 15, 0, 0, 12],
+      ['cumple', 'b', 'web', 25, 24, 20, 2], ['cumple', 'a', 'ig', 30, 24, 20, 2], ['cumple', 'b', 'offline', 20, 0, 0, 1],
+      ['recompra', 'a', 'web', 5, 24, 20, 4], ['recompra', 'b', 'ig', 4, 12, 10, 3],
+      ['hallo', 'a', 'web', 18, 48, 40, 10], ['hallo', 'a', 'ig', 22, 60, 50, 12], ['hallo', 'a', 'feria', 20, 0, 0, 14]
+    ];
+    const s = this.state;
+    const scale = s.period === 'mes' ? 1 : s.period === 'tri' ? 2.6 : 7.4;
+    const fmt = n => 'S/ ' + Math.round(n).toLocaleString('en-US');
+    const rows = L.map(([pid, v, ch, u, dIn, dOut, o]) => {
+      const p = P[pid]; const [price, cost] = p[v]; const units = Math.max(1, Math.round(u * scale));
+      return { pid, ch, coll: p.coll, units, rev: price * units, cost: cost * units, dIn: dIn * scale, dOut: dOut * scale, orders: Math.max(1, Math.round(o * scale)) };
+    });
+    const byColl = rows.filter(r => s.coll === 'all' || r.coll === s.coll);
+    const f = byColl.filter(r => s.chan === 'all' || r.ch === s.chan);
+    const sum = (arr, k) => arr.reduce((a, r) => a + r[k], 0);
+    const rev = sum(f, 'rev'), cost = sum(f, 'cost'), units = sum(f, 'units'), orders = sum(f, 'orders'), dIn = sum(f, 'dIn'), dOut = sum(f, 'dOut');
+    const del = dIn - dOut;
+    const k = { rev: fmt(rev), cost: fmt(cost), contrib: fmt(rev - cost), margin: rev ? Math.round((rev - cost) / rev * 100) + '%' : '—', units, orders: orders + ' ventas', ticket: orders ? fmt(rev / orders) : '—', del: (del >= 0 ? '+ ' : '− ') + fmt(Math.abs(del)), delIn: fmt(dIn), delOut: fmt(dOut), delColor: del >= 0 ? '#1F6B35' : '#B42318' };
+    const CH = [['web', 'Web'], ['ig', 'Instagram'], ['feria', 'Ferias'], ['offline', 'Otros']];
+    const chanAgg = CH.map(([key, label]) => { const a = byColl.filter(r => r.ch === key); return { key, label, rev: sum(a, 'rev'), contrib: sum(a, 'rev') - sum(a, 'cost'), units: sum(a, 'units') }; });
+    const maxRev = Math.max(1, ...chanAgg.map(c => c.rev));
+    const byChan = chanAgg.map(c => ({ ...c, revW: Math.round(c.rev / maxRev * 100) + '%', conW: Math.round(c.contrib / maxRev * 100) + '%', rev: fmt(c.rev), contrib: fmt(c.contrib) }));
+    const prodAgg = Object.keys(P).map(pid => { const a = f.filter(r => r.pid === pid); return { ...P[pid], units: sum(a, 'units'), contrib: sum(a, 'rev') - sum(a, 'cost'), rev: sum(a, 'rev') }; }).filter(p => p.units > 0);
+    const keyF = s.rank === 'c' ? 'contrib' : 'units';
+    prodAgg.sort((a, b) => b[keyF] - a[keyF]);
+    const top = prodAgg.slice(0, 5); const maxK = Math.max(1, ...top.map(p => p[keyF]));
+    const rank = top.map((p, i) => ({ pos: i + 1, name: p.name, coll: p.coll, img: p.img, w: Math.round(p[keyF] / maxK * 100) + '%', main: s.rank === 'c' ? fmt(p.contrib) : p.units + ' u.', sub: s.rank === 'c' ? p.units + ' u.' : fmt(p.contrib) }));
+    const fr = byColl.filter(r => r.ch === 'feria'); const fRev = sum(fr, 'rev'), fCon = fRev - sum(fr, 'cost'); const fNet = fCon - 300;
+    const fair = { rev: fmt(fRev), units: sum(fr, 'units'), contrib: fmt(fCon), margin: fRev ? Math.round(fCon / fRev * 100) + '%' : '—', net: (fNet >= 0 ? '' : '− ') + fmt(Math.abs(fNet)), perDay: fmt(fNet / 3) };
+    const periods = [['mes', 'Octubre'], ['tri', 'Trimestre'], ['ano', '2026']].map(([v, label]) => ({ label, on: s.period === v ? 'on' : '', pick: () => this.setState({ period: v }) }));
+    const collOpts = [['all', 'Todas las líneas'], ['Cajas', 'Cajas'], ['Mystery', 'Mystery'], ['Cumpleaños', 'Cumpleaños'], ['Recompra', 'Recompra'], ['Temporada', 'Temporada']].map(([v, label]) => ({ v, label, sel: s.coll === v }));
+    const chans = [['all', 'Todos los canales']].concat(CH).map(([v, label]) => ({ label, on: s.chan === v ? 'on' : '', pick: () => this.setState({ chan: v }) }));
+    return {
+      k, byChan, rank, f: fair, periods, collOpts, chans,
+      pickColl: (e) => this.setState({ coll: e && e.target ? e.target.value : 'all' }),
+      rkC: s.rank === 'c' ? 'on' : '', rkU: s.rank === 'u' ? 'on' : '', setRkC: () => this.setState({ rank: 'c' }), setRkU: () => this.setState({ rank: 'u' }),
+      fairVerdict: fNet > 0 ? 'Rentable · conviene volver' : 'No cubrió costos', fairCls: fNet > 0 ? 'ok-pill' : 'bad-pill'
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es-PE">
+<head>
+<meta charset="utf-8">
+<title>Pedido confirmado · The Squish Box</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./bloom.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Nunito:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="bloom" data-palette="{{palette}}" style="width: 100%;">
+  <header class="header">
+    <div class="wrap row" style="min-height: 76px; justify-content: center;">
+      <a class="logo sm" href="{{h.home}}" aria-label="The Squish Box, inicio"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></a>
+    </div>
+  </header>
+
+  <div class="wrap" style="padding-block: 56px 96px;">
+    <div class="split" style="align-items: start; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);">
+      <div class="stack g5">
+        <span style="width: 64px; height: 64px; border-radius: 50%; background: var(--primary); color: var(--on-primary); display: flex; align-items: center; justify-content: center;"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="width: 30px; height: 30px;"><path d="m5 12 4.5 4.5L19 7"></path></svg></span>
+        <p class="eyebrow">Pedido N.º 0123 · Pagado con Yape</p>
+        <h1 class="h1">¡Gracias, Daniela! <em>Tus sorpresas ya están en camino</em></h1>
+        <p class="lead">Te enviamos el resumen a daniela@correo.com. ¿Cuáles te tocarán?</p>
+
+        <div class="stack g3" style="background: var(--primary-soft); border-radius: 20px; padding: 24px;">
+          <p class="h4">Próximos pasos</p>
+          <div class="steps" style="margin-top: 6px;">
+            <div class="stp done"><span class="b"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7"></path></svg></span><div><b>Pago recibido</b><p class="small muted">Ya estamos armando tu pedido.</p></div></div>
+            <div class="stp"><span class="b"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1.3-3.8A8 8 0 1 1 8 19z"></path></svg></span><div><b>Te escribiremos por WhatsApp</b><p class="small muted">Para coordinar la entrega y confirmar el costo final del delivery.</p></div></div>
+            <div class="stp" style="padding-bottom: 0;"><span class="b"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"></path><circle cx="7" cy="18" r="1.8"></circle><circle cx="17" cy="18" r="1.8"></circle></svg></span><div><b>Entrega</b><p class="small muted">Fecha preferida: sáb 14 nov. La confirmamos contigo.</p></div></div>
+          </div>
+        </div>
+        <div class="note accent"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg><span>Si el delivery real a tu dirección es mayor al estimado, te enviaremos un link para pagar solo la diferencia. Si es menor, te devolvemos la diferencia.</span></div>
+        <div class="note"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M8 8h8M8 12h8M8 16h5"></path></svg><span>Busca cada squishy en tu cartilla. ¿Te salió repetido? <b>Intercámbialo con tus amigos.</b></span></div>
+        <div class="row g3 wrap-row">
+          <a class="btn" href="#">Escribirnos por WhatsApp</a>
+          <a class="btn ghost" href="{{h.home}}">Seguir viendo</a>
+        </div>
+      </div>
+
+      <aside class="summary" aria-label="Resumen del pedido">
+        <p class="h4">Resumen</p>
+        <div class="row g3"><div class="ph r45" style="width: 56px; flex: none; border-radius: 10px;"><img src="../img/mini-caja-sorpresa.jpg" alt="Mini Box Sorpresa de Cumple"></div><div class="grow"><b style="font-size: 14px;">Mini Box Sorpresa de Cumple</b><p class="small muted">3 squishies · x1</p></div><span class="small strong">S/ 24.00</span></div>
+        <div class="row g3"><div class="ph r45" style="width: 56px; flex: none; border-radius: 10px;"><img src="../img/mini-caja-recompra.jpg" alt="Mini Box Recompra"></div><div class="grow"><b style="font-size: 14px;">Mini Box Recompra</b><p class="small muted">4 squishies · x1</p></div><span class="small strong">S/ 39.00</span></div>
+        <hr class="hr">
+        <div class="sum-row"><span class="muted">Subtotal</span><span>S/ 63.00</span></div>
+        <div class="sum-row"><span class="muted">Delivery estimado · Miraflores</span><span>S/ 15.00</span></div>
+        <div class="sum-row total"><span>Total pagado</span><span>S/ 78.00</span></div>
+        <hr class="hr">
+        <div class="stack g2 small">
+          <div class="sum-row"><span class="muted">Entrega</span><span style="text-align: right;">Av. José Pardo 610, dpto. 302, Miraflores</span></div>
+          <div class="sum-row"><span class="muted">Mensaje de regalo</span><span style="text-align: right;">"¡Feliz cumple, Mati!…"</span></div>
+          <div class="sum-row"><span class="muted">Comprobante</span><span>Boleta</span></div>
+        </div>
+      </aside>
+    </div>
+    <div class="row" style="justify-content: center; margin-top: 56px;">
+      <a class="textlink" href="F1-Alerta.dc.html" style="border: 1px dashed var(--primary-line); border-radius: 999px; padding: 0 18px;">Prototipo · ver la alerta que recibe el equipo<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></a>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"palette":{"editor":"enum","options":["original","neon","halloween","pastel","menta"],"default":"original"},"mobile":{"editor":null,"tsType":"boolean"},"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const m = !!this.props.mobile;
+    const h = m ? { home: 'M-Home.dc.html' } : { home: 'S-Home.dc.html' };
+    return { palette: this.props.palette ?? 'original', h };
+  }
+}
+</script>
+</body>
+</html>

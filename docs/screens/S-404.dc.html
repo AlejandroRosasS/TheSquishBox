@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es-PE">
+<head>
+<meta charset="utf-8">
+<title>Página no encontrada · The Squish Box</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./bloom.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Nunito:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="bloom" data-palette="{{palette}}" style="width: 100%;">
+  <header class="header">
+    <div class="wrap header-in">
+      <nav class="nav only-d" aria-label="Principal"><a href="{{h.cat}}">Cajas sorpresa</a><a href="{{h.cat}}">Mystery Squish</a><a href="{{h.medida}}">Para tu fiesta</a></nav>
+      <button class="icon-btn only-m" type="button" aria-label="Abrir menú"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"></path></svg></button>
+      <a class="logo logo-slot" href="{{h.home}}" aria-label="The Squish Box, inicio"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></a>
+      <div class="h-actions"><a class="icon-btn" href="{{h.cat}}" aria-label="Carrito"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg></a></div>
+    </div>
+  </header>
+  <div class="wrap" style="padding-block: 72px 112px;">
+    <div class="split">
+      <div class="stack g5">
+        <p class="eyebrow">Error 404</p>
+        <p class="display" style="font-size: 120px; line-height: .9; color: var(--primary);"><em>Ups</em></p>
+        <h1 class="h2">Esta página se nos <em>escapó del sobre</em></h1>
+        <p class="lead">La página que buscas se movió o ya no existe. Pero hay muchas sorpresas esperándote.</p>
+        <div class="row g3 wrap-row"><a class="btn" href="{{h.cat}}">Ver cajas sorpresa</a><a class="btn ghost" href="{{h.home}}">Ir al inicio</a></div>
+      </div>
+      <div class="ph r45" style="border-radius: 20px; max-width: 460px; justify-self: end; width: 100%;"><img src="../img/mandarina.jpg" alt="Manos apretando un squishy de mandarina"></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"palette":{"editor":"enum","options":["original","neon","halloween","pastel","menta"],"default":"original"},"mobile":{"editor":null,"tsType":"boolean"},"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const m = !!this.props.mobile;
+    const h = m ? { home: 'M-Home.dc.html', cat: 'M-Catalogo.dc.html', medida: 'M-Medida.dc.html' } : { home: 'S-Home.dc.html', cat: 'S-Catalogo.dc.html', medida: 'S-Medida.dc.html' };
+    return { palette: this.props.palette ?? 'original', h };
+  }
+}
+</script>
+</body>
+</html>

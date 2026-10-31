@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="es-PE">
+<head>
+<meta charset="utf-8">
+<title>Para tu fiesta · The Squish Box</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./bloom.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&amp;family=Nunito:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="bloom" data-palette="{{palette}}" style="width: 100%;">
+  <div class="announce">Delivery en Lima · Coordinamos tu entrega por WhatsApp</div>
+  <header class="header">
+    <div class="wrap header-in">
+      <nav class="nav only-d" aria-label="Principal"><a href="{{h.cat}}">Cajas sorpresa</a><a href="{{h.cat}}">Mystery Squish</a><a class="on" href="{{h.medida}}">Para tu fiesta</a></nav>
+      <button class="icon-btn only-m" type="button" aria-label="Abrir menú"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"></path></svg></button>
+      <a class="logo logo-slot" href="{{h.home}}" aria-label="The Squish Box, inicio"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></a>
+      <div class="h-actions">
+        <a class="icon-btn only-d" href="{{h.cat}}" aria-label="Buscar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="m20 20-4.5-4.5"></path></svg></a>
+        <a class="icon-btn" href="{{h.drawer}}" aria-label="Carrito"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg></a>
+      </div>
+    </div>
+  </header>
+
+  <sc-if value="{{showForm}}" hint-placeholder-val="{{true}}">
+    <div class="wrap" style="padding-block: 48px 96px;">
+      <div class="split" style="align-items: start; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);">
+        <div class="stack g5">
+          <p class="eyebrow">Para tu fiesta</p>
+          <h1 class="h1">Una sorpresa para <em>cada invitado</em></h1>
+          <p class="lead">Mini Box Sorpresa de Cumple por cantidad: squishies sorpresa y espacio para agregar dulces. Cuéntanos de tu fiesta y te mandamos la cotización por WhatsApp. Si te gusta, pagas con un link y coordinamos la entrega.</p>
+          <div class="ph r45 only-d" style="border-radius: 20px;"><img src="../img/mini-caja-sorpresa.jpg" alt="Niña recibiendo una Mini Box Sorpresa de Cumple"></div>
+          <div class="steps">
+            <div class="stp"><span class="b"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg></span><div><b>Nos cuentas de tu fiesta</b><p class="small muted">Fecha, cantidad de invitados y temática.</p></div></div>
+            <div class="stp"><span class="b"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1.3-3.8A8 8 0 1 1 8 19z"></path></svg></span><div><b>Te cotizamos</b><p class="small muted">Te escribimos por WhatsApp con el precio total.</p></div></div>
+            <div class="stp"><span class="b"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 10h18"></path></svg></span><div><b>Confirmas y pagas</b><p class="small muted">Con un link seguro: tarjeta o Yape.</p></div></div>
+          </div>
+        </div>
+
+        <form class="stack g6" style="background: var(--surface); border: 1px solid var(--border); border-radius: 26px; padding: 32px;" onSubmit="{{noop}}">
+          <fieldset class="stack g3" style="border: 0; padding: 0; margin: 0;">
+            <legend class="label" style="margin-bottom: 10px;">¿Cuántas mini box necesitas?</legend>
+            <div class="row g2 wrap-row">
+              <sc-for list="{{spaces}}" as="s" hint-placeholder-count="6">
+                <button class="chip {{s.on}}" type="button" onClick="{{s.pick}}">{{s.label}}</button>
+              </sc-for>
+            </div>
+          </fieldset>
+
+          <fieldset class="stack g3" style="border: 0; padding: 0; margin: 0;">
+            <legend class="label" style="margin-bottom: 10px;">¿Cuántos squishies por mini box?</legend>
+            <div class="grid2" style="grid-template-columns: repeat(3, minmax(0, 1fr));">
+              <sc-for list="{{sizes}}" as="z" hint-placeholder-count="3">
+                <button class="seg-opt {{z.on}}" type="button" onClick="{{z.pick}}"><span class="t">{{z.label}}</span><span class="p">{{z.sub}}</span></button>
+              </sc-for>
+            </div>
+          </fieldset>
+
+          <fieldset class="stack g3" style="border: 0; padding: 0; margin: 0;">
+            <legend class="label" style="margin-bottom: 10px;">Colores de la fiesta <span class="muted" style="font-weight: 500;">(opcional)</span></legend>
+            <div class="row g3 wrap-row">
+              <button class="row g2 chip on" type="button"><span class="sw" style="width: 18px; height: 18px; background: #E5177B;"></span>Fucsia</button>
+              <button class="row g2 chip on" type="button"><span class="sw" style="width: 18px; height: 18px; background: #7B3FE4;"></span>Morado</button>
+              <button class="row g2 chip" type="button"><span class="sw" style="width: 18px; height: 18px; background: #36B8B5;"></span>Turquesa</button>
+              <button class="row g2 chip" type="button"><span class="sw" style="width: 18px; height: 18px; background: #C6F432;"></span>Lima</button>
+              <button class="row g2 chip" type="button"><span class="sw" style="width: 18px; height: 18px; background: #FFD23F;"></span>Amarillo</button>
+              <button class="row g2 chip" type="button"><span class="sw" style="width: 18px; height: 18px; background: #F6D5E6;"></span>Pastel</button>
+            </div>
+          </fieldset>
+
+          <div class="grid2">
+            <div class="field"><label for="m-dulces">¿Con dulces?</label><select id="m-dulces" class="select"><option>Sí, con dulces</option><option>No, solo squishies</option><option>Yo pongo los dulces</option></select></div>
+            <div class="field"><label for="m-fecha">Fecha del cumple</label><input id="m-fecha" class="input" type="text" value="Sáb 21 nov 2026"><span class="hint">La confirmamos por WhatsApp.</span></div>
+          </div>
+          <div class="field"><label for="m-dist">Distrito de entrega</label><select id="m-dist" class="select"><option>Surco</option><option>Miraflores</option><option>San Isidro</option><option>La Molina</option><option>San Borja</option><option>Otro distrito de Lima</option></select></div>
+
+          <div class="stack g3">
+            <span class="label">Foto de la temática <span class="muted" style="font-weight: 500;">(opcional)</span></span>
+            <div class="drop"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"></path><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"></path></svg><span class="small"><b style="color: var(--text);">Toca para subir</b> la invitación, la torta o la deco</span><span class="small">JPG o PNG · hasta 3 fotos</span></div>
+            <div class="thumbs">
+              <div class="thumb"><img src="../img/caja-regalo.jpg" alt="Referencia 1"></div>
+              <div class="thumb"><img src="../img/ajolote.jpg" alt="Referencia 2"></div>
+            </div>
+          </div>
+
+          <div class="field"><label for="m-idea">Comentarios</label><textarea id="m-idea" class="textarea" placeholder="Ej.: es el cumple de mi hija, le encantan los gatitos y el morado. Son 20 niños de 6 a 8 años."></textarea></div>
+
+          <hr class="hr">
+          <div class="stack g4">
+            <p class="h4">Tus datos</p>
+            <div class="field"><label for="m-nom">Nombre</label><input id="m-nom" class="input" placeholder="Nombre y apellido"></div>
+            <div class="grid2">
+              <div class="field"><label for="m-cel">Celular (WhatsApp)</label><input id="m-cel" class="input" type="tel" placeholder="9XX XXX XXX"></div>
+              <div class="field"><label for="m-mail">Correo</label><input id="m-mail" class="input" type="email" placeholder="tucorreo@ejemplo.com"></div>
+            </div>
+          </div>
+          <a class="btn block" href="{{h.medidaOk}}">Pedir cotización</a>
+          <p class="small muted" style="text-align: center;">Respondemos en horario de atención. Sin compromiso.</p>
+        </form>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{enviado}}" hint-placeholder-val="{{false}}">
+    <div class="wrap" style="padding-block: 72px 112px;">
+      <div class="stack g5" style="max-width: 640px; margin: 0 auto; align-items: center; text-align: center;">
+        <span style="width: 72px; height: 72px; border-radius: 50%; background: var(--primary); color: var(--on-primary); display: flex; align-items: center; justify-content: center;"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true" style="width: 32px; height: 32px;"><path d="m5 12 4.5 4.5L19 7"></path></svg></span>
+        <p class="eyebrow">Pedido para fiesta N.º F-0042</p>
+        <h1 class="h1">¡Recibimos <em>tu pedido</em>!</h1>
+        <p class="lead">Gracias, Daniela. Te escribimos por WhatsApp al 987 654 321 con tu cotización.</p>
+        <div class="stack g3" style="width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px;">
+          <p class="label">Resumen</p>
+          <div class="sum-row"><span class="muted">Producto</span><span>Mini Box Sorpresa de Cumple</span></div>
+          <div class="sum-row"><span class="muted">Cantidad</span><span>20 mini box</span></div>
+          <div class="sum-row"><span class="muted">Squishies por caja</span><span>2 squishies</span></div>
+          <div class="sum-row"><span class="muted">Dulces</span><span>Sí, con dulces</span></div>
+          <div class="sum-row"><span class="muted">Colores</span><span>Fucsia, morado</span></div>
+          <div class="sum-row"><span class="muted">Fecha del cumple</span><span>Sáb 21 nov 2026</span></div>
+          <div class="sum-row"><span class="muted">Entrega</span><span>Surco</span></div>
+          <div class="sum-row"><span class="muted">Fotos</span><span>2 adjuntas</span></div>
+        </div>
+        <div class="row g3 wrap-row" style="justify-content: center;">
+          <a class="btn" href="{{h.cat}}">Ver cajas sorpresa</a>
+          <a class="btn ghost" href="{{h.home}}">Volver al inicio</a>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="cols">
+        <div class="stack g4">
+          <span class="logo lg" role="img" aria-label="Logo The Squish Box"><span class="l-the">THE</span><span class="l-squish">SQUISH</span><span class="l-box">BOX</span></span>
+          <p class="small" style="max-width: 300px; opacity: .85;">Mystery squishies para coleccionar. Abre, descubre, colecciona e intercambia. Lima, Perú.</p>
+        </div>
+        <div><h4>Tienda</h4><ul><li><a href="{{h.cat}}">Cajas sorpresa</a></li><li><a href="{{h.cat}}">Mystery Squish</a></li><li><a href="{{h.medida}}">Para tu fiesta</a></li></ul></div>
+        <div><h4>Ayuda</h4><ul><li><a href="#">Entregas en Lima</a></li><li><a href="#">Squishy tips</a></li><li><a href="#">Cambios y devoluciones</a></li></ul></div>
+        <div><h4>Contacto</h4><ul><li><a href="https://www.instagram.com/the.squish.box/">@the.squish.box</a></li><li><a href="#">WhatsApp [+51 9XX XXX XXX]</a></li><li>Lima, Perú</li></ul></div>
+      </div>
+      <div class="legal"><span>© 2026 The Squish Box · RUC [N.º de RUC]</span><span>Libro de reclamaciones · Términos · Privacidad</span></div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"palette":{"editor":"enum","options":["original","neon","halloween","pastel","menta"],"default":"original"},"enviado":{"editor":"boolean","default":false},"mobile":{"editor":null,"tsType":"boolean"},"$preview":{"width":1440,"height":2000}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { space: '20', size: 's' }; }
+  renderVals() {
+    const m = !!this.props.mobile;
+    const h = m
+      ? { home: 'M-Home.dc.html', cat: 'M-Catalogo.dc.html', medida: 'M-Medida.dc.html', medidaOk: 'M-MedidaOK.dc.html', drawer: 'M-CarritoDrawer.dc.html' }
+      : { home: 'S-Home.dc.html', cat: 'S-Catalogo.dc.html', medida: 'S-Medida.dc.html', medidaOk: 'D-MedidaOK.dc.html', drawer: 'D-CarritoDrawer.dc.html' };
+    const spaces = ['10', '15', '20', '25', '30', 'Más de 30'].map(l => ({ label: l, on: this.state.space === l ? 'on' : '', pick: () => this.setState({ space: l }) }));
+    const sizes = [['s', '2 squishies', 'S/ 18 c/u'], ['m', '3 squishies', 'S/ 24 c/u'], ['l', 'Aún no sé', 'Te recomendamos']].map(([k, label, sub]) => ({ label, sub, on: this.state.size === k ? 'on' : '', pick: () => this.setState({ size: k }) }));
+    const enviado = !!this.props.enviado;
+    return { palette: this.props.palette ?? 'original', h, spaces, sizes, enviado, showForm: !enviado, noop: (e) => e && e.preventDefault && e.preventDefault() };
+  }
+}
+</script>
+</body>
+</html>
