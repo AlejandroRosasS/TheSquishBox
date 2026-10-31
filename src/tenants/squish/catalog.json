@@ -1,0 +1,197 @@
+{
+  "pricesNote": "Solo Mini Box Halloween (S/ 25) es precio real publicado en IG. El resto son referenciales hasta que la marca confirme.",
+  "lines": [
+    {
+      "id": "cajas",
+      "name": "Cajas",
+      "order": 1
+    },
+    {
+      "id": "mystery",
+      "name": "Mystery",
+      "order": 2
+    },
+    {
+      "id": "cumple",
+      "name": "Cumpleaños",
+      "order": 3
+    },
+    {
+      "id": "recompra",
+      "name": "Recompra",
+      "order": 4
+    },
+    {
+      "id": "temporada",
+      "name": "Temporada",
+      "order": 5
+    }
+  ],
+  "products": [
+    {
+      "id": "the-squish-box",
+      "name": "The Squish Box",
+      "line": "cajas",
+      "badge": "Favorito",
+      "status": "published",
+      "description": "4 squishies sorpresa (1 grande + 3 pequeños), cada uno en su sobre, y tu cartilla para coleccionarlos. Más de 80 modelos para descubrir; si te sale repetido, intercámbialo con tus amigos.",
+      "variants": [
+        {
+          "id": "unica",
+          "label": "Caja completa",
+          "price": 69,
+          "priceIsReference": true,
+          "stock": 24
+        }
+      ],
+      "images": [
+        "img/squish-box-contenido.jpg",
+        "img/caja-regalo.jpg",
+        "img/nuestros-productos.jpg"
+      ]
+    },
+    {
+      "id": "mystery-squish",
+      "name": "Mystery Squish",
+      "line": "mystery",
+      "badge": "Últimas 3",
+      "status": "published",
+      "description": "Un sobre sorpresa con 1 squishy grande que descubres recién al abrirlo. ¿Cuál te tocará?",
+      "variants": [
+        {
+          "id": "unica",
+          "label": "1 squishy grande",
+          "price": 29,
+          "priceIsReference": true,
+          "stock": 3
+        }
+      ],
+      "images": [
+        "img/mystery-nina.jpg",
+        "img/ajolote.jpg"
+      ]
+    },
+    {
+      "id": "mini-box-cumple",
+      "name": "Mini Box Sorpresa de Cumple",
+      "line": "cumple",
+      "status": "published",
+      "description": "Mini caja con squishies pequeños sorpresa y espacio para agregar dulces. Ideal como recuerdo para los invitados del cumple.",
+      "variants": [
+        {
+          "id": "2",
+          "label": "2 squishies",
+          "price": 18,
+          "priceIsReference": true,
+          "stock": 30
+        },
+        {
+          "id": "3",
+          "label": "3 squishies",
+          "price": 24,
+          "priceIsReference": true,
+          "stock": 4
+        }
+      ],
+      "images": [
+        "img/mini-caja-sorpresa.jpg",
+        "img/mama-pensando.jpg"
+      ]
+    },
+    {
+      "id": "mini-box-recompra",
+      "name": "Mini Box Recompra",
+      "line": "recompra",
+      "badge": "Nuevo",
+      "status": "published",
+      "description": "Squishies pequeños, cada uno en su sobre, para seguir llenando tu cartilla. Exclusiva para quienes ya tienen su The Squish Box y su cartilla.",
+      "variants": [
+        {
+          "id": "4",
+          "label": "4 squishies",
+          "price": 39,
+          "priceIsReference": true,
+          "stock": 15
+        },
+        {
+          "id": "5",
+          "label": "5 squishies",
+          "price": 47,
+          "priceIsReference": true,
+          "stock": 10
+        }
+      ],
+      "images": [
+        "img/mini-caja-recompra.jpg"
+      ]
+    },
+    {
+      "id": "mini-box-halloween",
+      "name": "Mini Box Halloween",
+      "line": "temporada",
+      "status": "sold_out",
+      "description": "2 squishies sorpresa + 4 dulces sorpresa. Delivery no incluido. Promoción hasta agotar stock.",
+      "variants": [
+        {
+          "id": "unica",
+          "label": "Mini box",
+          "price": 25,
+          "priceIsReference": false,
+          "stock": 0
+        }
+      ],
+      "images": [
+        "img/halloween-minibox.jpg"
+      ]
+    }
+  ],
+  "collectibleModels": {
+    "note": "No se venden sueltos: son los que te pueden tocar (más de 80 modelos).",
+    "items": [
+      {
+        "name": "Ajolote glitter",
+        "size": "grande",
+        "image": "img/ajolote.jpg"
+      },
+      {
+        "name": "Patitas",
+        "image": "img/patitas.jpg"
+      },
+      {
+        "name": "Jelly Cubes",
+        "image": "img/jelly-cubes.jpg"
+      },
+      {
+        "name": "Mini Butter",
+        "image": "img/mini-butter.jpg"
+      },
+      {
+        "name": "Butter",
+        "image": "img/butter-barra.jpg"
+      },
+      {
+        "name": "Gatitos",
+        "image": "img/gatitos.jpg"
+      },
+      {
+        "name": "Mandarina",
+        "image": "img/mandarina.jpg"
+      },
+      {
+        "name": "Fresa",
+        "image": "img/nina-fresa.jpg"
+      }
+    ]
+  },
+  "tips": [
+    "Lávalo con agua tibia y jabón suave.",
+    "Sécalo bien al aire.",
+    "Si se pone pegajoso, un poquito de maicena o talco.",
+    "Guárdalo lejos del sol y de objetos filosos."
+  ],
+  "benefits": [
+    "Ayudan a relajarse",
+    "Favorecen la concentración",
+    "Estimulan los sentidos"
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "slug": "squish",
+  "name": "The Squish Box",
+  "instagram": "the.squish.box",
+  "city": "Lima, Perú",
+  "tagline": "Mystery squishies para coleccionar",
+  "motto": "Abre • descubre • colecciona • intercambia",
+  "domain": "[dominio por definir]",
+  "whatsapp": "+51 9XX XXX XXX",
+  "currency": "PEN",
+  "locale": "es-PE",
+  "fonts": {
+    "display": "Fredoka",
+    "body": "Nunito",
+    "googleFontsUrl": "https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap"
+  },
+  "logo": {
+    "type": "css",
+    "lines": [
+      {
+        "text": "THE",
+        "color": "#FFFFFF"
+      },
+      {
+        "text": "SQUISH",
+        "color": "#E5177B"
+      },
+      {
+        "text": "BOX",
+        "color": "#36B8B5"
+      }
+    ],
+    "background": "#141018",
+    "image": "img/logo.jpg"
+  },
+  "brandColors": {
+    "ink": "#141018",
+    "pink": "#E5177B",
+    "teal": "#36B8B5",
+    "lime": "#C6F432",
+    "purple": "#7B3FE4",
+    "yellow": "#FFD23F"
+  },
+  "defaultPalette": "original",
+  "palettes": {
+    "original": {
+      "name": "Original (fucsia)",
+      "bg": "#FFF6FA",
+      "surface": "#FFFFFF",
+      "primary": "#D1106B",
+      "onPrimary": "#FFFFFF",
+      "accent": "#2BB5B8",
+      "text": "#1A1320",
+      "text2": "#6A5A6E",
+      "border": "#F1DCE7"
+    },
+    "neon": {
+      "name": "Neón",
+      "bg": "#121016",
+      "surface": "#1D1A23",
+      "primary": "#FF4FA3",
+      "onPrimary": "#121016",
+      "accent": "#C6F432",
+      "text": "#FFFFFF",
+      "text2": "#C9BFD0",
+      "border": "#322C3B"
+    },
+    "halloween": {
+      "name": "Halloween",
+      "bg": "#FFF7EE",
+      "surface": "#FFFFFF",
+      "primary": "#6A2BD1",
+      "onPrimary": "#FFFFFF",
+      "accent": "#FF8A1F",
+      "text": "#1C1424",
+      "text2": "#68596F",
+      "border": "#F0E0CF"
+    },
+    "pastel": {
+      "name": "Pastel",
+      "bg": "#F6F2FF",
+      "surface": "#FFFFFF",
+      "primary": "#7A3FE0",
+      "onPrimary": "#FFFFFF",
+      "accent": "#FF7EB9",
+      "text": "#1D1729",
+      "text2": "#655C75",
+      "border": "#E4DCF5"
+    },
+    "menta": {
+      "name": "Menta",
+      "bg": "#EFFAF8",
+      "surface": "#FFFFFF",
+      "primary": "#0B6E72",
+      "onPrimary": "#FFFFFF",
+      "accent": "#FF4FA3",
+      "text": "#13211F",
+      "text2": "#56666A",
+      "border": "#D3ECE8"
+    }
+  },
+  "highlights": [
+    "Unboxings",
+    "Squishy tips",
+    "Mystery Squish",
+    "The Squish Box"
+  ],
+  "customOrder": {
+    "enabled": true,
+    "label": "Para tu fiesta",
+    "description": "Cotiza Mini Box Sorpresa de Cumple para los invitados"
+  },
+  "payments": {
+    "provider": "culqi",
+    "methods": [
+      "tarjeta",
+      "yape"
+    ]
+  },
+  "fulfillment": {
+    "delivery": "Lima Metropolitana, tarifa por distrito (configurable)",
+    "pickup": "Recojo en punto de entrega acordado (por WhatsApp)"
+  },
+  "salesChannels": [
+    "web",
+    "instagram",
+    "ferias",
+    "otros"
+  ],
+  "notes": "Datos entre corchetes o con XX son placeholders: confirmar con la marca."
+}

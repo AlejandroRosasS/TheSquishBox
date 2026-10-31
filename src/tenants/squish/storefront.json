@@ -1,0 +1,180 @@
+{
+  "_note": "Textos e imágenes de la tienda pública, tomados de docs/screens (S-*). Se editarán desde el admin en fases siguientes.",
+  "brand": {
+    "ink": "ink",
+    "emphasis": "lime",
+    "highlights": [
+      { "bg": "pink", "fg": "#FFFFFF" },
+      { "bg": "lime", "fg": "ink" },
+      { "bg": "teal", "fg": "ink" },
+      { "bg": "purple", "fg": "#FFFFFF" }
+    ]
+  },
+  "announce": "Delivery en Lima · Coordinamos tu entrega por WhatsApp",
+  "nav": [
+    { "label": "Cajas sorpresa", "href": "/tienda?linea=cajas" },
+    { "label": "Mystery Squish", "href": "/tienda?linea=mystery" },
+    { "label": "Para tu fiesta", "href": "/fiesta" }
+  ],
+  "hero": {
+    "image": "img/patitas.jpg",
+    "alt": "Patitas squishy de muchos colores sobre una mesa clara",
+    "eyebrow": "Mystery squishies para coleccionar",
+    "title": "Abre, descubre, *colecciona* e intercambia",
+    "lead": "Cada squishy viene escondido en su sobre. Más de 80 modelos para descubrir. ¿Cuál te tocará?",
+    "primaryCta": { "label": "Quiero mi Squish Box", "href": "/p/the-squish-box" },
+    "secondaryCta": { "label": "Pedir para mi fiesta", "href": "/fiesta" }
+  },
+  "highlights": [
+    { "label": "Unboxings", "href": "#modelos" },
+    { "label": "Squishy tips", "href": "#tips" },
+    { "label": "Mystery Squish", "href": "/p/mystery-squish" },
+    { "label": "The Squish Box", "href": "/p/the-squish-box" }
+  ],
+  "tiles": [
+    { "image": "img/caja-regalo.jpg", "alt": "The Squish Box envuelta con lazo morado", "eyebrow": "4 squishies + cartilla", "title": "Cajas sorpresa", "href": "/tienda?linea=cajas" },
+    { "image": "img/mama-pensando.jpg", "alt": "Mamá pensando qué regalar en un cumpleaños", "eyebrow": "Mini Box para invitados", "title": "Para cumpleaños", "href": "/fiesta" },
+    { "image": "img/ajolote.jpg", "alt": "Ajolote squishy rosado con glitter en una mano", "eyebrow": "1 squishy grande", "title": "Mystery Squish", "href": "/tienda?linea=mystery" }
+  ],
+  "featured": {
+    "eyebrow": "Destacados",
+    "title": "Elige tu *sorpresa*",
+    "productIds": ["the-squish-box", "mystery-squish", "mini-box-recompra", "mini-box-halloween"],
+    "viewAll": "Ver todo",
+    "viewAllMobile": "Ver todas las sorpresas"
+  },
+  "partyBand": {
+    "image": "img/mini-caja-sorpresa.jpg",
+    "alt": "Niña recibiendo una Mini Box Sorpresa de Cumple",
+    "eyebrow": "Para tu fiesta",
+    "title": "Mini Box sorpresa para *todos tus invitados*",
+    "lead": "Mini cajas con 2 o 3 squishies sorpresa y espacio para agregar dulces. Un recuerdo divertido y diferente. Cuéntanos de tu cumple y te enviamos la cotización.",
+    "steps": ["Dinos la fecha y cuántos invitados son", "Te escribimos por WhatsApp con el precio", "Pagas con un link y coordinamos la entrega"],
+    "cta": "Cotizar mi fiesta"
+  },
+  "inside": {
+    "image": "img/squish-box-contenido.jpg",
+    "alt": "The Squish Box abierta con sus sobres, squishies y cartilla",
+    "eyebrow": "¿Qué hay dentro?",
+    "title": "4 squishies sorpresa y *tu cartilla* para coleccionarlos",
+    "lead": "Cada The Squish Box trae 1 squishy grande y 3 pequeños, cada uno escondido en su propio sobre. Ábrelos, búscalos en tu cartilla y sigue completando tu colección.",
+    "body": "Más de 80 modelos diferentes para descubrir. ¿Te salió uno repetido? Intercámbialo con tus amigos. Y para seguir llenando la cartilla, está la Mini Box Recompra."
+  },
+  "models": {
+    "eyebrow": "Modelos que te pueden tocar",
+    "title": "Demasiado *squishy* para tener solo uno",
+    "footnote": "Comparte tu unboxing y etiquétanos en Instagram para aparecer aquí.",
+    "max": 6
+  },
+  "tips": {
+    "eyebrow": "Squishy tips",
+    "title": "Un squishy feliz es un squishy *bien cuidado*",
+    "items": [
+      { "title": "Báñalo suave", "text": "Lávalo con agua tibia y un poquito de jabón suave." },
+      { "title": "Sécalo bien", "text": "Déjalo secar al aire antes de volver a guardarlo." },
+      { "title": "¿Pegajoso?", "text": "Un poquito de maicena o talco y vuelve a estar suavecito." },
+      { "title": "Guárdalo bien", "text": "Lejos del sol y de objetos filosos." }
+    ]
+  },
+  "footer": {
+    "about": "Mystery squishies para coleccionar. Abre, descubre, colecciona e intercambia. Lima, Perú.",
+    "shop": [
+      { "label": "Cajas sorpresa", "href": "/tienda?linea=cajas" },
+      { "label": "Mystery Squish", "href": "/tienda?linea=mystery" },
+      { "label": "Para tu fiesta", "href": "/fiesta" }
+    ],
+    "help": [
+      { "label": "Entregas en Lima", "href": "#" },
+      { "label": "Squishy tips", "href": "/#tips" },
+      { "label": "Cambios y devoluciones", "href": "#" }
+    ],
+    "legal": "RUC [N.º de RUC]",
+    "legalLinks": "Libro de reclamaciones · Términos · Privacidad"
+  },
+  "catalog": {
+    "title": "Todas las *sorpresas*",
+    "lead": "Cajas, sobres y mini box con squishies sorpresa. Cada uno viene escondido en su sobre. ¿Cuál te tocará?",
+    "allLabel": "Todas",
+    "priceRanges": [
+      { "label": "Hasta S/ 30", "max": 30 },
+      { "label": "S/ 30 – S/ 50", "min": 30, "max": 50 },
+      { "label": "Más de S/ 50", "min": 50 }
+    ],
+    "partyCta": { "title": "¿Es para un cumpleaños?", "text": "Armamos Mini Box sorpresa para todos tus invitados.", "cta": "Cotizar mi fiesta" }
+  },
+  "product": {
+    "variantQuestion": "¿Cuántos squishies?",
+    "partyHint": "¿Son para todos tus invitados? [Cotiza tu fiesta](/fiesta) y te armamos todas las que necesites.",
+    "deliveryNote": "**Entrega coordinada.** Después de tu compra te escribimos por WhatsApp para acordar fecha y hora. El delivery se calcula según tu distrito.",
+    "tipsTitle": "Squishy tips",
+    "soldOutAllText": "Déjanos tu correo y te avisamos cuando vuelva. O pide Mini Box sorpresa para los invitados de tu fiesta.",
+    "soldOutVariantText": "Déjanos tu correo y te avisamos cuando vuelva. Mientras tanto, elige otra opción disponible.",
+    "moreTitle": "Más *sorpresas*"
+  },
+  "cart": {
+    "emptyTitle": "Tu carrito está *vacío*",
+    "emptyLead": "¿Listo para descubrir cuál te toca? Elige tu caja sorpresa o arma las sorpresas de tu fiesta.",
+    "emptyPrimary": { "label": "Ver cajas sorpresa", "href": "/tienda" },
+    "emptySecondary": { "label": "Para tu fiesta", "href": "/fiesta" },
+    "popularTitle": "Los más pedidos",
+    "popularIds": ["the-squish-box", "mystery-squish", "mini-box-cumple", "mini-box-recompra"],
+    "deliveryNote": "Coordinamos fecha y hora de entrega por WhatsApp después de tu compra."
+  },
+  "checkout": {
+    "deliveryLabel": "Lima Metropolitana",
+    "pickupLabel": "En punto de entrega acordado · Gratis",
+    "pickupNote": "**Recojo en punto acordado**\nTe escribimos por WhatsApp para coordinar el lugar y la hora en Lima.",
+    "giftHint": "Lo escribimos a mano en una tarjeta. 120 caracteres máx.",
+    "deliveryRatesAreExample": true,
+    "deliveryRates": {
+      "Barranco": 15, "Jesús María": 15, "La Molina": 25, "Lince": 12, "Magdalena del Mar": 15,
+      "Miraflores": 15, "Pueblo Libre": 18, "San Borja": 18, "San Isidro": 15, "San Miguel": 18,
+      "Santiago de Surco": 20, "Surquillo": 12, "Chorrillos": 25, "Callao": null, "Ate": null, "Los Olivos": null
+    },
+    "defaultDistrict": "Miraflores"
+  },
+  "confirmation": {
+    "title": "¡Gracias, {name}! *Tus sorpresas ya están en camino*",
+    "lead": "Te enviamos el resumen a {email}. ¿Cuáles te tocarán?",
+    "collectNote": "Busca cada squishy en tu cartilla. ¿Te salió repetido? **Intercámbialo con tus amigos.**"
+  },
+  "party": {
+    "productId": "mini-box-cumple",
+    "eyebrow": "Para tu fiesta",
+    "title": "Una sorpresa para *cada invitado*",
+    "lead": "Mini Box Sorpresa de Cumple por cantidad: squishies sorpresa y espacio para agregar dulces. Cuéntanos de tu fiesta y te mandamos la cotización por WhatsApp. Si te gusta, pagas con un link y coordinamos la entrega.",
+    "image": "img/mini-caja-sorpresa.jpg",
+    "imageAlt": "Niña recibiendo una Mini Box Sorpresa de Cumple",
+    "steps": [
+      { "title": "Nos cuentas de tu fiesta", "text": "Fecha, cantidad de invitados y temática." },
+      { "title": "Te cotizamos", "text": "Te escribimos por WhatsApp con el precio total." },
+      { "title": "Confirmas y pagas", "text": "Con un link seguro: tarjeta o Yape." }
+    ],
+    "quantities": ["10", "15", "20", "25", "30", "Más de 30"],
+    "defaultQuantity": "20",
+    "sizeQuestion": "¿Cuántos squishies por mini box?",
+    "unsureLabel": "Aún no sé",
+    "colors": [
+      { "name": "Fucsia", "hex": "#E5177B" },
+      { "name": "Morado", "hex": "#7B3FE4" },
+      { "name": "Turquesa", "hex": "#36B8B5" },
+      { "name": "Lima", "hex": "#C6F432" },
+      { "name": "Amarillo", "hex": "#FFD23F" },
+      { "name": "Pastel", "hex": "#F6D5E6" }
+    ],
+    "extrasLabel": "¿Con dulces?",
+    "extrasOptions": ["Sí, con dulces", "No, solo squishies", "Yo pongo los dulces"],
+    "districts": ["Surco", "Miraflores", "San Isidro", "La Molina", "San Borja", "Otro distrito de Lima"],
+    "commentsPlaceholder": "Ej.: es el cumple de mi hija, le encantan los gatitos y el morado. Son 20 niños de 6 a 8 años.",
+    "uploadHint": "la invitación, la torta o la deco",
+    "footnote": "Respondemos en horario de atención. Sin compromiso.",
+    "sentTitle": "¡Recibimos *tu pedido*!",
+    "sentLead": "Gracias, {name}. Te escribimos por WhatsApp al {phone} con tu cotización."
+  },
+  "notFound": {
+    "image": "img/mandarina.jpg",
+    "alt": "Manos apretando un squishy de mandarina",
+    "title": "Esta página se nos *escapó del sobre*",
+    "lead": "La página que buscas se movió o ya no existe. Pero hay muchas sorpresas esperándote."
+  }
+}

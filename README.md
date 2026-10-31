@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tienda IG — tienda pública multi-marca
 
-## Getting Started
+Fase 1 del MVP: tienda pública de **The Squish Box** con datos fijos (sin base de datos). Ver `CLAUDE.md` y `docs/SPEC.md`.
 
-First, run the development server:
+## Correr en local
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
+npm run build      # debe terminar sin errores
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Variables (`.env`):
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `TENANT=squish` — marca activa. En producción se resolverá por dominio (Fase 3).
+- `NEXT_PUBLIC_DEMO=1` — muestra el selector de paletas abajo a la izquierda (solo demo; en Fase 2 vive en Admin › Apariencia).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Qué ver
 
-## Learn More
+| Ruta | Pantalla |
+|---|---|
+| `/` | Home |
+| `/tienda` (`?linea=cumple`) | Catálogo con filtro por línea y precio, y orden |
+| `/p/mini-box-cumple` | Producto con variantes (2 / 3 squishies) |
+| `/p/mini-box-halloween` | Producto agotado + "Avísame cuando vuelva" |
+| carrito (drawer) | Se abre al agregar o con el ícono de la bolsa |
+| `/carrito` | Carrito completo o vacío |
+| `/checkout` | Checkout simulado. El código de Yape `000000` muestra el error de pago |
+| `/pedido/0001` | Confirmación (el pedido se guarda en el navegador) |
+| `/fiesta` | Pedido especial "Para tu fiesta" + confirmación |
+| cualquier otra | 404 |
 
-To learn more about Next.js, take a look at the following resources:
+## Cómo está armado
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `src/tenants/<slug>/` — `tenant.json` y `catalog.json` (copiados del handoff) + `storefront.json` (textos e imágenes de la tienda que en los mockups estaban escritos a mano). Registro en `src/tenants/index.ts`.
+- `public/tenants/<slug>/img/` — fotos de la marca.
+- `src/app/store.css` — `bloom.css` del handoff renombrado a `.store`, sin colores de marca: los 8 tokens, los colores de marca y las fuentes se inyectan desde el tenant (`src/lib/theme.ts`).
+- Carrito y pedidos en `localStorage` (Fase 1). Pago simulado: en Fase 3 se conecta Culqi / Yape manual.
+- Next.js 16 con Cache Components (por defecto): lo que depende de la URL o de la fecha va dentro de `<Suspense>` o en el cliente.
