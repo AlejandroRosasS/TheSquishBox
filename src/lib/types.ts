@@ -47,6 +47,8 @@ export type Variant = {
   stock: number;
   /** Id de la variante en la base de datos (cuando la tienda lee de Supabase). */
   dbId?: string;
+  /** Foto opcional de esta opción (una de las fotos del producto). */
+  image?: string;
 };
 
 export type Product = {
@@ -55,6 +57,10 @@ export type Product = {
   line: string;
   badge?: string;
   status: "published" | "sold_out" | "draft";
+  /** simple = 1 variante; options = 2 o más. Si falta se deduce de variants.length. */
+  kind?: "simple" | "options";
+  /** Pregunta del selector de opciones; si falta se usa storefront.product.variantQuestion. */
+  optionsLabel?: string;
   description: string;
   variants: Variant[];
   images: string[];

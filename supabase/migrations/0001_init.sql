@@ -57,6 +57,8 @@ create table public.products (
   line text,
   badge text,
   status text not null default 'draft' check (status in ('published','sold_out','draft')),
+  kind text not null default 'simple' check (kind in ('simple','options')),
+  options_label text,                -- pregunta del selector; null = la de los textos de la tienda
   description text not null default '',
   images text[] not null default '{}',
   position integer not null default 0,
@@ -78,6 +80,7 @@ create table public.product_variants (
   price numeric(10,2) not null check (price >= 0),
   price_is_reference boolean not null default false,
   stock integer,  -- null = sin control de stock
+  image text,     -- foto opcional de esta opción (una de las fotos del producto)
   position integer not null default 0,
   unique (product_id, key)
 );

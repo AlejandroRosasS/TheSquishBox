@@ -37,16 +37,18 @@ for (const l of lines) {
 }
 
 products.forEach((p, i) => {
-  out.push(`insert into public.products (tenant_id, slug, name, line, badge, status, description, images, position)
-  select id, ${q(p.id)}, ${q(p.name)}, ${q(p.line)}, ${q(p.badge)}, ${q(p.status)}, ${q(p.description)}, ${arr(p.images)}, ${i} from _t
+  const kind = p.kind ?? (p.variants.length > 1 ? "options" : "simple");
+  out.push(`insert into public.products (tenant_id, slug, name, line, badge, status, kind, options_label, description, images, position)
+  select id, ${q(p.id)}, ${q(p.name)}, ${q(p.line)}, ${q(p.badge)}, ${q(p.status)}, ${q(kind)}, ${q(p.optionsLabel)}, ${q(p.description)}, ${arr(p.images)}, ${i} from _t
   on conflict (tenant_id, slug) do update set name = excluded.name, line = excluded.line, badge = excluded.badge, status = excluded.status,
+    kind = excluded.kind, options_label = excluded.options_label,
     description = excluded.description, images = excluded.images, position = excluded.position, updated_at = now();`);
   p.variants.forEach((v, k) => {
-    out.push(`insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, position)
-  select pr.tenant_id, pr.id, ${q(v.id)}, ${q(v.label)}, ${v.price}, ${v.priceIsReference}, ${v.stock ?? "null"}, ${k}
+    out.push(`insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, image, position)
+  select pr.tenant_id, pr.id, ${q(v.id)}, ${q(v.label)}, ${v.price}, ${v.priceIsReference}, ${v.stock ?? "null"}, ${q(v.image)}, ${k}
   from public.products pr where pr.tenant_id = (select id from _t) and pr.slug = ${q(p.id)}
   on conflict (product_id, key) do update set label = excluded.label, price = excluded.price,
-    price_is_reference = excluded.price_is_reference, stock = excluded.stock, position = excluded.position;`);
+    price_is_reference = excluded.price_is_reference, stock = excluded.stock, image = excluded.image, position = excluded.position;`);
   });
 });
 out.push("commit;");

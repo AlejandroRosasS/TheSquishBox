@@ -16,59 +16,64 @@ insert into public.product_lines (tenant_id, id, name, position) select id, 'mys
 insert into public.product_lines (tenant_id, id, name, position) select id, 'cumple', 'Cumpleaños', 3 from _t;
 insert into public.product_lines (tenant_id, id, name, position) select id, 'recompra', 'Recompra', 4 from _t;
 insert into public.product_lines (tenant_id, id, name, position) select id, 'temporada', 'Temporada', 5 from _t;
-insert into public.products (tenant_id, slug, name, line, badge, status, description, images, position)
-  select id, 'the-squish-box', 'The Squish Box', 'cajas', 'Favorito', 'published', '4 squishies sorpresa (1 grande + 3 pequeños), cada uno en su sobre, y tu cartilla para coleccionarlos. Más de 80 modelos para descubrir; si te sale repetido, intercámbialo con tus amigos.', array['img/squish-box-contenido.jpg','img/caja-regalo.jpg','img/nuestros-productos.jpg']::text[], 0 from _t
+insert into public.products (tenant_id, slug, name, line, badge, status, kind, options_label, description, images, position)
+  select id, 'the-squish-box', 'The Squish Box', 'cajas', 'Favorito', 'published', 'simple', null, '4 squishies sorpresa (1 grande + 3 pequeños), cada uno en su sobre, y tu cartilla para coleccionarlos. Más de 80 modelos para descubrir; si te sale repetido, intercámbialo con tus amigos.', array['img/squish-box-contenido.jpg','img/caja-regalo.jpg','img/nuestros-productos.jpg']::text[], 0 from _t
   on conflict (tenant_id, slug) do update set name = excluded.name, line = excluded.line, badge = excluded.badge, status = excluded.status,
+    kind = excluded.kind, options_label = excluded.options_label,
     description = excluded.description, images = excluded.images, position = excluded.position, updated_at = now();
-insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, position)
-  select pr.tenant_id, pr.id, 'unica', 'Caja completa', 69, true, 24, 0
+insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, image, position)
+  select pr.tenant_id, pr.id, 'unica', 'Caja completa', 69, true, 24, null, 0
   from public.products pr where pr.tenant_id = (select id from _t) and pr.slug = 'the-squish-box'
   on conflict (product_id, key) do update set label = excluded.label, price = excluded.price,
-    price_is_reference = excluded.price_is_reference, stock = excluded.stock, position = excluded.position;
-insert into public.products (tenant_id, slug, name, line, badge, status, description, images, position)
-  select id, 'mystery-squish', 'Mystery Squish', 'mystery', 'Últimas 3', 'published', 'Un sobre sorpresa con 1 squishy grande que descubres recién al abrirlo. ¿Cuál te tocará?', array['img/mystery-nina.jpg','img/ajolote.jpg']::text[], 1 from _t
+    price_is_reference = excluded.price_is_reference, stock = excluded.stock, image = excluded.image, position = excluded.position;
+insert into public.products (tenant_id, slug, name, line, badge, status, kind, options_label, description, images, position)
+  select id, 'mystery-squish', 'Mystery Squish', 'mystery', 'Últimas 3', 'published', 'simple', null, 'Un sobre sorpresa con 1 squishy grande que descubres recién al abrirlo. ¿Cuál te tocará?', array['img/mystery-nina.jpg','img/ajolote.jpg']::text[], 1 from _t
   on conflict (tenant_id, slug) do update set name = excluded.name, line = excluded.line, badge = excluded.badge, status = excluded.status,
+    kind = excluded.kind, options_label = excluded.options_label,
     description = excluded.description, images = excluded.images, position = excluded.position, updated_at = now();
-insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, position)
-  select pr.tenant_id, pr.id, 'unica', '1 squishy grande', 29, true, 3, 0
+insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, image, position)
+  select pr.tenant_id, pr.id, 'unica', '1 squishy grande', 29, true, 3, null, 0
   from public.products pr where pr.tenant_id = (select id from _t) and pr.slug = 'mystery-squish'
   on conflict (product_id, key) do update set label = excluded.label, price = excluded.price,
-    price_is_reference = excluded.price_is_reference, stock = excluded.stock, position = excluded.position;
-insert into public.products (tenant_id, slug, name, line, badge, status, description, images, position)
-  select id, 'mini-box-cumple', 'Mini Box Sorpresa de Cumple', 'cumple', null, 'published', 'Mini caja con squishies pequeños sorpresa y espacio para agregar dulces. Ideal como recuerdo para los invitados del cumple.', array['img/mini-caja-sorpresa.jpg','img/mama-pensando.jpg']::text[], 2 from _t
+    price_is_reference = excluded.price_is_reference, stock = excluded.stock, image = excluded.image, position = excluded.position;
+insert into public.products (tenant_id, slug, name, line, badge, status, kind, options_label, description, images, position)
+  select id, 'mini-box-cumple', 'Mini Box Sorpresa de Cumple', 'cumple', null, 'published', 'options', null, 'Mini caja con squishies pequeños sorpresa y espacio para agregar dulces. Ideal como recuerdo para los invitados del cumple.', array['img/mini-caja-sorpresa.jpg','img/mama-pensando.jpg']::text[], 2 from _t
   on conflict (tenant_id, slug) do update set name = excluded.name, line = excluded.line, badge = excluded.badge, status = excluded.status,
+    kind = excluded.kind, options_label = excluded.options_label,
     description = excluded.description, images = excluded.images, position = excluded.position, updated_at = now();
-insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, position)
-  select pr.tenant_id, pr.id, '2', '2 squishies', 18, true, 30, 0
+insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, image, position)
+  select pr.tenant_id, pr.id, '2', '2 squishies', 18, true, 30, null, 0
   from public.products pr where pr.tenant_id = (select id from _t) and pr.slug = 'mini-box-cumple'
   on conflict (product_id, key) do update set label = excluded.label, price = excluded.price,
-    price_is_reference = excluded.price_is_reference, stock = excluded.stock, position = excluded.position;
-insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, position)
-  select pr.tenant_id, pr.id, '3', '3 squishies', 24, true, 4, 1
+    price_is_reference = excluded.price_is_reference, stock = excluded.stock, image = excluded.image, position = excluded.position;
+insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, image, position)
+  select pr.tenant_id, pr.id, '3', '3 squishies', 24, true, 4, null, 1
   from public.products pr where pr.tenant_id = (select id from _t) and pr.slug = 'mini-box-cumple'
   on conflict (product_id, key) do update set label = excluded.label, price = excluded.price,
-    price_is_reference = excluded.price_is_reference, stock = excluded.stock, position = excluded.position;
-insert into public.products (tenant_id, slug, name, line, badge, status, description, images, position)
-  select id, 'mini-box-recompra', 'Mini Box Recompra', 'recompra', 'Nuevo', 'published', 'Squishies pequeños, cada uno en su sobre, para seguir llenando tu cartilla. Exclusiva para quienes ya tienen su The Squish Box y su cartilla.', array['img/mini-caja-recompra.jpg']::text[], 3 from _t
+    price_is_reference = excluded.price_is_reference, stock = excluded.stock, image = excluded.image, position = excluded.position;
+insert into public.products (tenant_id, slug, name, line, badge, status, kind, options_label, description, images, position)
+  select id, 'mini-box-recompra', 'Mini Box Recompra', 'recompra', 'Nuevo', 'published', 'options', null, 'Squishies pequeños, cada uno en su sobre, para seguir llenando tu cartilla. Exclusiva para quienes ya tienen su The Squish Box y su cartilla.', array['img/mini-caja-recompra.jpg']::text[], 3 from _t
   on conflict (tenant_id, slug) do update set name = excluded.name, line = excluded.line, badge = excluded.badge, status = excluded.status,
+    kind = excluded.kind, options_label = excluded.options_label,
     description = excluded.description, images = excluded.images, position = excluded.position, updated_at = now();
-insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, position)
-  select pr.tenant_id, pr.id, '4', '4 squishies', 39, true, 15, 0
+insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, image, position)
+  select pr.tenant_id, pr.id, '4', '4 squishies', 39, true, 15, null, 0
   from public.products pr where pr.tenant_id = (select id from _t) and pr.slug = 'mini-box-recompra'
   on conflict (product_id, key) do update set label = excluded.label, price = excluded.price,
-    price_is_reference = excluded.price_is_reference, stock = excluded.stock, position = excluded.position;
-insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, position)
-  select pr.tenant_id, pr.id, '5', '5 squishies', 47, true, 10, 1
+    price_is_reference = excluded.price_is_reference, stock = excluded.stock, image = excluded.image, position = excluded.position;
+insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, image, position)
+  select pr.tenant_id, pr.id, '5', '5 squishies', 47, true, 10, null, 1
   from public.products pr where pr.tenant_id = (select id from _t) and pr.slug = 'mini-box-recompra'
   on conflict (product_id, key) do update set label = excluded.label, price = excluded.price,
-    price_is_reference = excluded.price_is_reference, stock = excluded.stock, position = excluded.position;
-insert into public.products (tenant_id, slug, name, line, badge, status, description, images, position)
-  select id, 'mini-box-halloween', 'Mini Box Halloween', 'temporada', null, 'sold_out', '2 squishies sorpresa + 4 dulces sorpresa. Delivery no incluido. Promoción hasta agotar stock.', array['img/halloween-minibox.jpg']::text[], 4 from _t
+    price_is_reference = excluded.price_is_reference, stock = excluded.stock, image = excluded.image, position = excluded.position;
+insert into public.products (tenant_id, slug, name, line, badge, status, kind, options_label, description, images, position)
+  select id, 'mini-box-halloween', 'Mini Box Halloween', 'temporada', null, 'sold_out', 'simple', null, '2 squishies sorpresa + 4 dulces sorpresa. Delivery no incluido. Promoción hasta agotar stock.', array['img/halloween-minibox.jpg']::text[], 4 from _t
   on conflict (tenant_id, slug) do update set name = excluded.name, line = excluded.line, badge = excluded.badge, status = excluded.status,
+    kind = excluded.kind, options_label = excluded.options_label,
     description = excluded.description, images = excluded.images, position = excluded.position, updated_at = now();
-insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, position)
-  select pr.tenant_id, pr.id, 'unica', 'Mini box', 25, false, 0, 0
+insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, image, position)
+  select pr.tenant_id, pr.id, 'unica', 'Mini box', 25, false, 0, null, 0
   from public.products pr where pr.tenant_id = (select id from _t) and pr.slug = 'mini-box-halloween'
   on conflict (product_id, key) do update set label = excluded.label, price = excluded.price,
-    price_is_reference = excluded.price_is_reference, stock = excluded.stock, position = excluded.position;
+    price_is_reference = excluded.price_is_reference, stock = excluded.stock, image = excluded.image, position = excluded.position;
 commit;

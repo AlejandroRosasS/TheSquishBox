@@ -12,8 +12,8 @@ export type DbBundle = {
 
 type ProductRow = {
   id: string; slug: string; name: string; line: string | null; badge: string | null;
-  status: Product["status"]; description: string; images: string[]; position: number; extra: Record<string, unknown>;
-  product_variants: { id: string; key: string; label: string; price: number | string; price_is_reference: boolean; stock: number | null; position: number }[];
+  status: Product["status"]; kind: "simple" | "options"; options_label: string | null; description: string; images: string[]; position: number; extra: Record<string, unknown>;
+  product_variants: { id: string; key: string; label: string; price: number | string; price_is_reference: boolean; stock: number | null; image: string | null; position: number }[];
 };
 
 /**
@@ -30,7 +30,7 @@ export async function loadBundleFromDb(slug: string): Promise<DbBundle | null> {
     db.from("site_docs").select("kind, body").eq("tenant_id", t.id).eq("stage", "published"),
     db.from("product_lines").select("id, name, position").eq("tenant_id", t.id).order("position"),
     db.from("products")
-      .select("id, slug, name, line, badge, status, description, images, position, extra, product_variants(id, key, label, price, price_is_reference, stock, position)")
+      .select("id, slug, name, line, badge, status, kind, options_label, description, images, position, extra, product_variants(id, key, label, price, price_is_reference, stock, image, position)")
       .eq("tenant_id", t.id)
       .neq("status", "draft")
       .order("position"),
@@ -51,6 +51,8 @@ export async function loadBundleFromDb(slug: string): Promise<DbBundle | null> {
       line: p.line ?? "",
       ...(p.badge ? { badge: p.badge } : {}),
       status: p.status,
+      kind: p.kind,
+      ...(p.options_label ? { optionsLabel: p.options_label } : {}),
       description: p.description,
       images: p.images,
       variants: [...p.product_variants]
@@ -62,6 +64,7 @@ export async function loadBundleFromDb(slug: string): Promise<DbBundle | null> {
           price: Number(v.price),
           priceIsReference: v.price_is_reference,
           stock: v.stock ?? 999,
+          ...(v.image ? { image: v.image } : {}),
         })),
     })),
   };
