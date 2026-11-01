@@ -6,12 +6,11 @@ import type { Product } from "@/lib/types";
 import { useStore } from "@/components/StoreContext";
 import { useCart } from "@/components/cart/CartProvider";
 import { Rich } from "@/components/Rich";
-import { asset } from "@/lib/assets";
+import { Photo } from "@/components/Photo";
+import { SLOTS } from "@/lib/media";
 import { formatPrice } from "@/lib/format";
 import { isSoldOut, LOW_STOCK, variantStockLabel } from "@/lib/catalog";
 import { IconInstagram, IconMinus, IconPlus, IconTruck } from "@/components/Icons";
-
-/* eslint-disable @next/next/no-img-element */
 
 export function ProductView({ product: p, lineLabel }: { product: Product; lineLabel: string }) {
   const { tenant, catalog, storefront: sf } = useStore();
@@ -29,7 +28,7 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
   const v = p.variants.find((x) => x.id === vid) ?? firstAvailable;
   const curOut = allOut || v.stock <= 0;
   const stockBadge = curOut ? "Agotado" : v.stock <= LOW_STOCK ? `Últimas ${v.stock}` : "";
-  const images = p.images.map((src) => asset(tenant.slug, src));
+  const images = p.images;
   const ig = `https://www.instagram.com/${tenant.instagram}/`;
 
   const pickVariant = (id: string) => {
@@ -58,12 +57,12 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
             <div className="gthumbs">
               {images.map((src, i) => (
                 <button key={src} className={`gthumb ${img === i ? "on" : ""}`} type="button" aria-label={`Ver foto ${i + 1}`} aria-pressed={img === i} onClick={() => setImg(i)}>
-                  <img src={src} alt="" />
+                  <Photo src={src} alt="" slot={SLOTS.product} />
                 </button>
               ))}
             </div>
             <div className={`ph r45 ${allOut ? "dim" : ""}`} style={{ borderRadius: 24 }}>
-              <img src={images[img]} alt={`${p.name}, foto ${img + 1}`} />
+              <Photo src={images[img]} alt={`${p.name}, foto ${img + 1}`} slot={SLOTS.product} />
               {allOut && <span className="tag badge sold">Agotado</span>}
             </div>
           </div>
@@ -80,7 +79,7 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
             >
               {images.map((src, i) => (
                 <div key={src} className={`ph r45 ${allOut ? "dim" : ""}`}>
-                  <img src={src} alt={`${p.name}, foto ${i + 1}`} />
+                  <Photo src={src} alt={`${p.name}, foto ${i + 1}`} slot={SLOTS.product} />
                   {allOut && i === 0 && <span className="tag badge sold">Agotado</span>}
                 </div>
               ))}

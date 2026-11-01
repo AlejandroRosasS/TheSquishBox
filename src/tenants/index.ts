@@ -4,6 +4,8 @@ import squishCatalog from "./squish/catalog.json";
 import squishStorefront from "./squish/storefront.json";
 import squishSeo from "./squish/seo.json";
 import squishAdminDemo from "./squish/admin-demo.json";
+import squishMedia from "./squish/media.json";
+import type { MediaMap } from "@/lib/media";
 import type { AdminDemo } from "@/lib/admin/types";
 import type { Tokens } from "@/lib/publishedTheme";
 
@@ -16,6 +18,8 @@ export type TenantBundle = {
   appearance?: { key: string | null; tokens: Tokens } | null;
   /** "db" cuando viene de Supabase; "files" cuando sale de los JSON del repo. */
   source?: "db" | "files";
+  /** Encuadres y datos de las fotos de la marca (por src). */
+  media?: MediaMap;
 };
 
 /**
@@ -33,5 +37,6 @@ export const tenants: Record<string, TenantBundle> = {
     catalog: squishCatalog as Catalog,
     storefront: squishStorefront as unknown as Storefront,
     seo: squishSeo as Seo,
+    media: squishMedia as MediaMap,
   },
 };

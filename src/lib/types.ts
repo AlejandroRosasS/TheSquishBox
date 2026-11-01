@@ -81,7 +81,8 @@ export type Catalog = {
 };
 
 type Link = { label: string; href: string };
-type Img = { image: string; alt: string };
+/** `imageMobile`: foto distinta para celular (opcional; si no hay, se usa `image` con otro encuadre). */
+type Img = { image: string; imageMobile?: string; alt: string };
 
 /** Textos e imágenes de la tienda pública (lo que en los mockups estaba escrito a mano). */
 export type Storefront = {
