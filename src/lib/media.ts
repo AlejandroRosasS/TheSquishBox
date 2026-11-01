@@ -20,6 +20,8 @@ export type Frame = { x: number; y: number; zoom: number };
 export const CENTER: Frame = { x: 50, y: 50, zoom: 1 };
 
 export type MediaItem = {
+  /** id en la base (Fase 3). */
+  id?: string;
   src: string;
   origin: "ig" | "upload";
   igMediaId?: string;

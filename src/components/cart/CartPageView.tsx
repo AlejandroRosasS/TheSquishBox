@@ -13,7 +13,6 @@ import { formatPrice, plural } from "@/lib/format";
 import { lineName } from "@/lib/catalog";
 import { IconChevronLeft, IconGift, IconTruck } from "@/components/Icons";
 
-/* eslint-disable @next/next/no-img-element */
 
 export function PaymentLogos() {
   const { tenant } = useStore();
