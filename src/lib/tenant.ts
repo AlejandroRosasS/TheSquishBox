@@ -2,6 +2,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { adminDemos, tenants, type TenantBundle } from "@/tenants";
 import { dbConfigured } from "@/lib/db/env";
 import { loadBundleFromDb } from "@/lib/db/bundle";
+import { withDefaults } from "@/lib/defaults";
 
 /** Marca activa del despliegue (variable TENANT, por defecto "squish"). */
 export function tenantSlug(): string {
@@ -27,7 +28,16 @@ export async function getTenantBundle(): Promise<TenantBundle> {
   cacheLife("hours");
   if (!dbConfigured()) return fileBundle(slug);
   const fromDb = await loadBundleFromDb(slug);
-  return fromDb ? { ...fromDb, source: "db" } : fileBundle(slug);
+  if (!fromDb) return fileBundle(slug);
+  // Lo publicado manda; los archivos completan las claves nuevas que el código agregó después.
+  const files = tenants[slug];
+  return {
+    ...fromDb,
+    tenant: files ? withDefaults(files.tenant, fromDb.tenant) : fromDb.tenant,
+    storefront: files ? withDefaults(files.storefront, fromDb.storefront) : fromDb.storefront,
+    seo: files ? withDefaults(files.seo, fromDb.seo) : fromDb.seo,
+    source: "db",
+  };
 }
 
 /** Versión sin base de datos: para lo que debe resolverse sin red (p. ej. la página "en construcción"). */

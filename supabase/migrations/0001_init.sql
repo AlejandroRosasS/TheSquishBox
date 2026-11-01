@@ -160,6 +160,10 @@ alter table public.media enable row level security;
 
 -- Público (tienda)
 create policy "tenants: lectura pública" on public.tenants for select using (true);
+-- El contador de pedidos no es público: solo se leen los datos de la marca.
+revoke select, insert, update, delete on public.tenants from anon, authenticated;
+grant select (id, slug, name, domains, created_at) on public.tenants to anon, authenticated;
+grant update (name, domains) on public.tenants to authenticated;
 create policy "docs: publicados son públicos" on public.site_docs for select
   using (stage = 'published' and kind in ('tenant','storefront','seo','appearance') or public.is_member(tenant_id));
 create policy "líneas: lectura pública" on public.product_lines for select using (true);
@@ -197,7 +201,7 @@ declare
   fee numeric;
   rates jsonb;
   num integer;
-  oid uuid;
+  new_id uuid;
 begin
   select * into t from public.tenants where slug = tenant_slug;
   if not found then raise exception 'Marca no encontrada'; end if;
@@ -234,26 +238,26 @@ begin
   insert into public.orders (tenant_id, number, payment_method, customer, delivery, items, subtotal, delivery_fee, total, gift_message)
   values (t.id, num, coalesce(p->>'payment_method', 'yape'), coalesce(p->'customer', '{}'), coalesce(p->'delivery', '{}'),
           lines, sub, fee, sub + coalesce(fee, 0), nullif(p->>'gift_message', ''))
-  returning id into oid;
+  returning id into new_id;
 
-  insert into public.order_events (tenant_id, order_id, kind, text) values (t.id, oid, 'created', 'Pedido creado desde la tienda');
+  insert into public.order_events (tenant_id, order_id, kind, text) values (t.id, new_id, 'created', 'Pedido creado desde la tienda');
 
-  return query select oid, num, sub + coalesce(fee, 0);
+  return query select new_id, num, sub + coalesce(fee, 0);
 end $$;
 
 -- Pedido para fiesta: entra como pedido (kind 'party', estado 'new') sin precio; el equipo lo cotiza en Pedidos.
 -- p: { customer:{…}, delivery:{district, date}, party:{qty, size, theme, extras, idea, refs[]} }
 create or replace function public.place_party_request(tenant_slug text, p jsonb)
 returns integer language plpgsql security definer set search_path = public as $$
-declare t uuid; num integer; oid uuid;
+declare t uuid; num integer; new_id uuid;
 begin
   select id into t from public.tenants where slug = tenant_slug;
   if t is null then raise exception 'Marca no encontrada'; end if;
   update public.tenants set order_seq = order_seq + 1 where id = t returning order_seq into num;
   insert into public.orders (tenant_id, number, kind, customer, delivery, party)
   values (t, num, 'party', coalesce(p->'customer', '{}'), coalesce(p->'delivery', '{}'), coalesce(p->'party', '{}'))
-  returning id into oid;
-  insert into public.order_events (tenant_id, order_id, kind, text) values (t, oid, 'created', 'Solicitud de fiesta recibida');
+  returning id into new_id;
+  insert into public.order_events (tenant_id, order_id, kind, text) values (t, new_id, 'created', 'Solicitud de fiesta recibida');
   return num;
 end $$;
 
