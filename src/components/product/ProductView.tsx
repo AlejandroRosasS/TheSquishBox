@@ -8,7 +8,7 @@ import { useCart } from "@/components/cart/CartProvider";
 import { Rich } from "@/components/Rich";
 import { asset } from "@/lib/assets";
 import { formatPrice } from "@/lib/format";
-import { isSoldOut, LOW_STOCK, variantStockLabel } from "@/lib/catalog";
+import { hasOptions, isSoldOut, LOW_STOCK, variantStockLabel } from "@/lib/catalog";
 import { IconInstagram, IconMinus, IconPlus, IconTruck } from "@/components/Icons";
 
 /* eslint-disable @next/next/no-img-element */
@@ -32,15 +32,21 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
   const images = p.images.map((src) => asset(tenant.slug, src));
   const ig = `https://www.instagram.com/${tenant.instagram}/`;
 
-  const pickVariant = (id: string) => {
-    setVid(id);
-    setQty(1);
-  };
+  const options = hasOptions(p);
 
   const goTo = (i: number) => {
     setImg(i);
     const el = slider.current;
     if (el) el.scrollTo({ left: el.clientWidth * i, behavior: "smooth" });
+  };
+
+  const pickVariant = (id: string) => {
+    setVid(id);
+    setQty(1);
+    // Si la opción tiene su propia foto, la galería salta a ella.
+    const next = p.variants.find((x) => x.id === id);
+    const i = next?.image ? p.images.indexOf(next.image) : -1;
+    if (i >= 0) goTo(i);
   };
 
   const add = () => cart.add(p.id, v.id, qty);
@@ -112,9 +118,9 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
             </div>
           </div>
 
-          {p.variants.length > 1 && (
+          {options && (
             <div className="stack g3">
-              <span className="label" id="variant-q">{sf.product.variantQuestion}</span>
+              <span className="label" id="variant-q">{p.optionsLabel || sf.product.variantQuestion}</span>
               <div className="seg" role="radiogroup" aria-labelledby="variant-q">
                 {p.variants.map((x) => {
                   const out = x.stock <= 0;
@@ -208,7 +214,7 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
       {!curOut && (
         <div className="sticky-buy only-m flex">
           <div className="stack" style={{ lineHeight: 1.2 }}>
-            <span className="small muted">{v.label}</span>
+            {options && <span className="small muted">{v.label}</span>}
             <span className="price">{formatPrice(v.price * qty, cur)}</span>
           </div>
           <button className="btn grow" type="button" onClick={add}>Agregar al carrito</button>

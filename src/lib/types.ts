@@ -51,6 +51,12 @@ export type Variant = {
   image?: string;
 };
 
+/**
+ * simple: un solo precio (exactamente 1 variante, varias fotos).
+ * options: el cliente elige una opción y cada una tiene su precio (2 o más variantes, sin tope).
+ */
+export type ProductKind = "simple" | "options";
+
 export type Product = {
   id: string;
   name: string;
@@ -58,7 +64,7 @@ export type Product = {
   badge?: string;
   status: "published" | "sold_out" | "draft";
   /** simple = 1 variante; options = 2 o más. Si falta se deduce de variants.length. */
-  kind?: "simple" | "options";
+  kind?: ProductKind;
   /** Pregunta del selector de opciones; si falta se usa storefront.product.variantQuestion. */
   optionsLabel?: string;
   description: string;
