@@ -57,7 +57,7 @@ function TextInput({ k, value, onChange }: { k: string; value: string; onChange:
   );
 }
 
-function ImagePicker({ value, onChange, ctx }: { value: string; onChange: (v: string) => void; ctx: FieldCtx }) {
+export function ImagePicker({ value, onChange, ctx }: { value: string; onChange: (v: string) => void; ctx: FieldCtx }) {
   const id = useId();
   return (
     <div className="a-field" role="group" aria-labelledby={id}>

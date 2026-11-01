@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { Logo } from "@/components/Logo";
 import { useAdmin, useAdminCatalog, useOrders, useParty } from "./AdminContext";
 import { AIBell, AIBox, AIChart, AIGift, AIGlobe, AIHome, AIInstagram, AIMore, AIOrders, AIPalette, AISettings, AIText } from "./AdminIcons";
@@ -26,10 +26,22 @@ export function useAdminCounts() {
   return { newOrders, newParty, newPosts, lowStock };
 }
 
+/** El menú marca la sección activa con usePathname, que en rutas dinámicas debe ir dentro de Suspense. */
 export function AdminShell({ children }: { children: ReactNode }) {
+  return (
+    <Suspense fallback={<ShellInner path="">{children}</ShellInner>}>
+      <ShellWithPath>{children}</ShellWithPath>
+    </Suspense>
+  );
+}
+
+function ShellWithPath({ children }: { children: ReactNode }) {
+  return <ShellInner path={usePathname()}>{children}</ShellInner>;
+}
+
+function ShellInner({ children, path }: { children: ReactNode; path: string }) {
   const { bundle } = useAdmin();
   const { tenant } = bundle;
-  const path = usePathname();
   const c = useAdminCounts();
   const party = tenant.customOrder.enabled;
 
