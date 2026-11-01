@@ -9,12 +9,16 @@ insert into public.site_docs (tenant_id, kind, stage, body) select id, 'seo', 'p
   on conflict (tenant_id, kind, stage) do update set body = excluded.body, updated_at = now();
 insert into public.site_docs (tenant_id, kind, stage, body) select id, 'settings', 'published', '{"deliveryRates":{"Barranco":15,"Jesús María":15,"La Molina":25,"Lince":12,"Magdalena del Mar":15,"Miraflores":15,"Pueblo Libre":18,"San Borja":18,"San Isidro":15,"San Miguel":18,"Santiago de Surco":20,"Surquillo":12,"Chorrillos":25,"Callao":null,"Ate":null,"Los Olivos":null},"deliveryRatesAreExample":true}'::jsonb from public.tenants where slug = 'squish'
   on conflict (tenant_id, kind, stage) do update set body = excluded.body, updated_at = now();
-delete from public.product_lines where tenant_id = (select id from public.tenants where slug = 'squish');
-insert into public.product_lines (tenant_id, id, name, position) select id, 'cajas', 'Cajas', 1 from public.tenants where slug = 'squish';
-insert into public.product_lines (tenant_id, id, name, position) select id, 'mystery', 'Mystery', 2 from public.tenants where slug = 'squish';
-insert into public.product_lines (tenant_id, id, name, position) select id, 'cumple', 'Cumpleaños', 3 from public.tenants where slug = 'squish';
-insert into public.product_lines (tenant_id, id, name, position) select id, 'recompra', 'Recompra', 4 from public.tenants where slug = 'squish';
-insert into public.product_lines (tenant_id, id, name, position) select id, 'temporada', 'Temporada', 5 from public.tenants where slug = 'squish';
+insert into public.product_lines (tenant_id, id, name, position) select id, 'cajas', 'Cajas', 1 from public.tenants where slug = 'squish'
+  on conflict (tenant_id, id) do update set name = excluded.name, position = excluded.position;
+insert into public.product_lines (tenant_id, id, name, position) select id, 'mystery', 'Mystery', 2 from public.tenants where slug = 'squish'
+  on conflict (tenant_id, id) do update set name = excluded.name, position = excluded.position;
+insert into public.product_lines (tenant_id, id, name, position) select id, 'cumple', 'Cumpleaños', 3 from public.tenants where slug = 'squish'
+  on conflict (tenant_id, id) do update set name = excluded.name, position = excluded.position;
+insert into public.product_lines (tenant_id, id, name, position) select id, 'recompra', 'Recompra', 4 from public.tenants where slug = 'squish'
+  on conflict (tenant_id, id) do update set name = excluded.name, position = excluded.position;
+insert into public.product_lines (tenant_id, id, name, position) select id, 'temporada', 'Temporada', 5 from public.tenants where slug = 'squish'
+  on conflict (tenant_id, id) do update set name = excluded.name, position = excluded.position;
 insert into public.products (tenant_id, slug, name, line, badge, status, kind, options_label, description, images, position)
   select id, 'the-squish-box', 'The Squish Box', 'cajas', 'Favorito', 'published', 'simple', null, '4 squishies sorpresa (1 grande + 3 pequeños), cada uno en su sobre, y tu cartilla para coleccionarlos. Más de 80 modelos para descubrir; si te sale repetido, intercámbialo con tus amigos.', array['img/squish-box-contenido.jpg','img/caja-regalo.jpg','img/nuestros-productos.jpg']::text[], 0 from public.tenants where slug = 'squish'
   on conflict (tenant_id, slug) do update set name = excluded.name, line = excluded.line, badge = excluded.badge, status = excluded.status,

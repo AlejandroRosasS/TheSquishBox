@@ -31,9 +31,9 @@ for (const [kind, body] of Object.entries(docs)) {
   on conflict (tenant_id, kind, stage) do update set body = excluded.body, updated_at = now();`);
 }
 
-out.push(`delete from public.product_lines where tenant_id = (select id from ${T});`);
 for (const l of lines) {
-  out.push(`insert into public.product_lines (tenant_id, id, name, position) select id, ${q(l.id)}, ${q(l.name)}, ${l.order} from ${T};`);
+  out.push(`insert into public.product_lines (tenant_id, id, name, position) select id, ${q(l.id)}, ${q(l.name)}, ${l.order} from ${T}
+  on conflict (tenant_id, id) do update set name = excluded.name, position = excluded.position;`);
 }
 
 products.forEach((p, i) => {
