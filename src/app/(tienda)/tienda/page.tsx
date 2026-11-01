@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { Suspense } from "react";
 import { getTenantBundle } from "@/lib/tenant";
 import { Rich } from "@/components/Rich";
 import { CatalogView } from "@/components/catalog/CatalogView";
 
-export const metadata: Metadata = { title: "Tienda" };
+export function generateMetadata(): Metadata {
+  return pageMetadata(getTenantBundle(), "tienda", { title: "Tienda", description: "" });
+}
 
 type SP = Promise<{ linea?: string }>;
 

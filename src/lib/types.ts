@@ -158,3 +158,17 @@ export type Storefront = {
   };
   notFound: Img & { title: string; lead: string };
 };
+
+export type SeoPage = { title: string; description: string };
+
+/** SEO de la tienda (tenants/<slug>/seo.json). Se edita desde Admin › SEO. */
+export type Seo = {
+  siteTitle: string;
+  titleTemplate: string;
+  description: string;
+  shareImage: string;
+  pages: Record<string, SeoPage>;
+  products: Record<string, Partial<SeoPage>>;
+  indexing: boolean;
+  googleVerification: string;
+};

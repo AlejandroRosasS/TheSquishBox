@@ -10,6 +10,7 @@ export function PaletteDemo() {
   const [key, setKey] = useState(tenant.defaultPalette);
   const apply = (k: string) => {
     setKey(k);
+    document.getElementById("published-theme")?.remove();
     const el = document.querySelector<HTMLElement>(".store");
     if (!el) return;
     for (const [name, val] of Object.entries(paletteVars(tenant.palettes[k]))) el.style.setProperty(name, val);

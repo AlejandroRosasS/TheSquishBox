@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTenantBundle } from "@/lib/tenant";
+import { productMetadata } from "@/lib/seo";
 import { lineName, visibleProducts } from "@/lib/catalog";
 import { Rich } from "@/components/Rich";
 import { ProductCard } from "@/components/ProductCard";
@@ -15,8 +16,9 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const p = getTenantBundle().catalog.products.find((x) => x.id === slug);
-  return p ? { title: p.name, description: p.description } : {};
+  const bundle = getTenantBundle();
+  const p = bundle.catalog.products.find((x) => x.id === slug);
+  return p ? productMetadata(bundle, p) : {};
 }
 
 export default async function ProductPage({ params }: Props) {
