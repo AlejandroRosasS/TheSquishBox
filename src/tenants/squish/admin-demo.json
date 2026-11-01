@@ -1,0 +1,734 @@
+{
+  "_note": "Datos de EJEMPLO para el admin (Fase 2), tomados de las pantallas A-*. No son pedidos ni clientes reales. En Fase 3 salen de la base de datos.",
+  "today": "2026-10-31",
+  "costs": {
+    "the-squish-box": {
+      "unica": 34
+    },
+    "mystery-squish": {
+      "unica": 13
+    },
+    "mini-box-cumple": {
+      "2": 9,
+      "3": 12
+    },
+    "mini-box-recompra": {
+      "4": 20,
+      "5": 25
+    },
+    "mini-box-halloween": {
+      "unica": 12
+    }
+  },
+  "lineNotes": {
+    "cajas": "Todo el año",
+    "mystery": "Todo el año",
+    "cumple": "Todo el año · también por cantidad para fiestas",
+    "recompra": "Exclusiva para quienes tienen su cartilla",
+    "temporada": "Halloween 2026"
+  },
+  "deliveryCosts": {
+    "Miraflores": 10,
+    "San Isidro": 10,
+    "Barranco": 11,
+    "Surquillo": 8,
+    "Santiago de Surco": 12,
+    "San Borja": 12,
+    "La Molina": 19,
+    "Jesús María": 11,
+    "Lince": 8,
+    "Chorrillos": 17
+  },
+  "orders": [
+    {
+      "id": "0123",
+      "client": "Daniela Torres",
+      "phone": "987 654 321",
+      "email": "daniela@correo.com",
+      "createdAt": "Sábado 31 oct, 10:42 a. m.",
+      "payment": "Pagado con Yape",
+      "lines": [
+        {
+          "productId": "the-squish-box",
+          "variantId": "unica",
+          "qty": 2,
+          "price": 69
+        },
+        {
+          "productId": "mystery-squish",
+          "variantId": "unica",
+          "qty": 1,
+          "price": 29
+        }
+      ],
+      "district": "Miraflores",
+      "address": "Av. José Pardo 610, dpto. 302, Miraflores",
+      "reference": "Frente al parque, edificio blanco",
+      "date": "Mar 3 nov",
+      "doc": "Boleta · DNI 4•••••12",
+      "deliveryFee": 10,
+      "deliveryReal": null,
+      "gift": "¡Feliz cumple, Mateo! Ojalá te toque el ajolote. Con cariño, tía Dani.",
+      "notes": [
+        {
+          "who": "Equipo",
+          "when": "hoy 11:05",
+          "text": "Es para regalo: entregar las dos cajas en bolsa sin mostrar el contenido."
+        }
+      ],
+      "log": [
+        {
+          "t": "Alerta enviada a Telegram y WhatsApp del equipo",
+          "when": "Sáb 31 oct, 10:42"
+        },
+        {
+          "t": "Pago confirmado por Yape · S/ 177.00",
+          "when": "Sáb 31 oct, 10:42"
+        },
+        {
+          "t": "Pedido creado desde la tienda",
+          "when": "Sáb 31 oct, 10:41"
+        }
+      ],
+      "status": "nuevo",
+      "delivery": "pendconf"
+    },
+    {
+      "id": "0122",
+      "client": "Lucía Paredes",
+      "phone": "9XX XXX XXX",
+      "email": "",
+      "createdAt": "Sábado 31 oct",
+      "payment": "Pagado con tarjeta",
+      "lines": [
+        {
+          "productId": "mini-box-recompra",
+          "variantId": "5",
+          "qty": 1,
+          "price": 47
+        }
+      ],
+      "district": "San Isidro",
+      "address": "",
+      "reference": "",
+      "date": "Lun 2 nov",
+      "doc": "Boleta",
+      "deliveryFee": 10,
+      "deliveryReal": null,
+      "gift": "",
+      "notes": [],
+      "log": [],
+      "status": "nuevo",
+      "delivery": "pendconf"
+    },
+    {
+      "id": "0121",
+      "client": "Andrea Salas",
+      "phone": "9XX XXX XXX",
+      "email": "",
+      "createdAt": "Viernes 30 oct",
+      "payment": "Pagado con Yape",
+      "lines": [
+        {
+          "productId": "mystery-squish",
+          "variantId": "unica",
+          "qty": 2,
+          "price": 29
+        }
+      ],
+      "district": "La Molina",
+      "address": "",
+      "reference": "",
+      "date": "Mié 4 nov",
+      "doc": "Boleta",
+      "deliveryFee": 10,
+      "deliveryReal": 15,
+      "gift": "",
+      "notes": [],
+      "log": [],
+      "status": "prep",
+      "delivery": "pend"
+    },
+    {
+      "id": "0120",
+      "client": "Gabriela Ríos",
+      "phone": "9XX XXX XXX",
+      "email": "",
+      "createdAt": "Jueves 29 oct",
+      "payment": "Pagado con tarjeta",
+      "lines": [
+        {
+          "productId": "the-squish-box",
+          "variantId": "unica",
+          "qty": 1,
+          "price": 69
+        }
+      ],
+      "district": "Recojo coordinado",
+      "address": "",
+      "reference": "",
+      "date": "Sáb 31 oct",
+      "doc": "Boleta",
+      "deliveryFee": 0,
+      "deliveryReal": 0,
+      "gift": "",
+      "notes": [],
+      "log": [],
+      "status": "listo",
+      "delivery": "taller"
+    },
+    {
+      "id": "0119",
+      "client": "María José Vega",
+      "phone": "9XX XXX XXX",
+      "email": "",
+      "createdAt": "Miércoles 28 oct",
+      "payment": "Pagado con Yape",
+      "lines": [
+        {
+          "productId": "mini-box-halloween",
+          "variantId": "unica",
+          "qty": 4,
+          "price": 25
+        }
+      ],
+      "district": "Barranco",
+      "address": "",
+      "reference": "",
+      "date": "Vie 30 oct",
+      "doc": "Boleta",
+      "deliveryFee": 10,
+      "deliveryReal": 5,
+      "gift": "",
+      "notes": [],
+      "log": [],
+      "status": "listo",
+      "delivery": "dev"
+    },
+    {
+      "id": "0118",
+      "client": "Carolina Núñez",
+      "phone": "9XX XXX XXX",
+      "email": "",
+      "createdAt": "Martes 27 oct",
+      "payment": "Pagado con tarjeta",
+      "lines": [
+        {
+          "productId": "mini-box-recompra",
+          "variantId": "4",
+          "qty": 1,
+          "price": 39
+        }
+      ],
+      "district": "Surco",
+      "address": "",
+      "reference": "",
+      "date": "Jue 29 oct",
+      "doc": "Boleta",
+      "deliveryFee": 10,
+      "deliveryReal": 10,
+      "gift": "",
+      "notes": [],
+      "log": [],
+      "status": "entregado",
+      "delivery": "ok"
+    },
+    {
+      "id": "0117",
+      "client": "Fernanda Lazo",
+      "phone": "9XX XXX XXX",
+      "email": "",
+      "createdAt": "Lunes 26 oct",
+      "payment": "Pagado con Yape",
+      "lines": [
+        {
+          "productId": "the-squish-box",
+          "variantId": "unica",
+          "qty": 1,
+          "price": 69
+        },
+        {
+          "productId": "mini-box-halloween",
+          "variantId": "unica",
+          "qty": 1,
+          "price": 25
+        }
+      ],
+      "district": "Callao",
+      "address": "",
+      "reference": "",
+      "date": "Mié 28 oct",
+      "doc": "Boleta",
+      "deliveryFee": 15,
+      "deliveryReal": 20,
+      "gift": "",
+      "notes": [],
+      "log": [],
+      "status": "entregado",
+      "delivery": "pagado"
+    },
+    {
+      "id": "0116",
+      "client": "Paola Castro",
+      "phone": "9XX XXX XXX",
+      "email": "",
+      "createdAt": "Domingo 25 oct",
+      "payment": "Devuelto",
+      "lines": [
+        {
+          "productId": "mystery-squish",
+          "variantId": "unica",
+          "qty": 1,
+          "price": 29
+        }
+      ],
+      "district": "Jesús María",
+      "address": "",
+      "reference": "",
+      "date": "Mar 27 oct",
+      "doc": "Boleta",
+      "deliveryFee": 10,
+      "deliveryReal": null,
+      "gift": "",
+      "notes": [],
+      "log": [],
+      "status": "cancelado",
+      "delivery": "devuelto"
+    }
+  ],
+  "partyRequests": [
+    {
+      "id": "F-0042",
+      "name": "Daniela Torres",
+      "when": "Hoy 9:15",
+      "phone": "987 654 321",
+      "mail": "daniela@correo.com",
+      "qty": "25 mini box",
+      "theme": "Unicornios · rosado y lila",
+      "size": "3 squishies",
+      "extras": "Con dulces",
+      "date": "Sáb 14 nov",
+      "district": "Miraflores",
+      "idea": "Es para el cumple de 6 de mi hija. Quiero que cada invitado se lleve su mini box al final de la fiesta.",
+      "img": "img/mini-caja-sorpresa.jpg",
+      "refs": [
+        "img/mini-caja-sorpresa.jpg",
+        "img/caja-regalo.jpg"
+      ],
+      "status": "nueva",
+      "price": "600",
+      "deliveryFee": "15",
+      "proposal": "25 Mini Box Sorpresa de Cumple con 3 squishies pequeños sorpresa cada una y dulces, en colores rosado y lila para la temática de unicornios. Entrega en Miraflores un día antes del cumple."
+    },
+    {
+      "id": "F-0041",
+      "name": "Nido Pequeños Pasos",
+      "when": "Ayer",
+      "phone": "912 345 678",
+      "mail": "direccion@correo.com",
+      "qty": "40 mini box",
+      "theme": "Clausura de fin de año",
+      "size": "2 squishies",
+      "extras": "Sin dulces",
+      "date": "Vie 11 dic",
+      "district": "Surco",
+      "idea": "Un detalle para cada alumno en la clausura. Preferimos sin dulces.",
+      "img": "img/mama-pensando.jpg",
+      "refs": [],
+      "status": "nueva",
+      "price": "",
+      "deliveryFee": "",
+      "proposal": ""
+    },
+    {
+      "id": "F-0040",
+      "name": "Rocío Medina",
+      "when": "28 oct",
+      "phone": "945 111 222",
+      "mail": "rocio@correo.com",
+      "qty": "15 mini box",
+      "theme": "Videojuegos · verde y negro",
+      "size": "3 squishies",
+      "extras": "Con dulces",
+      "date": "Vie 20 nov",
+      "district": "San Borja",
+      "idea": "Cumple de 9 de mi hijo. Le encantan los squishies de comida.",
+      "img": "img/caja-regalo.jpg",
+      "refs": [],
+      "status": "cotizada",
+      "price": "",
+      "deliveryFee": "",
+      "proposal": ""
+    },
+    {
+      "id": "F-0039",
+      "name": "Valeria Chang",
+      "when": "26 oct",
+      "phone": "956 333 444",
+      "mail": "vale@correo.com",
+      "qty": "20 mini box",
+      "theme": "Pijamada",
+      "size": "2 squishies",
+      "extras": "Con dulces",
+      "date": "Sáb 7 nov",
+      "district": "La Molina",
+      "idea": "Para una pijamada de cumpleaños, que se puedan intercambiar entre ellas.",
+      "img": "img/halloween-minibox.jpg",
+      "refs": [],
+      "status": "aceptada",
+      "price": "",
+      "deliveryFee": "",
+      "proposal": ""
+    },
+    {
+      "id": "F-0038",
+      "name": "Jorge Benavides",
+      "when": "22 oct",
+      "phone": "934 555 666",
+      "mail": "jorge@correo.com",
+      "qty": "8 mini box",
+      "theme": "Cumple de oficina",
+      "size": "2 squishies",
+      "extras": "Sin dulces",
+      "date": "—",
+      "district": "San Isidro",
+      "idea": "Algo pequeño para el equipo de la oficina.",
+      "img": "img/nina-fresa.jpg",
+      "refs": [],
+      "status": "descartada",
+      "price": "",
+      "deliveryFee": "",
+      "proposal": ""
+    }
+  ],
+  "igPosts": [
+    {
+      "id": "cumple",
+      "img": "img/mini-caja-sorpresa.jpg",
+      "kind": "new",
+      "name": "Mini Box Sorpresa de Cumple",
+      "caption": "Nuestra nueva Caja Sorpresa de The Squish Box es perfecta para cumpleaños y celebraciones. Puedes elegirla con 2 o 3 squishies pequeños sorpresa y además tiene espacio para agregar dulces…",
+      "variants": [
+        "2 squishies",
+        "3 squishies"
+      ],
+      "line": "cumple"
+    },
+    {
+      "id": "recompra",
+      "img": "img/mini-caja-recompra.jpg",
+      "kind": "new",
+      "name": "Mini Box Recompra",
+      "caption": "¿Seguimos llenando la cartilla? Llegó la nueva Caja de Recompra para seguir descubriendo y coleccionando nuevos squishies sorpresa. Disponible con 4 o 5 squishies pequeños, cada uno en su propio sobre…",
+      "variants": [
+        "4 squishies",
+        "5 squishies"
+      ],
+      "line": "recompra"
+    },
+    {
+      "id": "productos",
+      "img": "img/nuestros-productos.jpg",
+      "kind": "content",
+      "name": "Nuestros productos"
+    },
+    {
+      "id": "hallo",
+      "img": "img/halloween-minibox.jpg",
+      "kind": "done",
+      "name": "Mini Box Halloween"
+    },
+    {
+      "id": "mystery",
+      "img": "img/mystery-nina.jpg",
+      "kind": "done",
+      "name": "Mystery Squish"
+    },
+    {
+      "id": "regalo",
+      "img": "img/caja-regalo.jpg",
+      "kind": "new",
+      "name": "Perfecto para regalo de cumpleaños",
+      "caption": "Perfecto para regalo de cumpleaños…",
+      "variants": [
+        "Única"
+      ],
+      "line": "cajas"
+    },
+    {
+      "id": "ajolote",
+      "img": "img/ajolote.jpg",
+      "kind": "content",
+      "name": "Ajolote glitter"
+    },
+    {
+      "id": "box",
+      "img": "img/squish-box-contenido.jpg",
+      "kind": "done",
+      "name": "The Squish Box"
+    },
+    {
+      "id": "patitas",
+      "img": "img/patitas.jpg",
+      "kind": "content",
+      "name": "Conoce las Patitas"
+    },
+    {
+      "id": "jelly",
+      "img": "img/jelly-cubes.jpg",
+      "kind": "content",
+      "name": "Jelly Cubes"
+    },
+    {
+      "id": "butter",
+      "img": "img/mini-butter.jpg",
+      "kind": "content",
+      "reel": true,
+      "name": "Mini Butter"
+    },
+    {
+      "id": "mama",
+      "img": "img/mama-pensando.jpg",
+      "kind": "new",
+      "name": "¿Qué le regalo?",
+      "caption": "¿Qué le regalo?…",
+      "variants": [
+        "Única"
+      ],
+      "line": "cajas"
+    },
+    {
+      "id": "gatitos",
+      "img": "img/gatitos.jpg",
+      "kind": "content",
+      "name": "Gatitos squishy"
+    },
+    {
+      "id": "mandarina",
+      "img": "img/mandarina.jpg",
+      "kind": "content",
+      "reel": true,
+      "name": "Mandarinita"
+    },
+    {
+      "id": "sorteo",
+      "img": "img/fresa-gigante.jpg",
+      "kind": "content",
+      "name": "Sorteo squishy"
+    }
+  ],
+  "weekSales": {
+    "total": 1240,
+    "count": 23,
+    "contribution": 610,
+    "bars": [
+      30,
+      45,
+      25,
+      60,
+      52,
+      78,
+      95
+    ]
+  },
+  "notifications": {
+    "telegram": {
+      "on": true,
+      "status": "Conectado",
+      "bot": "@SquishBoxAlertasBot",
+      "recipients": [
+        "Grupo \"Squish Box · Pedidos\""
+      ]
+    },
+    "email": {
+      "on": true,
+      "status": "Error",
+      "detail": "1 correo rebotó ayer",
+      "recipients": [
+        "hola@[dominio por definir]",
+        "pedidos@[dominio]"
+      ],
+      "bad": "pedidos@[dominio]"
+    },
+    "whatsapp": {
+      "on": false,
+      "status": "No configurado",
+      "recipients": [
+        "+51 9•• ••• 210",
+        "+51 9•• ••• 488"
+      ]
+    }
+  },
+  "sales": {
+    "_note": "Ventas de ejemplo de octubre: [producto, variante, canal, unidades, delivery cobrado, delivery costo, pedidos]",
+    "lines": [
+      [
+        "the-squish-box",
+        "unica",
+        "web",
+        14,
+        72,
+        60,
+        12
+      ],
+      [
+        "the-squish-box",
+        "unica",
+        "ig",
+        9,
+        48,
+        40,
+        8
+      ],
+      [
+        "the-squish-box",
+        "unica",
+        "feria",
+        8,
+        0,
+        0,
+        7
+      ],
+      [
+        "mystery-squish",
+        "unica",
+        "web",
+        10,
+        36,
+        30,
+        8
+      ],
+      [
+        "mystery-squish",
+        "unica",
+        "ig",
+        12,
+        36,
+        30,
+        9
+      ],
+      [
+        "mystery-squish",
+        "unica",
+        "feria",
+        15,
+        0,
+        0,
+        12
+      ],
+      [
+        "mini-box-cumple",
+        "3",
+        "web",
+        25,
+        24,
+        20,
+        2
+      ],
+      [
+        "mini-box-cumple",
+        "2",
+        "ig",
+        30,
+        24,
+        20,
+        2
+      ],
+      [
+        "mini-box-cumple",
+        "3",
+        "otros",
+        20,
+        0,
+        0,
+        1
+      ],
+      [
+        "mini-box-recompra",
+        "4",
+        "web",
+        5,
+        24,
+        20,
+        4
+      ],
+      [
+        "mini-box-recompra",
+        "5",
+        "ig",
+        4,
+        12,
+        10,
+        3
+      ],
+      [
+        "mini-box-halloween",
+        "unica",
+        "web",
+        18,
+        48,
+        40,
+        10
+      ],
+      [
+        "mini-box-halloween",
+        "unica",
+        "ig",
+        22,
+        60,
+        50,
+        12
+      ],
+      [
+        "mini-box-halloween",
+        "unica",
+        "feria",
+        20,
+        0,
+        0,
+        14
+      ]
+    ],
+    "fair": {
+      "name": "Feria de Halloween · [Lugar]",
+      "dates": "24 – 26 oct 2026 · 3 días",
+      "days": 3,
+      "fixedCosts": [
+        {
+          "label": "Stand",
+          "amount": 250
+        },
+        {
+          "label": "Movilidad",
+          "amount": 50
+        }
+      ]
+    },
+    "recent": [
+      {
+        "date": "Hoy",
+        "detail": "The Squish Box x1 + Mystery Squish x1",
+        "note": "Pago con Yape · delivery S/ 12 (costó S/ 10)",
+        "channel": "ig",
+        "revenue": 110,
+        "contribution": 53
+      },
+      {
+        "date": "26 oct",
+        "detail": "Mini Box Halloween x6",
+        "note": "Efectivo · sin delivery",
+        "channel": "feria",
+        "revenue": 150,
+        "contribution": 78
+      },
+      {
+        "date": "25 oct",
+        "detail": "Pedido web #0118",
+        "note": "Automático desde la tienda",
+        "channel": "web",
+        "revenue": 142,
+        "contribution": 70
+      }
+    ]
+  }
+}

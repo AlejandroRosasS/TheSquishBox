@@ -1,10 +1,12 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import type { TenantBundle } from "@/tenants";
 import { Logo } from "./Logo";
 import { IconInstagram, IconWhatsApp } from "./Icons";
 import { whatsappLink } from "@/lib/format";
 
-export function Footer({ bundle }: { bundle: TenantBundle }) {
+/** `year` lo pasa el layout del servidor (cacheado); en la vista previa del admin se calcula en el cliente. */
+export function Footer({ bundle, year }: { bundle: TenantBundle; year?: ReactNode }) {
   const { tenant, storefront } = bundle;
   const ig = `https://www.instagram.com/${tenant.instagram}/`;
   const wa = whatsappLink(tenant.whatsapp);
@@ -27,16 +29,16 @@ export function Footer({ bundle }: { bundle: TenantBundle }) {
           <div>
             <h4>Tienda</h4>
             <ul>
-              {storefront.footer.shop.map((l) => (
-                <li key={l.label}><Link href={l.href}>{l.label}</Link></li>
+              {storefront.footer.shop.map((l, i) => (
+                <li key={i}><Link href={l.href}>{l.label}</Link></li>
               ))}
             </ul>
           </div>
           <div>
             <h4>Ayuda</h4>
             <ul>
-              {storefront.footer.help.map((l) => (
-                <li key={l.label}><Link href={l.href}>{l.label}</Link></li>
+              {storefront.footer.help.map((l, i) => (
+                <li key={i}><Link href={l.href}>{l.label}</Link></li>
               ))}
             </ul>
           </div>
@@ -50,15 +52,10 @@ export function Footer({ bundle }: { bundle: TenantBundle }) {
           </div>
         </div>
         <div className="legal">
-          <span>© <Year /> {tenant.name} · {storefront.footer.legal}</span>
+          <span>© {year ?? new Date().getFullYear()} {tenant.name} · {storefront.footer.legal}</span>
           <span>{storefront.footer.legalLinks}</span>
         </div>
       </div>
     </footer>
   );
-}
-
-async function Year() {
-  "use cache";
-  return <>{new Date().getFullYear()}</>;
 }

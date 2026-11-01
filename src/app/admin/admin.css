@@ -395,3 +395,15 @@ html:has(.adm), body:has(.adm) { background: #F5F5F2; }
 .share .tx span:last-child { font-size: 13px; color: #65676B; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
 .seo-row { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 20px; border-bottom: 1px solid var(--a-border); }
 .seo-row:last-child { border-bottom: 0; }
+
+/* ---------- Registrar venta ---------- */
+.chg { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.chb { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 12px; border: 1px solid #CFD1C9; border-radius: 12px; background: #fff; font: inherit; text-align: left; cursor: pointer; color: #1D1F1C; min-height: 64px; }
+.chb.on { border: 2px solid #1F2A22; padding: 11px; background: #F3F5F1; }
+.ln { display: grid; grid-template-columns: 44px minmax(0, 1fr) 150px 120px 110px 44px; gap: 10px; align-items: center; padding: 12px 0; border-bottom: 1px solid #E2E3DD; }
+.qty2 { display: inline-flex; align-items: center; border: 1px solid #CFD1C9; border-radius: 10px; overflow: hidden; }
+.qty2 button { width: 44px; height: 44px; border: 0; background: #F5F5F2; font-weight: 800; cursor: pointer; color: #1D1F1C; }
+.qty2 span { min-width: 30px; text-align: center; font-weight: 800; }
+.sumrow { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; }
+.sumrow.big { font-size: 17px; font-weight: 800; border-top: 1px solid #E2E3DD; padding-top: 10px; margin-top: 4px; }
+@container page (max-width: 760px) { .chg { grid-template-columns: minmax(0, 1fr); } .ln { grid-template-columns: 44px minmax(0, 1fr) 44px; } .ln .wide { grid-column: 2 / -1; } }

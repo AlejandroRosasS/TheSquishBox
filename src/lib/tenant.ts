@@ -1,4 +1,4 @@
-import { tenants, type TenantBundle } from "@/tenants";
+import { adminDemos, tenants, type TenantBundle } from "@/tenants";
 
 /**
  * Resuelve la marca activa. En local: variable TENANT (por defecto "squish").
@@ -9,4 +9,10 @@ export function getTenantBundle(): TenantBundle {
   const bundle = tenants[slug];
   if (!bundle) throw new Error(`Tenant desconocido: "${slug}". Revisa la variable TENANT.`);
   return bundle;
+}
+
+export function getAdminDemo(slug: string) {
+  const demo = adminDemos[slug];
+  if (!demo) throw new Error(`No hay datos de ejemplo del admin para "${slug}".`);
+  return demo;
 }

@@ -32,7 +32,7 @@ export type Tenant = {
   defaultPalette: string;
   palettes: Record<string, PaletteTokens>;
   highlights: string[];
-  customOrder: { enabled: boolean; label: string; description: string };
+  customOrder: { enabled: boolean; label: string; description: string; adminLabel?: string; adminShort?: string };
   payments: { provider: string; methods: string[] };
   fulfillment: { delivery: string; pickup: string };
   salesChannels: string[];
