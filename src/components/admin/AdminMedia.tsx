@@ -62,7 +62,9 @@ export function AdminMediaProvider({ children }: { children: ReactNode }) {
   const [local, setLocal] = usePersisted<MediaMap>(dataKey(slug, "media"), {});
   const [rows, setRows] = useState<MediaMap>({});
   const saved = ready ? rows : local;
-  const [, setTick] = useState(0);
+  const [tick, setTick] = useState(0);
+  /** Tamaño real de las fotos que no lo tienen guardado (p. ej. las de Instagram), medido en el navegador. */
+  const [sizes, setSizes] = useState<Record<string, { width: number; height: number }>>({});
 
   const client = db?.client;
   const tenantId = ready?.tenantId;
@@ -114,8 +116,9 @@ export function AdminMediaProvider({ children }: { children: ReactNode }) {
     const out: MediaMap = { ...(bundle.media ?? {}) };
     for (const src of collectIg(bundle.catalog, bundle.storefront, extra)) out[src] = out[src] ?? { src, origin: "ig" };
     for (const [src, it] of Object.entries(saved)) out[src] = { ...out[src], ...it };
+    for (const [src, sz] of Object.entries(sizes)) if (out[src] && !out[src].width) out[src] = { ...out[src], ...sz };
     return out;
-  }, [bundle, extra, saved]);
+  }, [bundle, extra, saved, sizes]);
 
   const list = useMemo(
     () => Object.values(media).sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? "") || a.src.localeCompare(b.src)),
@@ -132,7 +135,9 @@ export function AdminMediaProvider({ children }: { children: ReactNode }) {
     };
   }, [saved]);
 
-  const resolve = useCallback((src: string) => (isLocal(src) ? cachedLocalUrl(src) : asset(slug, src)), [slug]);
+  // `tick` cambia cuando terminan de cargar fotos locales: así las pantallas vuelven a pedir la URL.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const resolve = useCallback((src: string) => (isLocal(src) ? cachedLocalUrl(src) : asset(slug, src)), [slug, tick]);
 
   const patch = useCallback(
     (src: string, p: Partial<MediaItem>) => write(src, { ...(media[src] ?? { src, origin: "ig" }), ...saved[src], ...p }),
@@ -173,15 +178,9 @@ export function AdminMediaProvider({ children }: { children: ReactNode }) {
     [patch, media],
   );
 
-  const setSize = useCallback(
-    (src: string, width: number, height: number) => {
-      const it = media[src];
-      if (it && it.width === width && it.height === height) return;
-      // Solo para avisar si la foto es chica: no hace falta guardarlo en la base.
-      if (!ready) void patch(src, { width, height });
-    },
-    [patch, media, ready],
-  );
+  const setSize = useCallback((src: string, width: number, height: number) => {
+    setSizes((prev) => (prev[src]?.width === width && prev[src]?.height === height ? prev : { ...prev, [src]: { width, height } }));
+  }, []);
 
   const remove = useCallback(
     (src: string) => {
@@ -209,4 +208,17 @@ export function useAdminMedia(): Ctx {
   const v = useContext(MediaCtx);
   if (!v) throw new Error("useAdminMedia fuera de AdminMediaProvider");
   return v;
+}
+
+/** Mide la foto si no sabemos su tamaño (para avisar cuando es muy chica para el formato). */
+export function useMeasure(src: string | undefined) {
+  const { media, resolve, setSize } = useAdminMedia();
+  const known = src ? media[src]?.width : 1;
+  const url = src ? resolve(src) : undefined;
+  useEffect(() => {
+    if (!src || known || !url) return;
+    const img = new Image();
+    img.onload = () => setSize(src, img.naturalWidth, img.naturalHeight);
+    img.src = url;
+  }, [src, known, url, setSize]);
 }

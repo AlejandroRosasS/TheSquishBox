@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 import { MediaProvider, Photo } from "@/components/Photo";
 import { FORMATS, hasTwoFormats, sizeWarning, slotFor, frameOf, type FormatId } from "@/lib/media";
-import { useAdminMedia } from "./AdminMedia";
+import { useAdminMedia, useMeasure } from "./AdminMedia";
 import { FrameEditor } from "./FrameEditor";
 import { OriginTag, PhotoPicker } from "./PhotoPicker";
 import { AICrop, AIRefresh, AIUndo } from "./AdminIcons";
@@ -12,6 +12,7 @@ type Value = { image: string; imageMobile?: string };
 
 function Preview({ src, format, label }: { src: string; format: FormatId; label: string }) {
   const { media } = useAdminMedia();
+  useMeasure(src);
   const f = FORMATS[format];
   const warn = sizeWarning(media[src]?.width, format, frameOf(media, src, format).zoom);
   return (
