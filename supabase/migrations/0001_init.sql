@@ -10,7 +10,6 @@ create table public.tenants (
   name text not null,
   domains text[] not null default '{}',
   order_seq integer not null default 0,
-  party_seq integer not null default 0,
   created_at timestamptz not null default now()
 );
 
@@ -105,16 +104,21 @@ create table public.orders (
   id uuid primary key default gen_random_uuid(),
   tenant_id uuid not null references public.tenants(id) on delete cascade,
   number integer not null,
-  status text not null default 'new' check (status in ('new','preparing','ready','delivered','cancelled')),
-  payment_method text not null,
+  -- store = compra en la tienda; party = pedido para fiesta (llega como solicitud y se cotiza). Todo vive en Pedidos.
+  kind text not null default 'store' check (kind in ('store','party')),
+  status text not null default 'new'
+    check (status in ('new','quoted','accepted','preparing','ready','delivered','cancelled')),
+  payment_method text,
   payment_status text not null default 'pending' check (payment_status in ('pending','paid','failed','refunded')),
   customer jsonb not null,       -- nombre, celular, correo, comprobante
   delivery jsonb not null,       -- modo, distrito, dirección, referencia, fecha
-  items jsonb not null,          -- copia de nombre, variante, precio y cantidad al momento de comprar
-  subtotal numeric(10,2) not null,
+  items jsonb not null default '[]', -- copia de nombre, variante, precio y cantidad al momento de comprar
+  party jsonb,                   -- solo fiestas: cantidad, tamaño, temática, fecha, ideas, fotos de referencia
+  proposal text,                 -- solo fiestas: propuesta enviada al cliente
+  subtotal numeric(10,2) not null default 0,
   delivery_fee numeric(10,2),
   delivery_cost numeric(10,2),   -- costo real, lo registra el equipo
-  total numeric(10,2) not null,
+  total numeric(10,2) not null default 0,
   gift_message text,
   created_at timestamptz not null default now(),
   unique (tenant_id, number)
@@ -129,18 +133,6 @@ create table public.order_events (
   text text not null,
   author uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now()
-);
-
-create table public.party_requests (
-  id uuid primary key default gen_random_uuid(),
-  tenant_id uuid not null references public.tenants(id) on delete cascade,
-  number integer not null,
-  status text not null default 'new' check (status in ('new','quoted','confirmed','done','cancelled')),
-  data jsonb not null,
-  quote numeric(10,2),
-  notes text,
-  created_at timestamptz not null default now(),
-  unique (tenant_id, number)
 );
 
 create table public.manual_sales (
@@ -163,7 +155,6 @@ alter table public.products enable row level security;
 alter table public.product_variants enable row level security;
 alter table public.orders enable row level security;
 alter table public.order_events enable row level security;
-alter table public.party_requests enable row level security;
 alter table public.manual_sales enable row level security;
 alter table public.media enable row level security;
 
@@ -186,7 +177,6 @@ create policy "productos: equipo escribe" on public.products for all using (publ
 create policy "variantes: equipo escribe" on public.product_variants for all using (public.is_member(tenant_id)) with check (public.is_member(tenant_id));
 create policy "pedidos: equipo" on public.orders for all using (public.is_member(tenant_id)) with check (public.is_member(tenant_id));
 create policy "actividad: equipo" on public.order_events for all using (public.is_member(tenant_id)) with check (public.is_member(tenant_id));
-create policy "fiestas: equipo" on public.party_requests for all using (public.is_member(tenant_id)) with check (public.is_member(tenant_id));
 create policy "media: lectura pública" on public.media for select using (true);
 create policy "media: equipo escribe" on public.media for all using (public.is_member(tenant_id)) with check (public.is_member(tenant_id));
 create policy "ventas: equipo" on public.manual_sales for all using (public.is_member(tenant_id)) with check (public.is_member(tenant_id));
@@ -251,14 +241,19 @@ begin
   return query select oid, num, sub + coalesce(fee, 0);
 end $$;
 
+-- Pedido para fiesta: entra como pedido (kind 'party', estado 'new') sin precio; el equipo lo cotiza en Pedidos.
+-- p: { customer:{…}, delivery:{district, date}, party:{qty, size, theme, extras, idea, refs[]} }
 create or replace function public.place_party_request(tenant_slug text, p jsonb)
 returns integer language plpgsql security definer set search_path = public as $$
-declare t uuid; num integer;
+declare t uuid; num integer; oid uuid;
 begin
   select id into t from public.tenants where slug = tenant_slug;
   if t is null then raise exception 'Marca no encontrada'; end if;
-  update public.tenants set party_seq = party_seq + 1 where id = t returning party_seq into num;
-  insert into public.party_requests (tenant_id, number, data) values (t, num, p);
+  update public.tenants set order_seq = order_seq + 1 where id = t returning order_seq into num;
+  insert into public.orders (tenant_id, number, kind, customer, delivery, party)
+  values (t, num, 'party', coalesce(p->'customer', '{}'), coalesce(p->'delivery', '{}'), coalesce(p->'party', '{}'))
+  returning id into oid;
+  insert into public.order_events (tenant_id, order_id, kind, text) values (t, oid, 'created', 'Solicitud de fiesta recibida');
   return num;
 end $$;
 

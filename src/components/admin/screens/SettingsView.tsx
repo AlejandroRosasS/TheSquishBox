@@ -25,7 +25,6 @@ export function SettingsView() {
   const [s, setS] = usePersisted<Settings>(dataKey(tenant.slug, "settings"), initial);
   const [newD, setNewD] = useState<string | null>(null);
   const setRate = (i: number, patch: Partial<Rate>) => setS((x) => ({ ...x, rates: x.rates.map((r, j) => (j === i ? { ...r, ...patch } : r)) }));
-  const party = tenant.customOrder.enabled ? tenant.customOrder.adminLabel ?? tenant.customOrder.label : null;
 
   const more = [
     { href: "/admin/apariencia", label: "Apariencia de la tienda" },
@@ -33,7 +32,6 @@ export function SettingsView() {
     { href: "/admin/seo", label: "SEO y redes" },
     { href: "/admin/notificaciones", label: "Notificaciones" },
     { href: "/admin/ventas", label: "Ventas y márgenes" },
-    ...(party ? [{ href: "/admin/fiestas", label: party }] : []),
   ];
 
   return (
