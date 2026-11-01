@@ -1,19 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useStore } from "@/components/StoreContext";
 import { Rich } from "@/components/Rich";
 import { asset } from "@/lib/assets";
 import { fill, formatPrice } from "@/lib/format";
 import { formatDate } from "@/lib/orders";
 import { useToday } from "@/lib/useToday";
-import { IconCard, IconCheck, IconChat, IconClose, IconPen, IconUpload } from "@/components/Icons";
+import { IconCard, IconCheck, IconChat, IconPen } from "@/components/Icons";
+import type { PartyBox } from "@/lib/types";
 
 /* eslint-disable @next/next/no-img-element */
 
 const STEP_ICONS = [IconPen, IconChat, IconCard];
-const MAX_PHOTOS = 3;
 const digits = (s: string) => s.replace(/\D/g, "");
 
 type Sent = { id: string; name: string; phone: string; rows: [string, string][] };
@@ -22,14 +22,15 @@ export function PartyForm() {
   const { tenant, catalog, storefront: sf } = useStore();
   const party = sf.party;
   const product = catalog.products.find((p) => p.id === party.productId);
-  const sizes = [
-    ...(product?.variants.map((v) => ({ id: v.id, label: v.label, sub: `${formatPrice(v.price, tenant.currency)} c/u` })) ?? []),
-    { id: "unsure", label: party.unsureLabel, sub: "Te recomendamos" },
-  ];
+  // Tipos de caja configurados en Admin › Textos. Si aún no hay, se usan las opciones del producto de fiesta.
+  const boxes: PartyBox[] = party.boxes?.length
+    ? party.boxes
+    : [{ name: product?.name ?? tenant.customOrder.label, sizes: product?.variants.map((v) => ({ name: v.label, price: v.price })) ?? [] }];
 
+  const [box, setBox] = useState(0);
   const [qty, setQty] = useState(party.defaultQuantity);
-  const [size, setSize] = useState(sizes[0]?.id ?? "unsure");
-  const [colors, setColors] = useState<string[]>([]);
+  const [otherQty, setOtherQty] = useState("");
+  const [size, setSize] = useState(0);
   const [extras, setExtras] = useState(party.extrasOptions[0]);
   const [date, setDate] = useState("");
   const [district, setDistrict] = useState(party.districts[0]);
@@ -37,26 +38,25 @@ export function PartyForm() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [photos, setPhotos] = useState<{ url: string; name: string }[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sent, setSent] = useState<Sent | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
   const today = useToday();
 
-  useEffect(() => () => photos.forEach((p) => URL.revokeObjectURL(p.url)), [photos]);
-
-  const addPhotos = (files: FileList | null) => {
-    if (!files) return;
-    const next = Array.from(files)
-      .filter((f) => /image\/(jpe?g|png)/.test(f.type))
-      .slice(0, MAX_PHOTOS - photos.length)
-      .map((f) => ({ url: URL.createObjectURL(f), name: f.name }));
-    setPhotos([...photos, ...next]);
+  const curBox = boxes[Math.min(box, boxes.length - 1)];
+  const sizes = [
+    ...curBox.sizes.map((z) => ({ label: z.name, sub: z.price > 0 ? `${formatPrice(z.price, tenant.currency)} c/u` : "A cotizar" })),
+    { label: party.unsureLabel, sub: "Te recomendamos" },
+  ];
+  const pickBox = (i: number) => {
+    setBox(i);
+    setSize(0);
   };
+  const quantity = otherQty.trim() || qty;
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const er: Record<string, string> = {};
+    if (otherQty.trim() && !(Number(otherQty) >= 1)) er.qty = "Escribe una cantidad válida.";
     if (!date) er.date = "Elige la fecha del cumple.";
     if (name.trim().length < 3) er.name = "Escribe tu nombre.";
     if (digits(phone).length !== 9) er.phone = "Escribe un celular de 9 dígitos.";
@@ -68,20 +68,18 @@ export function PartyForm() {
     }
     const n = Number(localStorage.getItem(`party:${tenant.slug}`) || "0") + 1;
     localStorage.setItem(`party:${tenant.slug}`, String(n));
-    const sizeLabel = sizes.find((s) => s.id === size)?.label ?? "";
+    const sizeLabel = sizes[size]?.label ?? "";
     setSent({
       id: `F-${String(n).padStart(4, "0")}`,
       name: name.trim().split(" ")[0],
       phone: phone.trim(),
       rows: [
-        ["Producto", product?.name ?? tenant.customOrder.label],
-        ["Cantidad", /^\d+$/.test(qty) ? `${qty} mini box` : qty],
+        ["Caja", curBox.name],
+        ["Cantidad", /^\d+$/.test(quantity) ? `${quantity} ${Number(quantity) === 1 ? "caja" : "cajas"}` : quantity],
         ["Squishies por caja", sizeLabel],
         [party.extrasLabel.replace(/[¿?]/g, ""), extras],
-        ...(colors.length ? [["Colores", colors.join(", ")] as [string, string]] : []),
         ["Fecha del cumple", formatDate(date)],
         ["Entrega", district],
-        ...(photos.length ? [["Fotos", `${photos.length} adjunta${photos.length > 1 ? "s" : ""}`] as [string, string]] : []),
       ],
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -137,43 +135,46 @@ export function PartyForm() {
         </div>
 
         <form className="stack g6" style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 26, padding: "clamp(20px, 4vw, 32px)" }} onSubmit={submit} noValidate>
+          {boxes.length > 1 && (
+            <fieldset className="stack g3" style={{ border: 0, padding: 0, margin: 0 }}>
+              <legend className="label" style={{ marginBottom: 10 }}>{party.boxQuestion || "¿Qué caja quieres?"}</legend>
+              <div className="seg-sizes" role="radiogroup">
+                {boxes.map((b, i) => (
+                  <button key={b.name + i} className={`seg-opt ${box === i ? "on" : ""}`} type="button" role="radio" aria-checked={box === i} onClick={() => pickBox(i)}>
+                    <span className="t">{b.name}</span>
+                    <span className="p">{b.sizes.length === 1 ? b.sizes[0].name : `${b.sizes.length} opciones`}</span>
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+          )}
+
           <fieldset className="stack g3" style={{ border: 0, padding: 0, margin: 0 }}>
-            <legend className="label" style={{ marginBottom: 10 }}>¿Cuántas mini box necesitas?</legend>
+            <legend className="label" style={{ marginBottom: 10 }}>{party.quantityQuestion || "¿Cuántas cajas necesitas?"}</legend>
             <div className="row g2 wrap-row">
-              {party.quantities.map((q) => (
-                <button key={q} className={`chip ${qty === q ? "on" : ""}`} type="button" aria-pressed={qty === q} onClick={() => setQty(q)}>{q}</button>
-              ))}
+              {party.quantities.map((q) => {
+                const on = !otherQty.trim() && qty === q;
+                return <button key={q} className={`chip ${on ? "on" : ""}`} type="button" aria-pressed={on} onClick={() => { setQty(q); setOtherQty(""); }}>{q}</button>;
+              })}
+            </div>
+            <div className={fieldCls("qty")} style={{ maxWidth: 240 }}>
+              <label htmlFor="m-qty">{party.otherQuantityLabel || "Otra cantidad"}</label>
+              <input id="m-qty" className="input" type="number" inputMode="numeric" min={1} step={1} placeholder="Ej.: 45" value={otherQty} onChange={(e) => setOtherQty(e.target.value.replace(/[^\d]/g, ""))} aria-invalid={!!errors.qty || undefined} />
+              {err("qty")}
             </div>
           </fieldset>
 
           <fieldset className="stack g3" style={{ border: 0, padding: 0, margin: 0 }}>
             <legend className="label" style={{ marginBottom: 10 }}>{party.sizeQuestion}</legend>
             <div className="seg-sizes" role="radiogroup">
-              {sizes.map((z) => (
-                <button key={z.id} className={`seg-opt ${size === z.id ? "on" : ""}`} type="button" role="radio" aria-checked={size === z.id} onClick={() => setSize(z.id)}>
+              {sizes.map((z, i) => (
+                <button key={z.label + i} className={`seg-opt ${size === i ? "on" : ""}`} type="button" role="radio" aria-checked={size === i} onClick={() => setSize(i)}>
                   <span className="t">{z.label}</span>
                   <span className="p">{z.sub}</span>
                 </button>
               ))}
             </div>
           </fieldset>
-
-          {party.colors.length > 0 && (
-            <fieldset className="stack g3" style={{ border: 0, padding: 0, margin: 0 }}>
-              <legend className="label" style={{ marginBottom: 10 }}>Colores de la fiesta <span className="muted" style={{ fontWeight: 500 }}>(opcional)</span></legend>
-              <div className="row g3 wrap-row">
-                {party.colors.map((c) => {
-                  const on = colors.includes(c.name);
-                  return (
-                    <button key={c.name} className={`row g2 chip ${on ? "on" : ""}`} type="button" aria-pressed={on} onClick={() => setColors(on ? colors.filter((x) => x !== c.name) : [...colors, c.name])}>
-                      <span className="sw" style={{ width: 18, height: 18, background: c.hex }} />
-                      {c.name}
-                    </button>
-                  );
-                })}
-              </div>
-            </fieldset>
-          )}
 
           <div className="grid2">
             <div className="field"><label htmlFor="m-extras">{party.extrasLabel}</label>
@@ -187,30 +188,6 @@ export function PartyForm() {
             <select id="m-dist" className="select" value={district} onChange={(e) => setDistrict(e.target.value)}>
               {party.districts.map((d) => <option key={d}>{d}</option>)}
             </select>
-          </div>
-
-          <div className="stack g3">
-            <span className="label" id="m-photos-l">Foto de la temática <span className="muted" style={{ fontWeight: 500 }}>(opcional)</span></span>
-            {photos.length < MAX_PHOTOS && (
-              <label className="drop" aria-labelledby="m-photos-l">
-                <IconUpload />
-                <span className="small"><b style={{ color: "var(--text)" }}>Toca para subir</b> {party.uploadHint}</span>
-                <span className="small">JPG o PNG · hasta {MAX_PHOTOS} fotos</span>
-                <input ref={fileRef} type="file" accept="image/jpeg,image/png" multiple onChange={(e) => { addPhotos(e.target.files); e.target.value = ""; }} />
-              </label>
-            )}
-            {photos.length > 0 && (
-              <div className="thumbs">
-                {photos.map((p, i) => (
-                  <div className="thumb" key={p.url}>
-                    <img src={p.url} alt={`Referencia ${i + 1}`} />
-                    <button type="button" className="icon-btn" aria-label={`Quitar ${p.name}`} onClick={() => setPhotos(photos.filter((x) => x !== p))} style={{ position: "absolute", top: -10, right: -10, background: "var(--surface)", width: 32, height: 32 }}>
-                      <IconClose size="xs" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
 
           <div className="field"><label htmlFor="m-idea">Comentarios</label><textarea id="m-idea" className="textarea" placeholder={party.commentsPlaceholder} value={comments} onChange={(e) => setComments(e.target.value)} /></div>

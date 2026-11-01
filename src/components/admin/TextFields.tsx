@@ -1,10 +1,11 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element */
 import { useId } from "react";
-import { asset } from "@/lib/assets";
-import { HIDDEN_KEYS, PRODUCT_LIST_KEYS, isImageKey, isLong, isRichCandidate, labelFor } from "@/lib/admin/textSchema";
+import { HIDDEN_KEYS, PRODUCT_LIST_KEYS, isImageKey, isLong, isRichCandidate, itemLabelFor, labelFor } from "@/lib/admin/textSchema";
 import { AIDown, AIPlus, AITrash, AIUp } from "./AdminIcons";
+import { SlotImage } from "./SlotImage";
+import { useAdminMedia } from "./AdminMedia";
+import { OriginTag, Thumb, UploadButton } from "./PhotoPicker";
 
 type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
 
@@ -21,7 +22,8 @@ type Props = { k: string; value: Json; onChange: (v: Json) => void; ctx: FieldCt
 function blank(v: Json): Json {
   if (typeof v === "string") return "";
   if (typeof v === "number") return 0;
-  if (Array.isArray(v)) return [];
+  // Una lista anidada nueva arranca con un elemento vacío, para que se pueda completar y agregar más.
+  if (Array.isArray(v)) return v.length ? [blank(v[0])] : [];
   if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, k === "image" ? x : blank(x)]));
   return v;
 }
@@ -59,17 +61,23 @@ function TextInput({ k, value, onChange }: { k: string; value: string; onChange:
 
 export function ImagePicker({ value, onChange, ctx }: { value: string; onChange: (v: string) => void; ctx: FieldCtx }) {
   const id = useId();
+  const { list, media } = useAdminMedia();
+  const images = [...new Set([...ctx.images, ...list.map((m) => m.src)])];
   return (
     <div className="a-field" role="group" aria-labelledby={id}>
       <span id={id} style={{ fontSize: 13, fontWeight: 600 }}>{labelFor("image")}</span>
       <div className="img-pick">
-        {ctx.images.map((src) => (
-          <button key={src} type="button" className={src === value ? "on" : ""} aria-pressed={src === value} aria-label={`Usar ${src.split("/").pop()}`} onClick={() => onChange(src)}>
-            <img src={asset(ctx.slug, src)} alt="" loading="lazy" />
+        {images.map((src) => (
+          <button key={src} type="button" className={src === value ? "on" : ""} aria-pressed={src === value} aria-label={`Usar ${media[src]?.name ?? src.split("/").pop()}`} onClick={() => onChange(src)} style={{ position: "relative" }}>
+            <Thumb src={src} />
+            <OriginTag item={media[src]} />
           </button>
         ))}
       </div>
-      <span className="a-cap">Fotos de la marca. Subir fotos nuevas llega con la Fase 3.</span>
+      <div className="row g2 wrap-row">
+        <UploadButton className="a-btn sm" label="Subir foto" multiple={false} onUploaded={(s) => onChange(s[0])} />
+        <span className="a-cap">Fotos de la marca: las de Instagram y las que subes.</span>
+      </div>
     </div>
   );
 }
@@ -134,14 +142,12 @@ export function FieldEditor({ k, value, onChange, ctx, depth = 0 }: Props) {
         </div>
         {items.map((item, i) => (
           <div key={i} className={simple ? "row g2" : "stack g3"} style={simple ? { alignItems: "flex-end" } : { borderTop: i ? "1px solid var(--a-border)" : 0, paddingTop: i ? 12 : 0 }}>
-            {!simple && <p className="a-label">{labelFor(k)} {i + 1}</p>}
+            {!simple && <p className="a-label">{itemLabelFor(k)} {i + 1}</p>}
             <div className="grow stack g3">
               {simple ? (
                 <TextInput k={`${k}`} value={item as string} onChange={(v) => onChange(items.map((x, j) => (j === i ? v : x)))} />
               ) : (
-                Object.entries(item as Record<string, Json>).map(([ck, cv]) => (
-                  <FieldEditor key={ck} k={ck} value={cv} ctx={ctx} depth={depth + 1} onChange={(v) => onChange(items.map((x, j) => (j === i ? { ...(x as object), [ck]: v } : x)))} />
-                ))
+                <ObjectFields k={k} obj={item as Record<string, Json>} ctx={ctx} depth={depth + 1} onChange={(v) => onChange(items.map((x, j) => (j === i ? v : x)))} />
               )}
             </div>
             <div className="mv" style={simple ? undefined : { alignSelf: "flex-end" }}>
@@ -160,8 +166,7 @@ export function FieldEditor({ k, value, onChange, ctx, depth = 0 }: Props) {
     );
   }
 
-  const entries = Object.entries(value).filter(([ck]) => !HIDDEN_KEYS.has(ck));
-  const inner = entries.map(([ck, cv]) => <FieldEditor key={ck} k={ck} value={cv} ctx={ctx} depth={depth + 1} onChange={(v) => onChange({ ...value, [ck]: v })} />);
+  const inner = <ObjectFields k={k} obj={value} ctx={ctx} depth={depth + 1} onChange={onChange} />;
   if (depth === 0) return <div className="stack g4">{inner}</div>;
   return (
     <fieldset className="tx-group" aria-labelledby={id}>
@@ -172,3 +177,29 @@ export function FieldEditor({ k, value, onChange, ctx, depth = 0 }: Props) {
 }
 
 export type { Json };
+
+/**
+ * Campos de un objeto. Si tiene foto (`image`), se edita con su formato de la tienda:
+ * en secciones con formatos distintos (portada, accesos) se puede elegir otra foto para celular.
+ */
+function ObjectFields({ k, obj, onChange, ctx, depth }: { k: string; obj: Record<string, Json>; onChange: (v: Json) => void; ctx: FieldCtx; depth: number }) {
+  const hasSlot = typeof obj.image === "string";
+  const entries = Object.entries(obj).filter(([ck]) => !HIDDEN_KEYS.has(ck) && !(hasSlot && (ck === "image" || ck === "imageMobile")));
+  return (
+    <>
+      {hasSlot && (
+        <SlotImage
+          slotKey={k}
+          value={{ image: obj.image as string, imageMobile: (obj.imageMobile as string) || undefined }}
+          onChange={(v) => {
+            const next: Record<string, Json> = { ...obj, image: v.image };
+            if (v.imageMobile) next.imageMobile = v.imageMobile;
+            else delete next.imageMobile;
+            onChange(next);
+          }}
+        />
+      )}
+      {entries.map(([ck, cv]) => <FieldEditor key={ck} k={ck} value={cv} ctx={ctx} depth={depth} onChange={(v) => onChange({ ...obj, [ck]: v })} />)}
+    </>
+  );
+}

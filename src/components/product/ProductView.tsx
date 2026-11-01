@@ -6,12 +6,11 @@ import type { Product } from "@/lib/types";
 import { useStore } from "@/components/StoreContext";
 import { useCart } from "@/components/cart/CartProvider";
 import { Rich } from "@/components/Rich";
-import { asset } from "@/lib/assets";
+import { Photo } from "@/components/Photo";
+import { SLOTS } from "@/lib/media";
 import { formatPrice } from "@/lib/format";
-import { isSoldOut, LOW_STOCK, unitsLeft, variantStockLabel } from "@/lib/catalog";
+import { hasOptions, isSoldOut, LOW_STOCK, unitsLeft, variantStockLabel } from "@/lib/catalog";
 import { IconInstagram, IconMinus, IconPlus, IconTruck } from "@/components/Icons";
-
-/* eslint-disable @next/next/no-img-element */
 
 export function ProductView({ product: p, lineLabel }: { product: Product; lineLabel: string }) {
   const { tenant, catalog, storefront: sf } = useStore();
@@ -30,18 +29,24 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
   const left = unitsLeft(p, v);
   const curOut = allOut || left <= 0;
   const stockBadge = curOut ? "Agotado" : left <= LOW_STOCK ? `Últimas ${left}` : "";
-  const images = p.images.map((src) => asset(tenant.slug, src));
+  const images = p.images;
   const ig = `https://www.instagram.com/${tenant.instagram}/`;
 
-  const pickVariant = (id: string) => {
-    setVid(id);
-    setQty(1);
-  };
+  const options = hasOptions(p);
 
   const goTo = (i: number) => {
     setImg(i);
     const el = slider.current;
     if (el) el.scrollTo({ left: el.clientWidth * i, behavior: "smooth" });
+  };
+
+  const pickVariant = (id: string) => {
+    setVid(id);
+    setQty(1);
+    // Si la opción tiene su propia foto, la galería salta a ella.
+    const next = p.variants.find((x) => x.id === id);
+    const i = next?.image ? p.images.indexOf(next.image) : -1;
+    if (i >= 0) goTo(i);
   };
 
   const add = () => cart.add(p.id, v.id, qty);
@@ -59,12 +64,12 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
             <div className="gthumbs">
               {images.map((src, i) => (
                 <button key={src} className={`gthumb ${img === i ? "on" : ""}`} type="button" aria-label={`Ver foto ${i + 1}`} aria-pressed={img === i} onClick={() => setImg(i)}>
-                  <img src={src} alt="" />
+                  <Photo src={src} alt="" slot={SLOTS.product} />
                 </button>
               ))}
             </div>
             <div className={`ph r45 ${allOut ? "dim" : ""}`} style={{ borderRadius: 24 }}>
-              <img src={images[img]} alt={`${p.name}, foto ${img + 1}`} />
+              <Photo src={images[img]} alt={`${p.name}, foto ${img + 1}`} slot={SLOTS.product} />
               {allOut && <span className="tag badge sold">Agotado</span>}
             </div>
           </div>
@@ -81,7 +86,7 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
             >
               {images.map((src, i) => (
                 <div key={src} className={`ph r45 ${allOut ? "dim" : ""}`}>
-                  <img src={src} alt={`${p.name}, foto ${i + 1}`} />
+                  <Photo src={src} alt={`${p.name}, foto ${i + 1}`} slot={SLOTS.product} />
                   {allOut && i === 0 && <span className="tag badge sold">Agotado</span>}
                 </div>
               ))}
@@ -113,9 +118,9 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
             </div>
           </div>
 
-          {p.variants.length > 1 && (
+          {options && (
             <div className="stack g3">
-              <span className="label" id="variant-q">{sf.product.variantQuestion}</span>
+              <span className="label" id="variant-q">{p.optionsLabel || sf.product.variantQuestion}</span>
               <div className="seg" role="radiogroup" aria-labelledby="variant-q">
                 {p.variants.map((x) => {
                   const out = unitsLeft(p, x) <= 0;
@@ -209,7 +214,7 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
       {!curOut && (
         <div className="sticky-buy only-m flex">
           <div className="stack" style={{ lineHeight: 1.2 }}>
-            <span className="small muted">{v.label}</span>
+            {options && <span className="small muted">{v.label}</span>}
             <span className="price">{formatPrice(v.price * qty, cur)}</span>
           </div>
           <button className="btn grow" type="button" onClick={add}>Agregar al carrito</button>

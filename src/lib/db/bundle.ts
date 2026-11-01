@@ -1,5 +1,6 @@
 import type { Catalog, Product, Seo, Storefront, Tenant } from "@/lib/types";
 import type { Tokens } from "@/lib/publishedTheme";
+import type { MediaMap } from "@/lib/media";
 import { publicClient } from "./public";
 import { UNTRACKED_STOCK } from "@/lib/catalog";
 
@@ -9,6 +10,7 @@ export type DbBundle = {
   storefront: Storefront;
   seo: Seo;
   appearance: { key: string | null; tokens: Tokens } | null;
+  media: MediaMap;
 };
 
 type ProductRow = {
@@ -27,7 +29,7 @@ export async function loadBundleFromDb(slug: string): Promise<DbBundle | null> {
   if (error) throw new Error(`Supabase: ${error.message}`);
   if (!t) return null;
 
-  const [docs, lines, products] = await Promise.all([
+  const [docs, lines, products, media] = await Promise.all([
     db.from("site_docs").select("kind, body").eq("tenant_id", t.id).eq("stage", "published"),
     db.from("product_lines").select("id, name, position").eq("tenant_id", t.id).order("position"),
     db.from("products")
@@ -35,8 +37,9 @@ export async function loadBundleFromDb(slug: string): Promise<DbBundle | null> {
       .eq("tenant_id", t.id)
       .neq("status", "draft")
       .order("position"),
+    db.from("media").select("src, origin, width, height, alt, frames").eq("tenant_id", t.id),
   ]);
-  for (const r of [docs, lines, products]) if (r.error) throw new Error(`Supabase: ${r.error.message}`);
+  for (const r of [docs, lines, products, media]) if (r.error) throw new Error(`Supabase: ${r.error.message}`);
 
   const doc = Object.fromEntries((docs.data ?? []).map((d) => [d.kind, d.body])) as Record<string, unknown>;
   const tenantDoc = doc.tenant as (Tenant & { catalogExtras?: Partial<Catalog> }) | undefined;
@@ -78,5 +81,6 @@ export async function loadBundleFromDb(slug: string): Promise<DbBundle | null> {
     storefront: doc.storefront as Storefront,
     seo: doc.seo as Seo,
     appearance: (doc.appearance as DbBundle["appearance"]) ?? null,
+    media: Object.fromEntries((media.data ?? []).map((m) => [m.src, { src: m.src, origin: m.origin, width: m.width ?? undefined, height: m.height ?? undefined, alt: m.alt, frames: m.frames ?? {} }])) as MediaMap,
   };
 }

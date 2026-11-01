@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import type { TenantBundle } from "@/tenants";
 import { StoreProvider } from "@/components/StoreContext";
+import { MediaProvider } from "@/components/Photo";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -17,6 +18,8 @@ type Props = {
   /** Alto visible del marco (px). El resto se ve con scroll. */
   maxHeight?: number;
   label?: string;
+  /** Página a mostrar; por defecto la Home. */
+  children?: ReactNode;
 };
 
 const WIDTH = { m: 390, d: 1280 };
@@ -27,7 +30,7 @@ const noop = () => () => {};
  * Se dibuja a su ancho real (celular o desktop) y se escala para caber en el panel.
  * Es solo para mirar: no se puede navegar ni enfocar (inert).
  */
-export function StorePreview({ bundle, tokens, mode, maxHeight = 680, label = "Vista previa de la tienda" }: Props) {
+export function StorePreview({ bundle, tokens, mode, maxHeight = 680, label = "Vista previa de la tienda", children }: Props) {
   const outer = useRef<HTMLDivElement>(null);
   const inner = useRef<HTMLDivElement>(null);
   const [box, setBox] = useState({ w: 0, h: 0 });
@@ -60,11 +63,13 @@ export function StorePreview({ bundle, tokens, mode, maxHeight = 680, label = "V
           {mounted && (
             <div className="store store-preview" style={style}>
               <StoreProvider value={bundle}>
+              <MediaProvider mode={mode}>
                 <CartProvider>
                   <Header />
-                  <HomeView bundle={bundle} />
+                  {children ?? <HomeView bundle={bundle} />}
                   <Footer bundle={bundle} year={new Date().getFullYear()} />
                 </CartProvider>
+              </MediaProvider>
               </StoreProvider>
             </div>
           )}

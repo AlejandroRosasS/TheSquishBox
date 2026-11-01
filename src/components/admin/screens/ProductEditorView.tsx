@@ -1,15 +1,18 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { use, useId, useMemo, useState } from "react";
-import { asset } from "@/lib/assets";
 import { formatPrice } from "@/lib/format";
+import { productKind } from "@/lib/catalog";
 import type { AdminProduct } from "@/lib/admin/types";
 import type { Variant } from "@/lib/types";
+import { ProductView } from "@/components/product/ProductView";
 import { useAdmin, useAdminCatalog } from "../AdminContext";
+import { StorePreview } from "../StorePreview";
 import { AdminPage, BackLink, DemoNote, Switch } from "../AdminPage";
-import { AIInstagram, AIPlus, AITrash, AIUp } from "../AdminIcons";
+import { ProductPhotos } from "../ProductPhotos";
+import { Thumb } from "../PhotoPicker";
+import { AIDown, AIInstagram, AIPlus, AITrash, AIUp } from "../AdminIcons";
 
 const LOW = 5;
 
@@ -55,18 +58,12 @@ export function ProductEditorView({ params }: { params: Promise<{ id: string }> 
   const savedCosts = useMemo(() => catalog.costs[id] ?? {}, [catalog.costs, id]);
   const [draft, setDraft] = useState<AdminProduct | null>(null);
   const [costs, setCosts] = useState<Record<string, number> | null>(null);
-  const [showPicker, setShowPicker] = useState(false);
-  const p = draft ?? saved;
+  // Opciones apartadas al pasar a «Precio único» (vuelven si regresas a «Con opciones» sin guardar).
+  const [stash, setStash] = useState<Variant[]>([]);
+  const base = draft ?? saved;
+  // Un producto nuevo sin precio todavía: se edita como «Precio único» con una variante vacía.
+  const p = base && !base.variants.length ? { ...base, variants: [{ id: "unica", label: "Precio único", price: 0, priceIsReference: true, stock: 0 }] } : base;
   const c = costs ?? savedCosts;
-  const a = (x: string) => asset(bundle.tenant.slug, x);
-
-  const brandImages = useMemo(() => {
-    const s = new Set<string>();
-    catalog.products.forEach((x) => x.images.forEach((i) => s.add(i)));
-    bundle.storefront.tiles.forEach((t) => s.add(t.image));
-    s.add(bundle.storefront.hero.image);
-    return [...s];
-  }, [catalog.products, bundle.storefront]);
 
   if (!p) {
     return (
@@ -78,22 +75,60 @@ export function ProductEditorView({ params }: { params: Promise<{ id: string }> 
   }
 
   const edit = (patch: Partial<AdminProduct>) => setDraft({ ...p, ...patch });
+  const options = productKind(p) === "options";
   const editVar = (i: number, patch: Partial<Variant>) => edit({ variants: p.variants.map((v, j) => (j === i ? { ...v, ...patch } : v)) });
   const dirty = draft !== null || costs !== null;
   const published = p.status !== "draft";
   const lineName = catalog.lines.find((l) => l.id === p.line)?.name ?? "";
+  const previewBundle = { ...bundle, catalog: { ...bundle.catalog, products: [p, ...bundle.catalog.products.filter((x) => x.id !== p.id)] } };
 
   const save = (status?: AdminProduct["status"], msg = "Producto guardado") => {
-    const next: AdminProduct = { ...p, ...(status ? { status } : {}) };
+    const next: AdminProduct = {
+      ...p,
+      ...(status ? { status } : {}),
+      kind: options ? "options" : "simple",
+      // Una foto de opción que ya no está entre las fotos del producto se descarta.
+      variants: p.variants.map((v) => (v.image && !p.images.includes(v.image) ? { ...v, image: undefined } : v)),
+    };
     if (!next.name.trim()) return toast("Ponle un nombre al producto");
+    if (options) {
+      const unnamed = next.variants.findIndex((v) => !v.label.trim());
+      if (unnamed >= 0) return toast(`Ponle nombre a la opción ${unnamed + 1}`);
+      const labels = next.variants.map((v) => v.label.trim().toLowerCase());
+      if (new Set(labels).size !== labels.length) return toast("Hay dos opciones con el mismo nombre");
+    }
+    if (next.status !== "draft") {
+      const free = next.variants.find((v) => !(v.price > 0));
+      if (free) return toast(options ? `Ponle precio a «${free.label}» para publicar` : "Ponle precio al producto para publicar");
+    }
     setCatalog({ ...catalog, products: catalog.products.map((x) => (x.id === id ? next : x)), costs: { ...catalog.costs, [id]: c } });
     setDraft(null);
     setCosts(null);
+    setStash([]);
     toast(msg);
   };
 
-  const addVariant = () => edit({ variants: [...p.variants, { id: `v${Date.now().toString(36)}`, label: "Nueva variante", price: 0, priceIsReference: true, stock: 0 }] });
+  const newVariant = (label = ""): Variant => ({ id: `v${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`, label, price: 0, priceIsReference: true, stock: 0 });
+  const addVariant = () => edit({ kind: "options", variants: [...p.variants, newVariant()] });
   const removeVariant = (i: number) => edit({ variants: p.variants.filter((_, j) => j !== i) });
+  const moveVariant = (i: number, d: -1 | 1) => {
+    const v = [...p.variants];
+    [v[i], v[i + d]] = [v[i + d], v[i]];
+    edit({ variants: v });
+  };
+  // Al pasar a «Precio único» se queda la primera opción; las demás se guardan aparte por si vuelves a «Con opciones».
+  const toSimple = () => {
+    if (!options) return;
+    setStash(p.variants.slice(1));
+    edit({ kind: "simple", variants: p.variants.slice(0, 1) });
+  };
+  const toOptions = () => {
+    if (options) return;
+    const list = [...p.variants, ...stash];
+    while (list.length < 2) list.push(newVariant());
+    setStash([]);
+    edit({ kind: "options", variants: list });
+  };
   const cap = (n: number) => (n <= 0 ? "Agotado en la tienda" : n <= LOW ? "Stock bajo · se avisará" : "Disponible");
   const pubStatus = (on: boolean): AdminProduct["status"] => (on ? (p.variants.length && p.variants.every((v) => v.stock <= 0) && p.stockMode !== "none" ? "sold_out" : "published") : "draft");
 
@@ -117,27 +152,8 @@ export function ProductEditorView({ params }: { params: Promise<{ id: string }> 
               <h2 className="a-h2" id="ed-ig">{p.igSynced ? "Contenido desde Instagram" : "Contenido"}</h2>
               {p.igSynced && <span className="sync"><AIInstagram size="sm" style={{ width: 14, height: 14 }} />Sincronizado</span>}
             </div>
-            {p.igSynced && <p className="a-cap">Fotos y texto se actualizan solos cuando editan el post en Instagram. Si editas algo a mano, ese campo deja de sincronizarse.</p>}
-            <div className="media">
-              {p.images.map((img, i) => (
-                <div key={img + i}>
-                  <img src={a(img)} alt={`Foto ${i + 1}`} />
-                  {i === 0 && <span className="cover">Portada</span>}
-                  <span className="m-act">
-                    {i > 0 && <button type="button" aria-label={`Usar foto ${i + 1} como portada`} onClick={() => edit({ images: [img, ...p.images.filter((_, j) => j !== i)] })}><AIUp size="sm" /></button>}
-                    <button type="button" aria-label={`Quitar foto ${i + 1}`} onClick={() => edit({ images: p.images.filter((_, j) => j !== i) })}><AITrash size="sm" /></button>
-                  </span>
-                </div>
-              ))}
-            </div>
-            <button className="a-btn sm" type="button" style={{ alignSelf: "flex-start" }} aria-expanded={showPicker} onClick={() => setShowPicker(!showPicker)}><AIPlus size="sm" /> Agregar foto</button>
-            {showPicker && (
-              <div className="img-pick">
-                {brandImages.filter((x) => !p.images.includes(x)).map((src) => (
-                  <button key={src} type="button" aria-label={`Agregar ${src.split("/").pop()}`} onClick={() => edit({ images: [...p.images, src] })}><img src={a(src)} alt="" /></button>
-                ))}
-              </div>
-            )}
+            {p.igSynced && <p className="a-cap">Fotos y texto se actualizan solos cuando editan el post en Instagram. Si cambias algo a mano (incluidas las fotos), eso deja de sincronizarse.</p>}
+            <ProductPhotos product={p} onChange={edit} />
             <Locked label="Nombre" value={p.name} synced={!!p.igSynced} onChange={(v) => edit({ name: v })} />
             <Locked label="Descripción" long value={p.description} synced={!!p.igSynced} onChange={(v) => edit({ description: v })} />
             <div className="a-field">
@@ -149,19 +165,59 @@ export function ProductEditorView({ params }: { params: Promise<{ id: string }> 
           </section>
 
           <section className="a-card" aria-labelledby="ed-price">
-            <div className="a-card-h"><h2 className="a-h2" id="ed-price">Variantes, precio y costo</h2><button className="a-btn sm" type="button" onClick={addVariant}><AIPlus size="sm" /> Variante</button></div>
+            <h2 className="a-h2" id="ed-price">Tipo de producto y precio</h2>
+            <div className="a-seg" role="radiogroup" aria-label="Tipo de producto" style={{ width: "100%" }}>
+              <button className={!options ? "on" : ""} type="button" role="radio" aria-checked={!options} onClick={toSimple}>Precio único</button>
+              <button className={options ? "on" : ""} type="button" role="radio" aria-checked={options} onClick={toOptions}>Con opciones</button>
+            </div>
+            <p className="a-cap">
+              {options
+                ? "El cliente elige una opción antes de agregar al carrito. Cada opción tiene su precio, su costo y su stock. Agrega todas las que necesites."
+                : "Un solo producto con un solo precio. Puedes subirle varias fotos."}
+            </p>
+
+            {options && (
+              <div className="a-field">
+                <label htmlFor="ed-optq">Pregunta para elegir <span className="a-cap">(se ve arriba de las opciones)</span></label>
+                <input id="ed-optq" className="a-input" value={p.optionsLabel ?? ""} placeholder={bundle.storefront.product.variantQuestion} onChange={(e) => edit({ optionsLabel: e.target.value || undefined })} />
+                <span className="a-cap">Si la dejas vacía se usa «{bundle.storefront.product.variantQuestion}».</span>
+              </div>
+            )}
+
             {p.variants.map((v, i) => {
               const cost = c[v.id] ?? 0;
               const contrib = v.price - cost;
               const margin = v.price ? Math.round((contrib / v.price) * 100) : 0;
+              const name = v.label || `Opción ${i + 1}`;
               return (
-                <div key={v.id} className="stack g2" style={{ borderBottom: "1px solid var(--a-border)", paddingBottom: 12 }}>
-                  <div className="var-edit">
-                    <div className="a-field"><label htmlFor={`vl-${i}`}>Nombre de la variante</label><input id={`vl-${i}`} className="a-input" value={v.label} onChange={(e) => editVar(i, { label: e.target.value })} /></div>
+                <div key={v.id} className={options ? "opt-edit" : "stack g2"}>
+                  {options && (
+                    <div className="row between">
+                      <b className="a-cap" style={{ fontWeight: 700 }}>Opción {i + 1}</b>
+                      <div className="row g1">
+                        <button className="a-btn sm ghost" type="button" style={{ width: 44, padding: 0 }} disabled={i === 0} aria-label={`Subir ${name}`} onClick={() => moveVariant(i, -1)}><AIUp size="sm" /></button>
+                        <button className="a-btn sm ghost" type="button" style={{ width: 44, padding: 0 }} disabled={i === p.variants.length - 1} aria-label={`Bajar ${name}`} onClick={() => moveVariant(i, 1)}><AIDown size="sm" /></button>
+                        <button className="a-btn sm ghost danger" type="button" style={{ width: 44, padding: 0 }} disabled={p.variants.length <= 2} aria-label={`Quitar ${name}`} title={p.variants.length <= 2 ? "Mínimo 2 opciones. Para un solo precio elige «Precio único»." : undefined} onClick={() => removeVariant(i)}><AITrash size="sm" /></button>
+                      </div>
+                    </div>
+                  )}
+                  <div className={options ? "var-edit opt" : "var-edit simple"}>
+                    {options && <div className="a-field"><label htmlFor={`vl-${i}`}>Nombre de la opción</label><input id={`vl-${i}`} className="a-input" value={v.label} placeholder="Ej.: 3 squishies" onChange={(e) => editVar(i, { label: e.target.value })} /></div>}
                     <Money id={`vp-${i}`} label="Precio" value={v.price} onChange={(n) => editVar(i, { price: n })} />
                     <Money id={`vc-${i}`} label="Costo" value={cost} onChange={(n) => setCosts({ ...c, [v.id]: n })} />
-                    <button className="a-btn ghost danger" type="button" style={{ padding: 0, width: 44 }} disabled={p.variants.length === 1} aria-label={`Quitar variante ${v.label}`} onClick={() => removeVariant(i)}><AITrash size="sm" /></button>
                   </div>
+                  {options && p.images.length > 0 && (
+                    <div className="a-field">
+                      <span className="opt-pics-l" id={`vi-${i}`}>Foto de esta opción <span className="a-cap">(opcional)</span></span>
+                      <div className="opt-pics" role="radiogroup" aria-labelledby={`vi-${i}`}>
+                        <button type="button" role="radio" aria-checked={!v.image || !p.images.includes(v.image)} className={!v.image || !p.images.includes(v.image) ? "on" : ""} onClick={() => editVar(i, { image: undefined })}>Ninguna</button>
+                        {p.images.map((img, k) => (
+                          <button key={img + k} type="button" role="radio" aria-checked={v.image === img} aria-label={`Foto ${k + 1}`} className={v.image === img ? "on" : ""} onClick={() => editVar(i, { image: img })}><Thumb src={img} /></button>
+                        ))}
+                      </div>
+                      <span className="a-cap">Al elegir esta opción en la tienda, la galería muestra esta foto y el carrito la usa de miniatura.</span>
+                    </div>
+                  )}
                   <div className="row between wrap-row g2">
                     <label className="row g2" style={{ minHeight: 44, cursor: "pointer" }}>
                       <input type="checkbox" checked={v.priceIsReference} style={{ width: 20, height: 20 }} onChange={(e) => editVar(i, { priceIsReference: e.target.checked })} />
@@ -172,6 +228,7 @@ export function ProductEditorView({ params }: { params: Promise<{ id: string }> 
                 </div>
               );
             })}
+            {options && <button className="a-btn sm" type="button" style={{ alignSelf: "flex-start" }} onClick={addVariant}><AIPlus size="sm" /> Agregar opción</button>}
             <p className="a-cap">El costo es interno (producto, caja, sobres y empaque). No se muestra en la tienda; se usa para calcular márgenes en Ventas.</p>
             <div className="a-field">
               <label htmlFor="ed-line">Línea</label>
@@ -201,7 +258,7 @@ export function ProductEditorView({ params }: { params: Promise<{ id: string }> 
               <div className="stack">
                 {p.variants.map((v, i) => (
                   <div className="var-row" key={v.id}>
-                    <div><b>{v.label}</b><p className="a-cap">{cap(v.stock)}</p></div>
+                    <div><b>{options ? v.label || "Opción sin nombre" : "Stock"}</b><p className="a-cap">{cap(v.stock)}</p></div>
                     <div className="stepq">
                       <button type="button" onClick={() => editVar(i, { stock: Math.max(0, v.stock - 1) })} aria-label={`Restar stock de ${v.label}`}>−</button>
                       <span aria-live="polite">{v.stock}</span>
@@ -213,7 +270,7 @@ export function ProductEditorView({ params }: { params: Promise<{ id: string }> 
                   <div><b>Avisar stock bajo</b><p className="a-cap">Cuando queden {LOW} o menos</p></div>
                   <Switch on={p.lowAlert !== false} onChange={(v) => edit({ lowAlert: v })} label="Avisar stock bajo" />
                 </div>
-                <p className="a-cap" style={{ marginTop: 10 }}>Se descuenta solo con cada venta. Al llegar a 0, la variante pasa a «Agotado».</p>
+                <p className="a-cap" style={{ marginTop: 10 }}>Se descuenta solo con cada venta. Al llegar a 0, {options ? "esa opción pasa" : "el producto pasa"} a «Agotado».</p>
               </div>
             )}
           </section>
@@ -226,7 +283,13 @@ export function ProductEditorView({ params }: { params: Promise<{ id: string }> 
             </div>
             <button className="a-btn primary block" type="button" onClick={() => save(pubStatus(true), "Producto publicado")}>Publicar</button>
             <button className="a-btn block" type="button" onClick={() => save("draft", "Guardado como borrador")}>Guardar como borrador</button>
-            {dirty && <button className="a-btn ghost block" type="button" onClick={() => { setDraft(null); setCosts(null); }}>Descartar cambios</button>}
+            {dirty && <button className="a-btn ghost block" type="button" onClick={() => { setDraft(null); setCosts(null); setStash([]); }}>Descartar cambios</button>}
+          </section>
+          <section className="a-card" aria-labelledby="ed-prev">
+            <h2 className="a-h2" id="ed-prev">Así se ve en la tienda</h2>
+            <StorePreview bundle={previewBundle} mode="m" maxHeight={820} label={`Vista previa de ${p.name || "este producto"} en la tienda`}>
+              <ProductView key={p.variants.map((v) => v.id).join("|")} product={p} lineLabel={lineName} />
+            </StorePreview>
           </section>
           <DemoNote>Demo: los cambios de productos se guardan en este navegador y se ven en el panel. La tienda en vivo los toma cuando conectemos la base de datos (Fase 3).</DemoNote>
         </div>

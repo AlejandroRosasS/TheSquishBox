@@ -51,6 +51,12 @@ export type Variant = {
   image?: string;
 };
 
+/**
+ * simple: un solo precio (exactamente 1 variante, varias fotos).
+ * options: el cliente elige una opción y cada una tiene su precio (2 o más variantes, sin tope).
+ */
+export type ProductKind = "simple" | "options";
+
 export type Product = {
   id: string;
   name: string;
@@ -58,7 +64,7 @@ export type Product = {
   badge?: string;
   status: "published" | "sold_out" | "draft";
   /** simple = 1 variante; options = 2 o más. Si falta se deduce de variants.length. */
-  kind?: "simple" | "options";
+  kind?: ProductKind;
   /** Pregunta del selector de opciones; si falta se usa storefront.product.variantQuestion. */
   optionsLabel?: string;
   description: string;
@@ -83,7 +89,11 @@ export type Catalog = {
 };
 
 type Link = { label: string; href: string };
-type Img = { image: string; alt: string };
+
+/** Tipo de caja del pedido para fiestas. price = precio referencial por caja (0 = a cotizar). */
+export type PartyBox = { name: string; sizes: { name: string; price: number }[] };
+/** `imageMobile`: foto distinta para celular (opcional; si no hay, se usa `image` con otro encuadre). */
+type Img = { image: string; imageMobile?: string; alt: string };
 
 /** Textos e imágenes de la tienda pública (lo que en los mockups estaba escrito a mano). */
 export type Storefront = {
@@ -152,16 +162,21 @@ export type Storefront = {
     image: string;
     imageAlt: string;
     steps: { title: string; text: string }[];
+    quantityQuestion?: string;
     quantities: string[];
+    /** Texto del campo para escribir una cantidad que no está entre las opciones. */
+    otherQuantityLabel?: string;
     defaultQuantity: string;
+    /** Pregunta para elegir el tipo de caja (va primero). */
+    boxQuestion?: string;
+    /** Tipos de caja; cada uno con sus propias opciones de squishies por caja. Se editan en Admin › Textos. */
+    boxes?: PartyBox[];
     sizeQuestion: string;
     unsureLabel: string;
-    colors: { name: string; hex: string }[];
     extrasLabel: string;
     extrasOptions: string[];
     districts: string[];
     commentsPlaceholder: string;
-    uploadHint: string;
     footnote: string;
     sentTitle: string;
     sentLead: string;

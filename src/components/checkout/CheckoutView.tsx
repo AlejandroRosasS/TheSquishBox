@@ -7,6 +7,7 @@ import { useStore } from "@/components/StoreContext";
 import { useCart } from "@/components/cart/CartProvider";
 import { Rich } from "@/components/Rich";
 import { asset } from "@/lib/assets";
+import { hasOptions, variantImage } from "@/lib/catalog";
 import { formatPrice, plural } from "@/lib/format";
 import { saveOrder } from "@/lib/orders";
 import { useToday } from "@/lib/useToday";
@@ -130,10 +131,10 @@ export function CheckoutView() {
         lines: cart.lines.map((l) => ({
           productId: l.productId,
           name: l.product.name,
-          variantLabel: l.product.variants.length > 1 ? l.variant.label : "",
+          variantLabel: hasOptions(l.product) ? l.variant.label : "",
           qty: l.qty,
           price: l.variant.price,
-          image: l.product.images[0],
+          image: variantImage(l.product, l.variant),
         })),
         subtotal: cart.subtotal,
         deliveryFee: isDelivery ? rate : 0,
@@ -276,8 +277,8 @@ export function CheckoutView() {
             <p className="h4">Tu pedido</p>
             {cart.lines.map((l) => (
               <div className="row g3" key={`${l.productId}/${l.variantId}`}>
-                <div className="ph r45" style={{ width: 56, flex: "none", borderRadius: 10 }}><img src={asset(tenant.slug, l.product.images[0])} alt={l.product.name} /></div>
-                <div className="grow"><b style={{ fontSize: 14 }}>{l.product.name}</b><p className="small muted">{l.product.variants.length > 1 ? `${l.variant.label} · ` : ""}x{l.qty}</p></div>
+                <div className="ph r45" style={{ width: 56, flex: "none", borderRadius: 10 }}><img src={asset(tenant.slug, variantImage(l.product, l.variant))} alt={l.product.name} /></div>
+                <div className="grow"><b style={{ fontSize: 14 }}>{l.product.name}</b><p className="small muted">{hasOptions(l.product) ? `${l.variant.label} · ` : ""}x{l.qty}</p></div>
                 <span className="small strong">{formatPrice(l.lineTotal, cur)}</span>
               </div>
             ))}

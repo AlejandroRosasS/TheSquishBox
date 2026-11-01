@@ -150,23 +150,34 @@
       { "title": "Te cotizamos", "text": "Te escribimos por WhatsApp con el precio total." },
       { "title": "Confirmas y pagas", "text": "Con un link seguro: tarjeta o Yape." }
     ],
-    "quantities": ["10", "15", "20", "25", "30", "Más de 30"],
+    "quantityQuestion": "¿Cuántas cajas necesitas?",
+    "quantities": ["10", "15", "20", "25", "30"],
+    "otherQuantityLabel": "Otra cantidad",
     "defaultQuantity": "20",
-    "sizeQuestion": "¿Cuántos squishies por mini box?",
-    "unsureLabel": "Aún no sé",
-    "colors": [
-      { "name": "Fucsia", "hex": "#E5177B" },
-      { "name": "Morado", "hex": "#7B3FE4" },
-      { "name": "Turquesa", "hex": "#36B8B5" },
-      { "name": "Lima", "hex": "#C6F432" },
-      { "name": "Amarillo", "hex": "#FFD23F" },
-      { "name": "Pastel", "hex": "#F6D5E6" }
+    "boxQuestion": "¿Qué caja quieres?",
+    "boxes": [
+      {
+        "name": "Mini Squish Box",
+        "sizes": [
+          { "name": "2 squishies", "price": 18 },
+          { "name": "3 squishies", "price": 24 },
+          { "name": "4 squishies", "price": 0 }
+        ]
+      },
+      {
+        "name": "Squish Box grande",
+        "sizes": [
+          { "name": "1 grande + 2 pequeños", "price": 0 },
+          { "name": "1 grande + 3 pequeños", "price": 69 }
+        ]
+      }
     ],
+    "sizeQuestion": "¿Cuántos squishies por caja?",
+    "unsureLabel": "Aún no sé",
     "extrasLabel": "¿Con dulces?",
     "extrasOptions": ["Sí, con dulces", "No, solo squishies", "Yo pongo los dulces"],
     "districts": ["Surco", "Miraflores", "San Isidro", "La Molina", "San Borja", "Otro distrito de Lima"],
     "commentsPlaceholder": "Ej.: es el cumple de mi hija, le encantan los gatitos y el morado. Son 20 niños de 6 a 8 años.",
-    "uploadHint": "la invitación, la torta o la deco",
     "footnote": "Respondemos en horario de atención. Sin compromiso.",
     "sentTitle": "¡Recibimos *tu pedido*!",
     "sentLead": "Gracias, {name}. Te escribimos por WhatsApp al {phone} con tu cotización."

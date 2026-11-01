@@ -44,6 +44,8 @@ function adminProduct(p: Product): AdminProduct {
     available: p.status !== "sold_out",
     lowAlert: true,
     igSynced: true,
+    igImages: p.images,
+    photosSynced: true,
   };
 }
 
