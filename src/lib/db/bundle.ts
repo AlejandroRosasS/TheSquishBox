@@ -2,6 +2,7 @@ import type { Catalog, Product, Seo, Storefront, Tenant } from "@/lib/types";
 import type { Tokens } from "@/lib/publishedTheme";
 import type { MediaMap } from "@/lib/media";
 import { publicClient } from "./public";
+import { UNTRACKED_STOCK } from "@/lib/catalog";
 
 export type DbBundle = {
   tenant: Tenant;
@@ -58,6 +59,8 @@ export async function loadBundleFromDb(slug: string): Promise<DbBundle | null> {
       ...(p.options_label ? { optionsLabel: p.options_label } : {}),
       description: p.description,
       images: p.images,
+      // Sin stock en ninguna variante = la marca vende sin contar unidades.
+      ...(p.product_variants.length && p.product_variants.every((v) => v.stock === null) ? { trackStock: false } : {}),
       variants: [...p.product_variants]
         .sort((a, b) => a.position - b.position)
         .map((v) => ({
@@ -66,7 +69,7 @@ export async function loadBundleFromDb(slug: string): Promise<DbBundle | null> {
           label: v.label,
           price: Number(v.price),
           priceIsReference: v.price_is_reference,
-          stock: v.stock ?? 999,
+          stock: v.stock ?? UNTRACKED_STOCK,
           ...(v.image ? { image: v.image } : {}),
         })),
     })),

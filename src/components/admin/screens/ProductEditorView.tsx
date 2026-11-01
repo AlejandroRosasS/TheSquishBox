@@ -252,7 +252,7 @@ export function ProductEditorView({ params }: { params: Promise<{ id: string }> 
                   <div><b>{p.available !== false ? "Disponible" : "Agotado"}</b><p className="a-cap">Se muestra como «{p.available !== false ? "Disponible" : "Agotado"}» en la tienda.</p></div>
                   <Switch on={p.available !== false} onChange={(v) => edit({ available: v })} label="Disponible" />
                 </div>
-                <p className="a-cap">Útil para productos que se arman bajo pedido.</p>
+                <p className="a-cap">Se vende siempre, sin contar unidades. Útil para lo que siempre tienes o armas bajo pedido. Cuando quieras controlar unidades, elige «Con control de stock».</p>
               </div>
             ) : (
               <div className="stack">

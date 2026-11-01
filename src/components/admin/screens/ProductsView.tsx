@@ -9,12 +9,13 @@ import { formatPrice } from "@/lib/format";
 import type { AdminProduct } from "@/lib/admin/types";
 import { useAdmin, useAdminCatalog } from "../AdminContext";
 import { AdminPage } from "../AdminPage";
-import { AIDown, AIInstagram, AISearch, AIUp } from "../AdminIcons";
+import { AIInstagram, AISearch } from "../AdminIcons";
+import { LineHeader } from "../LineHeader";
 
 type Filter = "all" | "pub" | "draft" | "low";
 
 export function stockInfo(p: AdminProduct): { label: string; cls: string } {
-  if (p.stockMode === "none") return p.available === false ? { label: "Agotado", cls: "agotado" } : { label: "Bajo pedido", cls: "publicado" };
+  if (p.stockMode === "none") return p.available === false ? { label: "Agotado", cls: "agotado" } : { label: "Sin control de stock", cls: "publicado" };
   if (p.status === "draft" && !p.variants.length) return { label: "Sin definir", cls: "borrador" };
   if (isSoldOut(p)) return { label: "Agotado", cls: "agotado" };
   const low = p.variants.some((v) => v.stock > 0 && v.stock <= 5);
@@ -35,6 +36,7 @@ export function ProductsView() {
   const [filter, setFilter] = useState<Filter>("all");
   const [q, setQ] = useState("");
   const [newLine, setNewLine] = useState<string | null>(null);
+  const [newLineAt, setNewLineAt] = useState<"top" | "bottom">("top");
   const a = (p: string) => asset(bundle.tenant.slug, p);
 
   const match = (p: AdminProduct) => {
@@ -57,11 +59,18 @@ export function ProductsView() {
     const name = (newLine ?? "").trim();
     if (!name) return;
     const id = name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `linea-${Date.now()}`;
-    if (catalog.lines.some((l) => l.id === id)) return toast("Ya existe una línea con ese nombre");
+    if (catalog.lines.some((l) => l.id === id || l.name.trim().toLocaleLowerCase("es") === name.toLocaleLowerCase("es"))) return toast("Ya existe una línea con ese nombre");
     setCatalog({ ...catalog, lines: [...catalog.lines, { id, name, order: catalog.lines.length + 1 }] });
     setNewLine(null);
     toast(`Línea «${name}» creada`);
   };
+
+  const newLineForm = (
+    <form className="a-card" onSubmit={(e) => { e.preventDefault(); addLine(); }}>
+      <div className="a-field"><label htmlFor="nl">Nombre de la nueva línea</label><input id="nl" className="a-input" autoFocus value={newLine ?? ""} onChange={(e) => setNewLine(e.target.value)} placeholder="Ej.: Navidad" /></div>
+      <div className="row g2"><button className="a-btn primary" type="submit">Crear línea</button><button className="a-btn ghost" type="button" onClick={() => setNewLine(null)}>Cancelar</button></div>
+    </form>
+  );
 
   const chips: [Filter, string, number?][] = [["all", "Todos"], ["pub", "Publicados"], ["draft", "Borradores", count("draft")], ["low", "Stock bajo / agotado", count("low")]];
 
@@ -70,17 +79,12 @@ export function ProductsView() {
       <div className="a-head">
         <div className="stack g1"><h1 className="a-h1">Productos</h1><p className="a-sub">Agrupados por línea. El orden de aquí es el orden de la tienda.</p></div>
         <div className="row g2 wrap-row only-d">
-          <button className="a-btn" type="button" onClick={() => setNewLine("")}>+ Nueva línea</button>
+          <button className="a-btn" type="button" onClick={() => { setNewLineAt("top"); setNewLine(""); }}>+ Nueva línea</button>
           <Link className="a-btn primary" href="/admin/instagram"><AIInstagram />Convertir post en producto</Link>
         </div>
       </div>
 
-      {newLine !== null && (
-        <form className="a-card" onSubmit={(e) => { e.preventDefault(); addLine(); }}>
-          <div className="a-field"><label htmlFor="nl">Nombre de la nueva línea</label><input id="nl" className="a-input" autoFocus value={newLine} onChange={(e) => setNewLine(e.target.value)} placeholder="Ej.: Navidad" /></div>
-          <div className="row g2"><button className="a-btn primary" type="submit">Crear línea</button><button className="a-btn ghost" type="button" onClick={() => setNewLine(null)}>Cancelar</button></div>
-        </form>
-      )}
+      {newLine !== null && newLineAt === "top" && newLineForm}
 
       <div className="filters-bar">
         <div className="a-search grow"><AISearch size="sm" /><input placeholder="Buscar producto" aria-label="Buscar producto" value={q} onChange={(e) => setQ(e.target.value)} /></div>
@@ -98,17 +102,15 @@ export function ProductsView() {
         const note = catalog.lineNotes[line.id];
         return (
           <section key={line.id} className="a-card flush" aria-label={`Línea ${line.name}`}>
-            <div className="coll-h">
-              <span className="ord">{i + 1}</span>
-              <div className="stack grow" style={{ gap: 0 }}>
-                <b style={{ fontSize: 15 }}>{line.name}</b>
-                <span className="a-cap">{[note, `${all.length} ${all.length === 1 ? "producto" : "productos"}`].filter(Boolean).join(" · ")}</span>
-              </div>
-              <div className="mv">
-                <button type="button" disabled={i === 0} onClick={() => moveLine(i, -1)} aria-label={`Subir línea ${line.name}`}><AIUp size="sm" /></button>
-                <button type="button" disabled={i === catalog.lines.length - 1} onClick={() => moveLine(i, 1)} aria-label={`Bajar línea ${line.name}`}><AIDown size="sm" /></button>
-              </div>
-            </div>
+            <LineHeader
+              line={line}
+              index={i}
+              catalog={catalog}
+              caption={[note, `${all.length} ${all.length === 1 ? "producto" : "productos"}`].filter(Boolean).join(" · ")}
+              onMove={(d) => moveLine(i, d)}
+              onChange={setCatalog}
+              toast={toast}
+            />
             <div className="a-table">
               {items.map((p) => {
                 const inv = stockInfo(p);
@@ -131,6 +133,11 @@ export function ProductsView() {
           </section>
         );
       })}
+
+      {!catalog.lines.length && <p className="a-cap">Todavía no tienes líneas. Crea una para agrupar tus productos en la tienda.</p>}
+      {newLine !== null && newLineAt === "bottom" ? newLineForm : (
+        <button className="a-btn block" type="button" onClick={() => { setNewLineAt("bottom"); setNewLine(""); }}>+ Nueva línea</button>
+      )}
     </AdminPage>
   );
 }

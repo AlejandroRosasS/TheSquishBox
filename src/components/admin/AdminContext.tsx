@@ -2,7 +2,8 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { TenantBundle } from "@/tenants";
-import type { AdminCatalog, AdminDemo, DemoOrder, PartyRequest } from "@/lib/admin/types";
+import type { AdminCatalog, AdminDemo, AdminProduct, DemoOrder, PartyRequest } from "@/lib/admin/types";
+import type { Product } from "@/lib/types";
 import { dataKey, usePersisted } from "@/lib/admin/storage";
 
 type Ctx = { bundle: TenantBundle; demo: AdminDemo; toast: (msg: string) => void };
@@ -33,13 +34,28 @@ export function useAdmin(): Ctx {
   return v;
 }
 
+/** Producto de la tienda → producto editable. Sin control de stock = las unidades no se cuentan (quedan en 0 si luego se prende). */
+function adminProduct(p: Product): AdminProduct {
+  const tracked = p.trackStock !== false;
+  return {
+    ...p,
+    variants: tracked ? p.variants : p.variants.map((v) => ({ ...v, stock: 0 })),
+    stockMode: tracked ? "stock" : "none",
+    available: p.status !== "sold_out",
+    lowAlert: true,
+    igSynced: true,
+    igImages: p.images,
+    photosSynced: true,
+  };
+}
+
 /** Catálogo editable (productos, líneas, costos). Se guarda en el navegador en esta fase. */
 export function useAdminCatalog() {
   const { bundle, demo } = useAdmin();
   const initial: AdminCatalog = useMemo(
     () => ({
       lines: [...bundle.catalog.lines].sort((a, b) => a.order - b.order),
-      products: bundle.catalog.products.map((p) => ({ ...p, stockMode: "stock" as const, available: true, lowAlert: true, igSynced: true, igImages: p.images, photosSynced: true })),
+      products: bundle.catalog.products.map(adminProduct),
       costs: demo.costs,
       lineNotes: demo.lineNotes,
     }),

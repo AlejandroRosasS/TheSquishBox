@@ -70,6 +70,8 @@ export type Product = {
   description: string;
   variants: Variant[];
   images: string[];
+  /** false = se vende sin contar unidades (siempre disponible salvo que se marque agotado). */
+  trackStock?: boolean;
 };
 
 export type Line = { id: string; name: string; order: number };

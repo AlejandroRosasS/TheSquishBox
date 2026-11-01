@@ -226,6 +226,18 @@ html:has(.adm), body:has(.adm) { background: #F5F5F2; }
 .mv { display: flex; gap: 4px; }
 .mv button { width: 44px; height: 44px; border-radius: 8px; border: 1px solid #CFD1C9; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #1D1F1C; }
 .mv button[disabled] { opacity: .35; cursor: not-allowed; }
+.coll-h .line-edit { min-height: 44px; flex: none; }
+.line-panel { display: flex; flex-direction: column; gap: 12px; padding: 16px; border-bottom: 1px solid var(--a-border); background: var(--a-surface); }
+.line-panel .line-del { margin-left: auto; }
+.line-err { color: var(--a-red); font-weight: 600; }
+.line-fate { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.line-fate legend { font-size: 14px; padding: 0; margin-bottom: 4px; }
+.line-opt { display: flex; gap: 12px; align-items: flex-start; min-height: 44px; padding: 12px 14px; border: 1px solid var(--a-border-2); border-radius: 10px; cursor: pointer; }
+.line-opt:has(input:checked) { border-color: var(--a-ink); background: var(--a-sunken); }
+.line-opt input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--a-ink); flex: none; }
+.line-opt:focus-within { outline: 3px solid var(--a-focus); }
+.line-target { padding-left: 44px; max-width: 420px; }
+@container page (max-width: 760px) { .coll-h { gap: 8px; padding: 12px; } .line-panel .line-del { margin-left: 0; } .line-target { padding-left: 0; } }
 .igsrc { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: #5C5F58; }
 
 /* ---------- Editor de producto ---------- */
