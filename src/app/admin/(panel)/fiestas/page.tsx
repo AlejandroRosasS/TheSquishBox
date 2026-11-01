@@ -1,8 +1,6 @@
-import type { Metadata } from "next";
-import { PartyRequestsView } from "@/components/admin/screens/PartyRequestsView";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Pedidos especiales" };
-
+/** Los pedidos para fiestas viven en Pedidos. */
 export default function PartyRequestsPage() {
-  return <PartyRequestsView />;
+  redirect("/admin/pedidos");
 }

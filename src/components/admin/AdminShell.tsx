@@ -6,7 +6,7 @@ import { Suspense, type ReactNode } from "react";
 import { Logo } from "@/components/Logo";
 import { useAdmin, useAdminCatalog, useOrders, useParty } from "./AdminContext";
 import { AuthGate, SignOutButton } from "./AuthGate";
-import { AIBell, AIBox, AIChart, AIGift, AIGlobe, AIHome, AIInstagram, AIMore, AIOrders, AIPalette, AISettings, AIText } from "./AdminIcons";
+import { AIBell, AIBox, AIChart, AIGlobe, AIHome, AIInstagram, AIMore, AIOrders, AIPalette, AISettings, AIText } from "./AdminIcons";
 import { isSoldOut, totalStock, LOW_STOCK } from "@/lib/catalog";
 
 type Item = { href: string; label: string; icon: ReactNode; count?: number; exact?: boolean };
@@ -50,8 +50,7 @@ function ShellInner({ children, path }: { children: ReactNode; path: string }) {
 
   const main: Item[] = [
     { href: "/admin", label: "Inicio", icon: <AIHome />, exact: true },
-    { href: "/admin/pedidos", label: "Pedidos", icon: <AIOrders />, count: c.newOrders },
-    ...(party ? [{ href: "/admin/fiestas", label: tenant.customOrder.adminLabel ?? tenant.customOrder.label, icon: <AIGift />, count: c.newParty }] : []),
+    { href: "/admin/pedidos", label: "Pedidos", icon: <AIOrders />, count: c.newOrders + (party ? c.newParty : 0) },
     { href: "/admin/productos", label: "Productos", icon: <AIBox /> },
     { href: "/admin/instagram", label: "Instagram", icon: <AIInstagram />, count: c.newPosts },
     { href: "/admin/ventas", label: "Ventas y márgenes", icon: <AIChart /> },

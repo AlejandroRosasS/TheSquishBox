@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { use, useState } from "react";
+import { useState } from "react";
 import { asset } from "@/lib/assets";
 import { whatsappLink } from "@/lib/format";
 import { money, ORDER_STATUS } from "@/lib/admin/format";
@@ -19,8 +19,7 @@ export function waTo(phone: string, text?: string) {
   return whatsappLink(digits.length === 9 ? `+51${digits}` : phone, text);
 }
 
-export function OrderView({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export function OrderView({ id }: { id: string }) {
   const { bundle, toast } = useAdmin();
   const { tenant } = bundle;
   const { orders, update, hydrated } = useOrders();
