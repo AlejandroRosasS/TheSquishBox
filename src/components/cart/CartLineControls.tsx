@@ -3,16 +3,17 @@
 import type { CartLine } from "./CartProvider";
 import { useCart } from "./CartProvider";
 import { formatPrice } from "@/lib/format";
+import { hasOptions } from "@/lib/catalog";
 import { IconMinus, IconPlus } from "@/components/Icons";
 
 /** Selector de variante + cantidad + quitar, compartido por el drawer y la página de carrito. */
 export function VariantSelect({ line, currency }: { line: CartLine; currency: string }) {
   const { setVariant } = useCart();
-  if (line.product.variants.length < 2) return <p className="small muted">{line.variant.label}</p>;
+  if (!hasOptions(line.product)) return null;
   return (
     <select
       className="select mini-select"
-      aria-label={`Presentación de ${line.product.name}`}
+      aria-label={`${line.product.optionsLabel || "Opción"} de ${line.product.name}`}
       value={line.variantId}
       onChange={(e) => setVariant(line.productId, line.variantId, e.target.value)}
       style={{ alignSelf: "flex-start" }}

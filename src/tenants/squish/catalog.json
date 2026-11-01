@@ -35,6 +35,7 @@
       "badge": "Favorito",
       "status": "published",
       "description": "4 squishies sorpresa (1 grande + 3 pequeños), cada uno en su sobre, y tu cartilla para coleccionarlos. Más de 80 modelos para descubrir; si te sale repetido, intercámbialo con tus amigos.",
+      "kind": "simple",
       "variants": [
         {
           "id": "unica",
@@ -57,6 +58,7 @@
       "badge": "Últimas 3",
       "status": "published",
       "description": "Un sobre sorpresa con 1 squishy grande que descubres recién al abrirlo. ¿Cuál te tocará?",
+      "kind": "simple",
       "variants": [
         {
           "id": "unica",
@@ -77,6 +79,7 @@
       "line": "cumple",
       "status": "published",
       "description": "Mini caja con squishies pequeños sorpresa y espacio para agregar dulces. Ideal como recuerdo para los invitados del cumple.",
+      "kind": "options",
       "variants": [
         {
           "id": "2",
@@ -105,6 +108,7 @@
       "badge": "Nuevo",
       "status": "published",
       "description": "Squishies pequeños, cada uno en su sobre, para seguir llenando tu cartilla. Exclusiva para quienes ya tienen su The Squish Box y su cartilla.",
+      "kind": "options",
       "variants": [
         {
           "id": "4",
@@ -131,6 +135,7 @@
       "line": "temporada",
       "status": "sold_out",
       "description": "2 squishies sorpresa + 4 dulces sorpresa. Delivery no incluido. Promoción hasta agotar stock.",
+      "kind": "simple",
       "variants": [
         {
           "id": "unica",

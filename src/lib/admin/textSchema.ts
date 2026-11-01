@@ -104,20 +104,28 @@ const LABELS: Record<string, string> = {
   party: "Pedido especial",
   quantities: "Cantidades para elegir",
   defaultQuantity: "Cantidad marcada al inicio",
-  sizeQuestion: "Pregunta de tamaño",
+  sizeQuestion: "Pregunta de squishies por caja",
   unsureLabel: "Opción «aún no sé»",
-  colors: "Colores para elegir",
   name: "Nombre",
   hex: "Color",
+  quantityQuestion: "Pregunta de cantidad",
+  otherQuantityLabel: "Campo «otra cantidad»",
+  boxQuestion: "Pregunta del tipo de caja",
+  boxes: "Tipos de caja",
+  sizes: "Opciones de squishies por caja",
+  price: "Precio referencial por caja (S/, 0 = a cotizar)",
   extrasLabel: "Pregunta de extras",
   extrasOptions: "Opciones de extras",
   districts: "Distritos",
   commentsPlaceholder: "Ejemplo en el campo de comentarios",
-  uploadHint: "Ayuda para subir fotos",
   sentTitle: "Título al enviar",
   sentLead: "Texto al enviar",
   notFound: "Página 404",
 };
+
+/** Nombre de cada elemento de una lista (si no está, se usa el de la lista). */
+const ITEM_LABELS: Record<string, string> = { boxes: "Caja", sizes: "Opción" };
+export const itemLabelFor = (key: string) => ITEM_LABELS[key] ?? labelFor(key);
 
 export function labelFor(key: string): string {
   if (LABELS[key]) return LABELS[key];
