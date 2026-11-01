@@ -3,11 +3,12 @@ import { getTenantBundle } from "@/lib/tenant";
 import { asset } from "@/lib/assets";
 import { Header } from "@/components/Header";
 import { Rich } from "@/components/Rich";
+import { StoreShell } from "@/components/StoreShell";
 
-export default function NotFound() {
-  const { tenant, storefront: sf } = getTenantBundle();
+export default async function NotFound() {
+  const { tenant, storefront: sf } = await getTenantBundle();
   return (
-    <>
+    <StoreShell>
       <Header />
       <main id="contenido" className="wrap" style={{ paddingBlock: "72px 112px" }}>
         <div className="split">
@@ -27,6 +28,6 @@ export default function NotFound() {
           </div>
         </div>
       </main>
-    </>
+    </StoreShell>
   );
 }

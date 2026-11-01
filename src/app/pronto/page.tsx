@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getTenantBundle } from "@/lib/tenant";
+import { getFileBundle } from "@/lib/tenant";
 import { asset } from "@/lib/assets";
 
 export const metadata: Metadata = {
@@ -17,7 +17,7 @@ const PHOTOS = [
 ];
 
 export default function ComingSoon() {
-  const { tenant } = getTenantBundle();
+  const { tenant } = getFileBundle();
   const ig = `https://instagram.com/${tenant.instagram}`;
   return (
     <main className="soon">

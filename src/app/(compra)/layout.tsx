@@ -1,3 +1,9 @@
+import { StoreShell } from "@/components/StoreShell";
+
 export default function PurchaseLayout({ children }: { children: React.ReactNode }) {
-  return <main id="contenido">{children}</main>;
+  return (
+    <StoreShell>
+      <main id="contenido">{children}</main>
+    </StoreShell>
+  );
 }

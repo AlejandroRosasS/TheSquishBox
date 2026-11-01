@@ -32,7 +32,7 @@ export type Tenant = {
   defaultPalette: string;
   palettes: Record<string, PaletteTokens>;
   highlights: string[];
-  customOrder: { enabled: boolean; label: string; description: string };
+  customOrder: { enabled: boolean; label: string; description: string; adminLabel?: string; adminShort?: string };
   payments: { provider: string; methods: string[] };
   fulfillment: { delivery: string; pickup: string };
   salesChannels: string[];
@@ -45,6 +45,10 @@ export type Variant = {
   price: number;
   priceIsReference: boolean;
   stock: number;
+  /** Id de la variante en la base de datos (cuando la tienda lee de Supabase). */
+  dbId?: string;
+  /** Foto opcional de esta opción (una de las fotos del producto). */
+  image?: string;
 };
 
 export type Product = {
@@ -53,6 +57,10 @@ export type Product = {
   line: string;
   badge?: string;
   status: "published" | "sold_out" | "draft";
+  /** simple = 1 variante; options = 2 o más. Si falta se deduce de variants.length. */
+  kind?: "simple" | "options";
+  /** Pregunta del selector de opciones; si falta se usa storefront.product.variantQuestion. */
+  optionsLabel?: string;
   description: string;
   variants: Variant[];
   images: string[];
@@ -157,4 +165,18 @@ export type Storefront = {
     sentLead: string;
   };
   notFound: Img & { title: string; lead: string };
+};
+
+export type SeoPage = { title: string; description: string };
+
+/** SEO de la tienda (tenants/<slug>/seo.json). Se edita desde Admin › SEO. */
+export type Seo = {
+  siteTitle: string;
+  titleTemplate: string;
+  description: string;
+  shareImage: string;
+  pages: Record<string, SeoPage>;
+  products: Record<string, Partial<SeoPage>>;
+  indexing: boolean;
+  googleVerification: string;
 };

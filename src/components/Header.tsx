@@ -22,8 +22,8 @@ function Nav() {
   const linea = useSearchParams().get("linea");
   return (
     <nav className="nav only-d" aria-label="Principal">
-      {storefront.nav.map((n) => (
-        <Link key={n.href} href={n.href} className={isActive(n.href, path, linea) ? "on" : ""} aria-current={isActive(n.href, path, linea) ? "page" : undefined}>
+      {storefront.nav.map((n, i) => (
+        <Link key={i} href={n.href} className={isActive(n.href, path, linea) ? "on" : ""} aria-current={isActive(n.href, path, linea) ? "page" : undefined}>
           {n.label}
         </Link>
       ))}
@@ -95,8 +95,8 @@ export function Header() {
             <nav className="mmenu" aria-label="Menú principal">
               <Link href="/">Inicio</Link>
               <Link href="/tienda">Toda la tienda</Link>
-              {storefront.nav.map((n) => (
-                <Link key={n.href} href={n.href}>
+              {storefront.nav.map((n, i) => (
+                <Link key={i} href={n.href}>
                   {n.label}
                 </Link>
               ))}

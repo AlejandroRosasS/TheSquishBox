@@ -1,0 +1,15 @@
+{
+  "_note": "SEO de la tienda. Se edita desde Admin › SEO. Una descripción vacía usa la descripción general.",
+  "siteTitle": "The Squish Box · Mystery squishies para coleccionar",
+  "titleTemplate": "%s · The Squish Box",
+  "description": "Mystery squishies para coleccionar. Abre • descubre • colecciona • intercambia. Lima, Perú.",
+  "shareImage": "img/squish-box-contenido.jpg",
+  "pages": {
+    "tienda": { "title": "Tienda", "description": "" },
+    "fiesta": { "title": "Para tu fiesta", "description": "Cotiza Mini Box Sorpresa de Cumple para los invitados" },
+    "carrito": { "title": "Tu carrito", "description": "" }
+  },
+  "products": {},
+  "indexing": true,
+  "googleVerification": ""
+}

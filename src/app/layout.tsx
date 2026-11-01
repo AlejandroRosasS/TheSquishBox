@@ -1,50 +1,27 @@
 import type { Metadata, Viewport } from "next";
 import "./store.css";
-import { getTenantBundle } from "@/lib/tenant";
-import { storeStyle } from "@/lib/theme";
-import { StoreProvider } from "@/components/StoreContext";
-import { CartProvider } from "@/components/cart/CartProvider";
-import { CartDrawer } from "@/components/cart/CartDrawer";
-import { PaletteDemo } from "@/components/PaletteDemo";
+import { getFileBundle, getTenantBundle } from "@/lib/tenant";
+import { siteMetadata } from "@/lib/seo";
 
-export function generateMetadata(): Metadata {
-  const { tenant } = getTenantBundle();
-  return {
-    title: { default: `${tenant.name} · ${tenant.tagline}`, template: `%s · ${tenant.name}` },
-    description: `${tenant.tagline}. ${tenant.motto}. ${tenant.city}.`,
-  };
+export async function generateMetadata(): Promise<Metadata> {
+  return siteMetadata(await getTenantBundle());
 }
 
-export function generateViewport(): Viewport {
-  const { tenant } = getTenantBundle();
-  return { themeColor: tenant.palettes[tenant.defaultPalette]?.primary };
+export async function generateViewport(): Promise<Viewport> {
+  const { tenant, appearance } = await getTenantBundle();
+  return { themeColor: appearance?.tokens.primary ?? tenant.palettes[tenant.defaultPalette]?.primary };
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const bundle = getTenantBundle();
-  const { tenant, storefront } = bundle;
+  // El idioma no cambia con lo que se publica: se lee de los archivos para no esperar a la base.
+  const { tenant } = getFileBundle();
   return (
     <html lang={tenant.locale}>
       <head>
-        {tenant.fonts.googleFontsUrl && (
-          <>
-            <link rel="preconnect" href="https://fonts.googleapis.com" />
-            <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-            <link rel="stylesheet" href={tenant.fonts.googleFontsUrl} />
-          </>
-        )}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       </head>
-      <body>
-        <div className="store" style={storeStyle(tenant, storefront)}>
-          <StoreProvider value={bundle}>
-            <CartProvider>
-              {children}
-              <CartDrawer />
-              {process.env.NEXT_PUBLIC_DEMO === "1" && <PaletteDemo />}
-            </CartProvider>
-          </StoreProvider>
-        </div>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
