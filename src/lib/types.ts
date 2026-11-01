@@ -87,6 +87,9 @@ export type Catalog = {
 };
 
 type Link = { label: string; href: string };
+
+/** Tipo de caja del pedido para fiestas. price = precio referencial por caja (0 = a cotizar). */
+export type PartyBox = { name: string; sizes: { name: string; price: number }[] };
 type Img = { image: string; alt: string };
 
 /** Textos e imágenes de la tienda pública (lo que en los mockups estaba escrito a mano). */
@@ -156,16 +159,21 @@ export type Storefront = {
     image: string;
     imageAlt: string;
     steps: { title: string; text: string }[];
+    quantityQuestion?: string;
     quantities: string[];
+    /** Texto del campo para escribir una cantidad que no está entre las opciones. */
+    otherQuantityLabel?: string;
     defaultQuantity: string;
+    /** Pregunta para elegir el tipo de caja (va primero). */
+    boxQuestion?: string;
+    /** Tipos de caja; cada uno con sus propias opciones de squishies por caja. Se editan en Admin › Textos. */
+    boxes?: PartyBox[];
     sizeQuestion: string;
     unsureLabel: string;
-    colors: { name: string; hex: string }[];
     extrasLabel: string;
     extrasOptions: string[];
     districts: string[];
     commentsPlaceholder: string;
-    uploadHint: string;
     footnote: string;
     sentTitle: string;
     sentLead: string;

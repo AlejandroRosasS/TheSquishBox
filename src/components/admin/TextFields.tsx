@@ -3,7 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { useId } from "react";
 import { asset } from "@/lib/assets";
-import { HIDDEN_KEYS, PRODUCT_LIST_KEYS, isImageKey, isLong, isRichCandidate, labelFor } from "@/lib/admin/textSchema";
+import { HIDDEN_KEYS, PRODUCT_LIST_KEYS, isImageKey, isLong, isRichCandidate, itemLabelFor, labelFor } from "@/lib/admin/textSchema";
 import { AIDown, AIPlus, AITrash, AIUp } from "./AdminIcons";
 
 type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
@@ -21,7 +21,8 @@ type Props = { k: string; value: Json; onChange: (v: Json) => void; ctx: FieldCt
 function blank(v: Json): Json {
   if (typeof v === "string") return "";
   if (typeof v === "number") return 0;
-  if (Array.isArray(v)) return [];
+  // Una lista anidada nueva arranca con un elemento vacío, para que se pueda completar y agregar más.
+  if (Array.isArray(v)) return v.length ? [blank(v[0])] : [];
   if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, k === "image" ? x : blank(x)]));
   return v;
 }
@@ -134,7 +135,7 @@ export function FieldEditor({ k, value, onChange, ctx, depth = 0 }: Props) {
         </div>
         {items.map((item, i) => (
           <div key={i} className={simple ? "row g2" : "stack g3"} style={simple ? { alignItems: "flex-end" } : { borderTop: i ? "1px solid var(--a-border)" : 0, paddingTop: i ? 12 : 0 }}>
-            {!simple && <p className="a-label">{labelFor(k)} {i + 1}</p>}
+            {!simple && <p className="a-label">{itemLabelFor(k)} {i + 1}</p>}
             <div className="grow stack g3">
               {simple ? (
                 <TextInput k={`${k}`} value={item as string} onChange={(v) => onChange(items.map((x, j) => (j === i ? v : x)))} />
