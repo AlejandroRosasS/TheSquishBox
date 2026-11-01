@@ -407,3 +407,5 @@ html:has(.adm), body:has(.adm) { background: #F5F5F2; }
 .sumrow { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; }
 .sumrow.big { font-size: 17px; font-weight: 800; border-top: 1px solid #E2E3DD; padding-top: 10px; margin-top: 4px; }
 @container page (max-width: 760px) { .chg { grid-template-columns: minmax(0, 1fr); } .ln { grid-template-columns: 44px minmax(0, 1fr) 44px; } .ln .wide { grid-column: 2 / -1; } }
+.ig-cell[disabled] { cursor: default; }
+.ig-ava .logo { width: 48px; height: 48px; }
