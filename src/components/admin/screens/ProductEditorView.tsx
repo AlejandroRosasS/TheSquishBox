@@ -1,9 +1,7 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { use, useId, useMemo, useState } from "react";
-import { asset } from "@/lib/assets";
 import { formatPrice } from "@/lib/format";
 import { productKind } from "@/lib/catalog";
 import type { AdminProduct } from "@/lib/admin/types";
@@ -12,6 +10,8 @@ import { ProductView } from "@/components/product/ProductView";
 import { useAdmin, useAdminCatalog } from "../AdminContext";
 import { StorePreview } from "../StorePreview";
 import { AdminPage, BackLink, DemoNote, Switch } from "../AdminPage";
+import { ProductPhotos } from "../ProductPhotos";
+import { Thumb } from "../PhotoPicker";
 import { AIDown, AIInstagram, AIPlus, AITrash, AIUp } from "../AdminIcons";
 
 const LOW = 5;
@@ -58,22 +58,12 @@ export function ProductEditorView({ params }: { params: Promise<{ id: string }> 
   const savedCosts = useMemo(() => catalog.costs[id] ?? {}, [catalog.costs, id]);
   const [draft, setDraft] = useState<AdminProduct | null>(null);
   const [costs, setCosts] = useState<Record<string, number> | null>(null);
-  const [showPicker, setShowPicker] = useState(false);
   // Opciones apartadas al pasar a «Precio único» (vuelven si regresas a «Con opciones» sin guardar).
   const [stash, setStash] = useState<Variant[]>([]);
   const base = draft ?? saved;
   // Un producto nuevo sin precio todavía: se edita como «Precio único» con una variante vacía.
   const p = base && !base.variants.length ? { ...base, variants: [{ id: "unica", label: "Precio único", price: 0, priceIsReference: true, stock: 0 }] } : base;
   const c = costs ?? savedCosts;
-  const a = (x: string) => asset(bundle.tenant.slug, x);
-
-  const brandImages = useMemo(() => {
-    const s = new Set<string>();
-    catalog.products.forEach((x) => x.images.forEach((i) => s.add(i)));
-    bundle.storefront.tiles.forEach((t) => s.add(t.image));
-    s.add(bundle.storefront.hero.image);
-    return [...s];
-  }, [catalog.products, bundle.storefront]);
 
   if (!p) {
     return (
@@ -162,27 +152,8 @@ export function ProductEditorView({ params }: { params: Promise<{ id: string }> 
               <h2 className="a-h2" id="ed-ig">{p.igSynced ? "Contenido desde Instagram" : "Contenido"}</h2>
               {p.igSynced && <span className="sync"><AIInstagram size="sm" style={{ width: 14, height: 14 }} />Sincronizado</span>}
             </div>
-            {p.igSynced && <p className="a-cap">Fotos y texto se actualizan solos cuando editan el post en Instagram. Si editas algo a mano, ese campo deja de sincronizarse.</p>}
-            <div className="media">
-              {p.images.map((img, i) => (
-                <div key={img + i}>
-                  <img src={a(img)} alt={`Foto ${i + 1}`} />
-                  {i === 0 && <span className="cover">Portada</span>}
-                  <span className="m-act">
-                    {i > 0 && <button type="button" aria-label={`Usar foto ${i + 1} como portada`} onClick={() => edit({ images: [img, ...p.images.filter((_, j) => j !== i)] })}><AIUp size="sm" /></button>}
-                    <button type="button" aria-label={`Quitar foto ${i + 1}`} onClick={() => edit({ images: p.images.filter((_, j) => j !== i) })}><AITrash size="sm" /></button>
-                  </span>
-                </div>
-              ))}
-            </div>
-            <button className="a-btn sm" type="button" style={{ alignSelf: "flex-start" }} aria-expanded={showPicker} onClick={() => setShowPicker(!showPicker)}><AIPlus size="sm" /> Agregar foto</button>
-            {showPicker && (
-              <div className="img-pick">
-                {brandImages.filter((x) => !p.images.includes(x)).map((src) => (
-                  <button key={src} type="button" aria-label={`Agregar ${src.split("/").pop()}`} onClick={() => edit({ images: [...p.images, src] })}><img src={a(src)} alt="" /></button>
-                ))}
-              </div>
-            )}
+            {p.igSynced && <p className="a-cap">Fotos y texto se actualizan solos cuando editan el post en Instagram. Si cambias algo a mano (incluidas las fotos), eso deja de sincronizarse.</p>}
+            <ProductPhotos product={p} onChange={edit} />
             <Locked label="Nombre" value={p.name} synced={!!p.igSynced} onChange={(v) => edit({ name: v })} />
             <Locked label="Descripción" long value={p.description} synced={!!p.igSynced} onChange={(v) => edit({ description: v })} />
             <div className="a-field">
@@ -241,7 +212,7 @@ export function ProductEditorView({ params }: { params: Promise<{ id: string }> 
                       <div className="opt-pics" role="radiogroup" aria-labelledby={`vi-${i}`}>
                         <button type="button" role="radio" aria-checked={!v.image || !p.images.includes(v.image)} className={!v.image || !p.images.includes(v.image) ? "on" : ""} onClick={() => editVar(i, { image: undefined })}>Ninguna</button>
                         {p.images.map((img, k) => (
-                          <button key={img + k} type="button" role="radio" aria-checked={v.image === img} aria-label={`Foto ${k + 1}`} className={v.image === img ? "on" : ""} onClick={() => editVar(i, { image: img })}><img src={a(img)} alt="" /></button>
+                          <button key={img + k} type="button" role="radio" aria-checked={v.image === img} aria-label={`Foto ${k + 1}`} className={v.image === img ? "on" : ""} onClick={() => editVar(i, { image: img })}><Thumb src={img} /></button>
                         ))}
                       </div>
                       <span className="a-cap">Al elegir esta opción en la tienda, la galería muestra esta foto y el carrito la usa de miniatura.</span>

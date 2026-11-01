@@ -1,6 +1,7 @@
 import { getTenantBundle } from "@/lib/tenant";
 import { storeStyle } from "@/lib/theme";
 import { StoreProvider } from "@/components/StoreContext";
+import { MediaProvider } from "@/components/Photo";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { PaletteDemo } from "@/components/PaletteDemo";
@@ -19,12 +20,14 @@ export async function StoreShell({ children }: { children: React.ReactNode }) {
       {demoTheme && <script dangerouslySetInnerHTML={{ __html: themeBootScript(tenant.slug) }} />}
       <div className="store" style={storeStyle(tenant, storefront, undefined, bundle.appearance?.tokens)}>
         <StoreProvider value={bundle}>
+        <MediaProvider slug={tenant.slug} media={bundle.media ?? {}}>
           <CartProvider>
             {children}
             <CartDrawer />
             {demoTheme && <PublishedTheme />}
             {process.env.NEXT_PUBLIC_DEMO === "1" && <PaletteDemo />}
           </CartProvider>
+        </MediaProvider>
         </StoreProvider>
       </div>
     </>

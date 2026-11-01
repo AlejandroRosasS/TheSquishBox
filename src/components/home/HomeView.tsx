@@ -1,16 +1,15 @@
 import Link from "next/link";
 import type { TenantBundle } from "@/tenants";
-import { asset } from "@/lib/assets";
+import { Photo } from "@/components/Photo";
+import { SLOTS } from "@/lib/media";
 import { Rich } from "@/components/Rich";
 import { ProductCard } from "@/components/ProductCard";
 import { IconChevronRight, IconInstagram, IconStar } from "@/components/Icons";
 
-/* eslint-disable @next/next/no-img-element */
 
 /** Home de la tienda. Es isomórfica: la usa la página pública y la vista previa del admin. */
 export function HomeView({ bundle }: { bundle: TenantBundle }) {
   const { tenant, catalog, storefront: sf } = bundle;
-  const a = (p: string) => asset(tenant.slug, p);
   const featured = sf.featured.productIds
     .map((id) => catalog.products.find((p) => p.id === id))
     .filter((p) => p && p.status !== "draft") as typeof catalog.products;
@@ -21,7 +20,7 @@ export function HomeView({ bundle }: { bundle: TenantBundle }) {
   return (
     <>
       <section className="hero">
-        <img src={a(sf.hero.image)} alt={sf.hero.alt} fetchPriority="high" />
+        <Photo src={sf.hero.image} srcMobile={sf.hero.imageMobile} alt={sf.hero.alt} slot={SLOTS.hero} fetchPriority="high" />
         <div className="wrap hero-in stack g4">
           <p className="eyebrow">{sf.hero.eyebrow}</p>
           <h1 className="display" style={{ maxWidth: 760 }}><Rich text={sf.hero.title} /></h1>
@@ -50,7 +49,7 @@ export function HomeView({ bundle }: { bundle: TenantBundle }) {
           <div className="tiles">
             {sf.tiles.map((t, i) => (
               <Link className="tile" href={t.href} key={i}>
-                <img src={a(t.image)} alt={t.alt} loading="lazy" />
+                <Photo src={t.image} srcMobile={t.imageMobile} alt={t.alt} slot={SLOTS.tiles} loading="lazy" />
                 <div className="tile-in">
                   <span className="eyebrow" style={{ color: "#FFFFFF" }}>{t.eyebrow}</span>
                   <span className="h3">{t.title}</span>
@@ -85,7 +84,7 @@ export function HomeView({ bundle }: { bundle: TenantBundle }) {
         <section className="section primary-band">
           <div className="wrap split">
             <div className="ph r45" style={{ borderRadius: 24 }}>
-              <img src={a(sf.partyBand.image)} alt={sf.partyBand.alt} loading="lazy" />
+              <Photo src={sf.partyBand.image} srcMobile={sf.partyBand.imageMobile} alt={sf.partyBand.alt} slot={SLOTS.partyBand} loading="lazy" />
             </div>
             <div className="stack g5">
               <p className="eyebrow">{sf.partyBand.eyebrow}</p>
@@ -115,7 +114,7 @@ export function HomeView({ bundle }: { bundle: TenantBundle }) {
             <p className="body muted">{sf.inside.body}</p>
           </div>
           <div className="ph r45" style={{ borderRadius: 24 }}>
-            <img src={a(sf.inside.image)} alt={sf.inside.alt} loading="lazy" />
+            <Photo src={sf.inside.image} srcMobile={sf.inside.imageMobile} alt={sf.inside.alt} slot={SLOTS.inside} loading="lazy" />
           </div>
         </div>
       </section>
@@ -135,7 +134,7 @@ export function HomeView({ bundle }: { bundle: TenantBundle }) {
             <div className="ugc">
               {models.map((m, i) => (
                 <div className="ph r11" key={`${m.name}-${i}`}>
-                  <img src={a(m.image)} alt={m.name} loading="lazy" />
+                  <Photo src={m.image} alt={m.name} slot={SLOTS.models} loading="lazy" />
                 </div>
               ))}
             </div>

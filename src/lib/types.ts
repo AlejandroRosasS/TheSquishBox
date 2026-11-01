@@ -90,7 +90,8 @@ type Link = { label: string; href: string };
 
 /** Tipo de caja del pedido para fiestas. price = precio referencial por caja (0 = a cotizar). */
 export type PartyBox = { name: string; sizes: { name: string; price: number }[] };
-type Img = { image: string; alt: string };
+/** `imageMobile`: foto distinta para celular (opcional; si no hay, se usa `image` con otro encuadre). */
+type Img = { image: string; imageMobile?: string; alt: string };
 
 /** Textos e imágenes de la tienda pública (lo que en los mockups estaba escrito a mano). */
 export type Storefront = {

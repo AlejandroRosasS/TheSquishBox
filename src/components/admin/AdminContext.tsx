@@ -39,7 +39,7 @@ export function useAdminCatalog() {
   const initial: AdminCatalog = useMemo(
     () => ({
       lines: [...bundle.catalog.lines].sort((a, b) => a.order - b.order),
-      products: bundle.catalog.products.map((p) => ({ ...p, stockMode: "stock" as const, available: true, lowAlert: true, igSynced: true })),
+      products: bundle.catalog.products.map((p) => ({ ...p, stockMode: "stock" as const, available: true, lowAlert: true, igSynced: true, igImages: p.images, photosSynced: true })),
       costs: demo.costs,
       lineNotes: demo.lineNotes,
     }),

@@ -1,11 +1,13 @@
 "use client";
 
+import { Photo } from "@/components/Photo";
+import { SLOTS } from "@/lib/media";
+
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useCart } from "./CartProvider";
 import { QtyControl, RemoveButton, VariantSelect } from "./CartLineControls";
 import { useStore } from "@/components/StoreContext";
-import { asset } from "@/lib/assets";
 import { hasOptions, variantImage } from "@/lib/catalog";
 import { formatPrice, plural } from "@/lib/format";
 import { IconCheck, IconClose } from "@/components/Icons";
@@ -69,8 +71,7 @@ export function CartDrawer() {
               {cart.lines.map((it) => (
                 <div className="line" key={`${it.productId}/${it.variantId}`} style={{ gridTemplateColumns: "80px minmax(0, 1fr)" }}>
                   <div className="ph r45" style={{ width: 80 }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={asset(tenant.slug, variantImage(it.product, it.variant))} alt={it.product.name} />
+                    <Photo src={variantImage(it.product, it.variant)} alt={it.product.name} slot={SLOTS.product} />
                   </div>
                   <div className="stack g2">
                     <div className="row between g2" style={{ alignItems: "flex-start" }}>

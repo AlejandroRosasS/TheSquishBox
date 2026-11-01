@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
 import type { TenantBundle } from "@/tenants";
 import { StoreProvider } from "@/components/StoreContext";
+import { MediaProvider } from "@/components/Photo";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -62,11 +63,13 @@ export function StorePreview({ bundle, tokens, mode, maxHeight = 680, label = "V
           {mounted && (
             <div className="store store-preview" style={style}>
               <StoreProvider value={bundle}>
+              <MediaProvider mode={mode}>
                 <CartProvider>
                   <Header />
                   {children ?? <HomeView bundle={bundle} />}
                   <Footer bundle={bundle} year={new Date().getFullYear()} />
                 </CartProvider>
+              </MediaProvider>
               </StoreProvider>
             </div>
           )}

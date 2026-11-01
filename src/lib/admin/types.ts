@@ -82,7 +82,11 @@ export type AdminDemo = {
 };
 
 /** Catálogo que edita el admin: el del tenant + costos internos y notas por línea. */
-export type AdminProduct = Product & { stockMode?: "stock" | "none"; available?: boolean; lowAlert?: boolean; igSynced?: boolean };
+/**
+ * `igImages`: las fotos que trajo Instagram (se guardan aunque el equipo las reemplace).
+ * `photosSynced`: false cuando el equipo cambió las fotos a mano; la sincronización ya no las toca.
+ */
+export type AdminProduct = Product & { stockMode?: "stock" | "none"; available?: boolean; lowAlert?: boolean; igSynced?: boolean; igImages?: string[]; photosSynced?: boolean };
 export type AdminCatalog = {
   lines: Line[];
   products: AdminProduct[];

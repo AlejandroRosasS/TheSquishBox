@@ -1,17 +1,18 @@
 "use client";
 
+import { Photo } from "@/components/Photo";
+import { SLOTS } from "@/lib/media";
+
 import Link from "next/link";
 import { useCart } from "./CartProvider";
 import { QtyControl, RemoveButton, VariantSelect } from "./CartLineControls";
 import { useStore } from "@/components/StoreContext";
 import { Rich } from "@/components/Rich";
 import { ProductCard } from "@/components/ProductCard";
-import { asset } from "@/lib/assets";
 import { formatPrice, plural } from "@/lib/format";
 import { lineName, variantImage } from "@/lib/catalog";
 import { IconChevronLeft, IconGift, IconTruck } from "@/components/Icons";
 
-/* eslint-disable @next/next/no-img-element */
 
 export function PaymentLogos() {
   const { tenant } = useStore();
@@ -67,7 +68,7 @@ export function CartPageView() {
           {cart.lines.map((it) => (
             <div className="line" key={`${it.productId}/${it.variantId}`}>
               <Link className="ph r45" href={`/p/${it.productId}`}>
-                <img src={asset(tenant.slug, variantImage(it.product, it.variant))} alt={it.product.name} />
+                <Photo src={variantImage(it.product, it.variant)} alt={it.product.name} slot={SLOTS.product} />
               </Link>
               <div className="stack g2">
                 <p className="small muted">{lineName(catalog, it.product.line)}</p>
