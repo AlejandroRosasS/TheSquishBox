@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { asset } from "@/lib/assets";
-import { isSoldOut } from "@/lib/catalog";
+import { hasOptions, isSoldOut } from "@/lib/catalog";
 import { formatPrice } from "@/lib/format";
 import type { AdminProduct } from "@/lib/admin/types";
 import { useAdmin, useAdminCatalog } from "../AdminContext";
@@ -24,7 +24,8 @@ export function stockInfo(p: AdminProduct): { label: string; cls: string } {
 
 export function priceSummary(p: AdminProduct): string {
   if (!p.variants.length || p.variants.every((v) => !v.price)) return "Sin precio";
-  if (p.variants.length === 1) return formatPrice(p.variants[0].price);
+  if (!hasOptions(p)) return formatPrice(p.variants[0].price);
+  if (p.variants.length > 3) return `${p.variants.length} opciones · desde ${formatPrice(Math.min(...p.variants.map((v) => v.price)))}`;
   return p.variants.map((v) => `${v.label} ${formatPrice(v.price)}`).join(" · ");
 }
 

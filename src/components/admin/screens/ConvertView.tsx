@@ -43,7 +43,7 @@ export function ConvertView() {
       ids.add(id);
       const variants = it.vars.map((v, i) => ({ id: it.vars.length === 1 ? "unica" : String(i + 1), label: v.label, price: parseFloat(v.price) || 0, priceIsReference: false, stock: it.mode === "stock" ? v.qty : 99 }));
       costs[id] = Object.fromEntries(variants.map((v, i) => [v.id, parseFloat(it.vars[i].cost) || 0]));
-      newProducts.push({ id, name: it.name, line: it.line, status, description: p.caption ?? "", variants, images: [p.img], stockMode: it.mode, available: true, lowAlert: true, igSynced: true });
+      newProducts.push({ id, name: it.name, line: it.line, status, kind: variants.length > 1 ? "options" : "simple", description: p.caption ?? "", variants, images: [p.img], stockMode: it.mode, available: true, lowAlert: true, igSynced: true });
     });
     setCatalog({ ...catalog, products: [...catalog.products, ...newProducts], costs });
     setSt((s) => ({ ...s, converted: [...s.converted, ...selected.map((p) => p.id)], sel: [] }));
