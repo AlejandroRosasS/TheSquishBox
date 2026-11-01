@@ -160,13 +160,15 @@
         "name": "Mini Squish Box",
         "sizes": [
           { "name": "2 squishies", "price": 18 },
-          { "name": "3 squishies", "price": 24 }
+          { "name": "3 squishies", "price": 24 },
+          { "name": "4 squishies", "price": 0 }
         ]
       },
       {
         "name": "Squish Box grande",
         "sizes": [
-          { "name": "4 squishies (1 grande + 3 pequeños)", "price": 69 }
+          { "name": "1 grande + 2 pequeños", "price": 0 },
+          { "name": "1 grande + 3 pequeños", "price": 69 }
         ]
       }
     ],
