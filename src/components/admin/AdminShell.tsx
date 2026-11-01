@@ -6,7 +6,7 @@ import { Suspense, type ReactNode } from "react";
 import { Logo } from "@/components/Logo";
 import { useAdmin, useAdminCatalog, useOrders, useParty } from "./AdminContext";
 import { AuthGate, SignOutButton } from "./AuthGate";
-import { AIBell, AIBox, AIChart, AIGlobe, AIHome, AIInstagram, AIMore, AIOrders, AIPalette, AISettings, AIText } from "./AdminIcons";
+import { AIBell, AIBox, AIChart, AIGlobe, AIHome, AIInstagram, AIMore, AIOrders, AIPalette, AISettings, AIText, AIImage } from "./AdminIcons";
 import { isSoldOut, totalStock, LOW_STOCK } from "@/lib/catalog";
 
 type Item = { href: string; label: string; icon: ReactNode; count?: number; exact?: boolean };
@@ -58,6 +58,7 @@ function ShellInner({ children, path }: { children: ReactNode; path: string }) {
   const store: Item[] = [
     { href: "/admin/apariencia", label: "Apariencia", icon: <AIPalette /> },
     { href: "/admin/textos", label: "Textos", icon: <AIText /> },
+    { href: "/admin/fotos", label: "Fotos", icon: <AIImage /> },
     { href: "/admin/seo", label: "SEO", icon: <AIGlobe /> },
   ];
   const config: Item[] = [
