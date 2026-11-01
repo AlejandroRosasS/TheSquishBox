@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAdmin } from "@/components/admin/AdminContext";
 import type { DocName } from "@/components/admin/DbContext";
 import { useStoredDoc } from "./useStoredDoc";
+import { withDefaults } from "@/lib/defaults";
 
 export type DocStatus = "live" | "dirty" | "saved";
 
@@ -20,8 +21,9 @@ export function useDoc<T>(name: DocName, base: T) {
   const [local, setLocal] = useState<T | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const published = doc.published ?? base;
-  const saved = doc.draft ?? published;
+  // Lo guardado manda; `base` completa claves que el código agregó después.
+  const published = doc.published ? withDefaults(base, doc.published) : base;
+  const saved = doc.draft ? withDefaults(base, doc.draft) : published;
   const value = local ?? saved;
   const dirty = local !== null && !same(local, saved);
   const status: DocStatus = dirty ? "dirty" : doc.draft && !same(doc.draft, published) ? "saved" : "live";
