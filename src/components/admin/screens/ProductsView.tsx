@@ -15,7 +15,7 @@ import { LineHeader } from "../LineHeader";
 type Filter = "all" | "pub" | "draft" | "low";
 
 export function stockInfo(p: AdminProduct): { label: string; cls: string } {
-  if (p.stockMode === "none") return p.available === false ? { label: "Agotado", cls: "agotado" } : { label: "Bajo pedido", cls: "publicado" };
+  if (p.stockMode === "none") return p.available === false ? { label: "Agotado", cls: "agotado" } : { label: "Sin control de stock", cls: "publicado" };
   if (p.status === "draft" && !p.variants.length) return { label: "Sin definir", cls: "borrador" };
   if (isSoldOut(p)) return { label: "Agotado", cls: "agotado" };
   const low = p.variants.some((v) => v.stock > 0 && v.stock <= 5);

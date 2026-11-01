@@ -8,7 +8,7 @@ import { useCart } from "@/components/cart/CartProvider";
 import { Rich } from "@/components/Rich";
 import { asset } from "@/lib/assets";
 import { formatPrice } from "@/lib/format";
-import { isSoldOut, LOW_STOCK, variantStockLabel } from "@/lib/catalog";
+import { isSoldOut, LOW_STOCK, unitsLeft, variantStockLabel } from "@/lib/catalog";
 import { IconInstagram, IconMinus, IconPlus, IconTruck } from "@/components/Icons";
 
 /* eslint-disable @next/next/no-img-element */
@@ -18,7 +18,7 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
   const cart = useCart();
   const cur = tenant.currency;
   const allOut = isSoldOut(p);
-  const firstAvailable = p.variants.find((v) => v.stock > 0) ?? p.variants[0];
+  const firstAvailable = p.variants.find((v) => unitsLeft(p, v) > 0) ?? p.variants[0];
   const [vid, setVid] = useState(firstAvailable.id);
   const [img, setImg] = useState(0);
   const [qty, setQty] = useState(1);
@@ -27,8 +27,9 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
   const slider = useRef<HTMLDivElement>(null);
 
   const v = p.variants.find((x) => x.id === vid) ?? firstAvailable;
-  const curOut = allOut || v.stock <= 0;
-  const stockBadge = curOut ? "Agotado" : v.stock <= LOW_STOCK ? `Últimas ${v.stock}` : "";
+  const left = unitsLeft(p, v);
+  const curOut = allOut || left <= 0;
+  const stockBadge = curOut ? "Agotado" : left <= LOW_STOCK ? `Últimas ${left}` : "";
   const images = p.images.map((src) => asset(tenant.slug, src));
   const ig = `https://www.instagram.com/${tenant.instagram}/`;
 
@@ -117,8 +118,8 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
               <span className="label" id="variant-q">{sf.product.variantQuestion}</span>
               <div className="seg" role="radiogroup" aria-labelledby="variant-q">
                 {p.variants.map((x) => {
-                  const out = x.stock <= 0;
-                  const s = variantStockLabel(x);
+                  const out = unitsLeft(p, x) <= 0;
+                  const s = variantStockLabel(x, p);
                   return (
                     <button
                       key={x.id}
@@ -145,7 +146,7 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
                     <IconMinus size="sm" />
                   </button>
                   <span aria-live="polite">{qty}</span>
-                  <button type="button" aria-label="Agregar uno" onClick={() => setQty(Math.min(v.stock, qty + 1))} disabled={qty >= v.stock}>
+                  <button type="button" aria-label="Agregar uno" onClick={() => setQty(Math.min(left, qty + 1))} disabled={qty >= left}>
                     <IconPlus size="sm" />
                   </button>
                 </div>

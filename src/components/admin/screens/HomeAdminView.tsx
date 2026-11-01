@@ -3,7 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { asset } from "@/lib/assets";
-import { isSoldOut } from "@/lib/catalog";
+import { isSoldOut, tracksStock } from "@/lib/catalog";
 import { money, moneyShort, ORDER_STATUS, todayLabel } from "@/lib/admin/format";
 import { useAdmin, useAdminCatalog, useOrders } from "../AdminContext";
 import { AdminPage } from "../AdminPage";
@@ -27,8 +27,8 @@ export function HomeAdminView() {
   const stock = catalog.products
     .filter((p) => p.status !== "draft")
     .map((p) => {
-      const low = p.variants.filter((v) => v.stock > 0 && v.stock <= 5);
-      if (isSoldOut(p)) return { p, label: "Agotado", cls: "agotado", cap: "Sin stock" };
+      const low = tracksStock(p) ? p.variants.filter((v) => v.stock > 0 && v.stock <= 5) : [];
+      if (isSoldOut(p) || (!tracksStock(p) && p.available === false)) return { p, label: "Agotado", cls: "agotado", cap: "Sin stock" };
       if (low.length) return { p, label: "Stock bajo", cls: "bajo", cap: low.map((v) => (p.variants.length > 1 ? `${v.label} · quedan ${v.stock}` : `Quedan ${v.stock}`)).join(" · ") };
       return null;
     })
