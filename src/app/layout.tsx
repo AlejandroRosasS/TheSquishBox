@@ -1,19 +1,20 @@
 import type { Metadata, Viewport } from "next";
 import "./store.css";
-import { getTenantBundle } from "@/lib/tenant";
+import { getFileBundle, getTenantBundle } from "@/lib/tenant";
 import { siteMetadata } from "@/lib/seo";
 
-export function generateMetadata(): Metadata {
-  return siteMetadata(getTenantBundle());
+export async function generateMetadata(): Promise<Metadata> {
+  return siteMetadata(await getTenantBundle());
 }
 
-export function generateViewport(): Viewport {
-  const { tenant } = getTenantBundle();
-  return { themeColor: tenant.palettes[tenant.defaultPalette]?.primary };
+export async function generateViewport(): Promise<Viewport> {
+  const { tenant, appearance } = await getTenantBundle();
+  return { themeColor: appearance?.tokens.primary ?? tenant.palettes[tenant.defaultPalette]?.primary };
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const { tenant } = getTenantBundle();
+  // El idioma no cambia con lo que se publica: se lee de los archivos para no esperar a la base.
+  const { tenant } = getFileBundle();
   return (
     <html lang={tenant.locale}>
       <head>

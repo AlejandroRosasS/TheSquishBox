@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { usePersisted, type Doc } from "./storage";
+import { useAdmin } from "@/components/admin/AdminContext";
+import type { DocName } from "@/components/admin/DbContext";
+import { useStoredDoc } from "./useStoredDoc";
 
 export type DocStatus = "live" | "dirty" | "saved";
 
@@ -12,9 +14,11 @@ const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
  * - `value`: lo que se está editando (cambios locales > borrador guardado > publicado > base del tenant).
  * - `published`: lo que ven los clientes.
  */
-export function useDoc<T>(key: string, base: T) {
-  const [doc, setDoc, hydrated] = usePersisted<Doc<T>>(key, { draft: null, published: null });
+export function useDoc<T>(name: DocName, base: T) {
+  const { toast } = useAdmin();
+  const [doc, setDoc, hydrated] = useStoredDoc<T>(name);
   const [local, setLocal] = useState<T | null>(null);
+  const [busy, setBusy] = useState(false);
 
   const published = doc.published ?? base;
   const saved = doc.draft ?? published;
@@ -37,25 +41,32 @@ export function useDoc<T>(key: string, base: T) {
     });
   }, [saved]);
 
-  const saveDraft = useCallback(() => {
-    setDoc((d) => ({ ...d, draft: value, savedAt: new Date().toISOString() }));
-    setLocal(null);
-  }, [setDoc, value]);
+  /** Guarda y devuelve true si salió bien; si falla, avisa y conserva los cambios. */
+  const run = useCallback(
+    async (next: typeof doc) => {
+      setBusy(true);
+      try {
+        await setDoc(next);
+        setLocal(null);
+        return true;
+      } catch (e) {
+        toast(`No se pudo guardar: ${e instanceof Error ? e.message : "error de conexión"}`);
+        return false;
+      } finally {
+        setBusy(false);
+      }
+    },
+    [setDoc, toast],
+  );
 
-  const publish = useCallback(() => {
-    setDoc((d) => ({ ...d, draft: null, published: value, publishedAt: new Date().toISOString() }));
-    setLocal(null);
-  }, [setDoc, value]);
-
+  const saveDraft = useCallback(() => run({ ...doc, draft: value }), [run, doc, value]);
+  const publish = useCallback(() => run({ ...doc, draft: null, published: value }), [run, doc, value]);
   /** Descarta borrador y cambios locales: vuelve a lo publicado. */
-  const discard = useCallback(() => {
-    setDoc((d) => ({ ...d, draft: null }));
-    setLocal(null);
-  }, [setDoc]);
+  const discard = useCallback(() => (doc.draft ? run({ ...doc, draft: null }) : (setLocal(null), Promise.resolve(true))), [run, doc]);
 
   const isBase = useMemo(() => same(value, base), [value, base]);
 
-  return { value, published, edit, saveDraft, publish, discard, status, dirty, hydrated, isBase, publishedAt: doc.publishedAt, hasPublished: doc.published !== null };
+  return { value, published, edit, saveDraft, publish, discard, status, dirty, hydrated, busy, isBase, publishedAt: doc.publishedAt, hasPublished: doc.published !== null };
 }
 
 export const STATUS_LABEL: Record<DocStatus, [string, string]> = {

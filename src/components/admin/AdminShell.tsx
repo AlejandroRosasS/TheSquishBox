@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import { Logo } from "@/components/Logo";
 import { useAdmin, useAdminCatalog, useOrders, useParty } from "./AdminContext";
+import { AuthGate, SignOutButton } from "./AuthGate";
 import { AIBell, AIBox, AIChart, AIGift, AIGlobe, AIHome, AIInstagram, AIMore, AIOrders, AIPalette, AISettings, AIText } from "./AdminIcons";
 import { isSoldOut, totalStock, LOW_STOCK } from "@/lib/catalog";
 
@@ -29,9 +30,11 @@ export function useAdminCounts() {
 /** El menú marca la sección activa con usePathname, que en rutas dinámicas debe ir dentro de Suspense. */
 export function AdminShell({ children }: { children: ReactNode }) {
   return (
-    <Suspense fallback={<ShellInner path="">{children}</ShellInner>}>
-      <ShellWithPath>{children}</ShellWithPath>
-    </Suspense>
+    <AuthGate>
+      <Suspense fallback={<ShellInner path="">{children}</ShellInner>}>
+        <ShellWithPath>{children}</ShellWithPath>
+      </Suspense>
+    </AuthGate>
   );
 }
 
@@ -93,7 +96,7 @@ function ShellInner({ children, path }: { children: ReactNode; path: string }) {
         </nav>
         <div className="stack g2" style={{ marginTop: "auto", paddingTop: 20 }}>
           <a className="a-btn sm" href="/" target="_blank" rel="noreferrer">Ver tienda</a>
-          <Link className="a-btn sm ghost" href="/admin/login">Salir</Link>
+          <SignOutButton />
         </div>
       </aside>
       {children}

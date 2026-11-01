@@ -6,8 +6,8 @@ import { getTenantBundle } from "@/lib/tenant";
 import { Rich } from "@/components/Rich";
 import { CatalogView } from "@/components/catalog/CatalogView";
 
-export function generateMetadata(): Metadata {
-  return pageMetadata(getTenantBundle(), "tienda", { title: "Tienda", description: "" });
+export async function generateMetadata(): Promise<Metadata> {
+  return pageMetadata(await getTenantBundle(), "tienda", { title: "Tienda", description: "" });
 }
 
 type SP = Promise<{ linea?: string }>;
@@ -24,7 +24,7 @@ function Crumbs({ label }: { label: string }) {
 
 async function Filtered({ searchParams, children }: { searchParams: SP; children: React.ReactNode }) {
   const { linea } = await searchParams;
-  const { catalog } = getTenantBundle();
+  const { catalog } = await getTenantBundle();
   const line = catalog.lines.find((l) => l.id === linea);
   return (
     <>
@@ -35,8 +35,8 @@ async function Filtered({ searchParams, children }: { searchParams: SP; children
   );
 }
 
-export default function CatalogPage({ searchParams }: { searchParams: SP }) {
-  const { storefront: sf } = getTenantBundle();
+export default async function CatalogPage({ searchParams }: { searchParams: SP }) {
+  const { storefront: sf } = await getTenantBundle();
   const intro = (
     <div className="stack g3" style={{ paddingBottom: 32 }}>
       <h1 className="h1"><Rich text={sf.catalog.title} /></h1>

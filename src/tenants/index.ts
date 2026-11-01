@@ -5,8 +5,18 @@ import squishStorefront from "./squish/storefront.json";
 import squishSeo from "./squish/seo.json";
 import squishAdminDemo from "./squish/admin-demo.json";
 import type { AdminDemo } from "@/lib/admin/types";
+import type { Tokens } from "@/lib/publishedTheme";
 
-export type TenantBundle = { tenant: Tenant; catalog: Catalog; storefront: Storefront; seo: Seo };
+export type TenantBundle = {
+  tenant: Tenant;
+  catalog: Catalog;
+  storefront: Storefront;
+  seo: Seo;
+  /** Paleta publicada desde Admin › Apariencia (null = la paleta por defecto del tenant). */
+  appearance?: { key: string | null; tokens: Tokens } | null;
+  /** "db" cuando viene de Supabase; "files" cuando sale de los JSON del repo. */
+  source?: "db" | "files";
+};
 
 /**
  * Registro de marcas. Agregar una marca = agregar su carpeta y una línea aquí.

@@ -45,6 +45,8 @@ export type Variant = {
   price: number;
   priceIsReference: boolean;
   stock: number;
+  /** Id de la variante en la base de datos (cuando la tienda lee de Supabase). */
+  dbId?: string;
 };
 
 export type Product = {

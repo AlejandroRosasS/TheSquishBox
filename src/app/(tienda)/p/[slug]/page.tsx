@@ -10,20 +10,20 @@ import { ProductView } from "@/components/product/ProductView";
 
 type Props = { params: Promise<{ slug: string }> };
 
-export function generateStaticParams() {
-  return visibleProducts(getTenantBundle().catalog).map((p) => ({ slug: p.id }));
+export async function generateStaticParams() {
+  return visibleProducts((await getTenantBundle()).catalog).map((p) => ({ slug: p.id }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const bundle = getTenantBundle();
+  const bundle = await getTenantBundle();
   const p = bundle.catalog.products.find((x) => x.id === slug);
   return p ? productMetadata(bundle, p) : {};
 }
 
 export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
-  const { tenant, catalog, storefront: sf } = getTenantBundle();
+  const { tenant, catalog, storefront: sf } = await getTenantBundle();
   const product = visibleProducts(catalog).find((p) => p.id === slug);
   if (!product) notFound();
   const more = visibleProducts(catalog).filter((p) => p.id !== product.id && p.status === "published").slice(0, 4);

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { Storefront } from "@/lib/types";
-import { docKey, usePersisted, type Doc } from "@/lib/admin/storage";
+import { useStoredDoc } from "@/lib/admin/useStoredDoc";
 import { STATUS_LABEL, useDoc } from "@/lib/admin/useDoc";
 import { TEXT_SECTIONS } from "@/lib/admin/textSchema";
 import { TOKEN_KEYS, type Tokens } from "@/lib/publishedTheme";
@@ -29,8 +29,8 @@ function collectImages(...sources: unknown[]): string[] {
 export function TextsView() {
   const { bundle, demo, toast } = useAdmin();
   const { tenant, catalog } = bundle;
-  const doc = useDoc<Storefront>(docKey(tenant.slug, "texts"), bundle.storefront);
-  const [appearance] = usePersisted<Doc<{ tokens: Tokens }>>(docKey(tenant.slug, "appearance"), { draft: null, published: null });
+  const doc = useDoc<Storefront>("texts", bundle.storefront);
+  const [appearance] = useStoredDoc<{ tokens: Tokens }>("appearance");
   const sections = TEXT_SECTIONS.filter((s) => !s.needsCustomOrder || tenant.customOrder.enabled);
   const [secId, setSecId] = useState(sections[1]?.id ?? sections[0].id);
   const [mode, setMode] = useState<"m" | "d">("m");
@@ -124,15 +124,15 @@ export function TextsView() {
         </section>
       </div>
 
-      <DemoNote>
+      <DemoNote untilDb>
         Demo (Fase 2): lo que publiques aquí se guarda en este navegador y ya se ve en las vistas previas del panel. En la tienda en vivo los textos se activan cuando conectemos la base de datos (Fase 3).
       </DemoNote>
 
       <div className="a-sticky">
         <span className="a-cap">{doc.status === "live" ? "La tienda muestra estos textos." : "Los clientes verán los cambios solo al publicar."}</span>
         <div className="row g2">
-          <button className="a-btn" type="button" disabled={!doc.dirty} onClick={() => { doc.saveDraft(); toast("Borrador guardado"); }}>Guardar borrador</button>
-          <button className="a-btn primary" type="button" disabled={doc.status === "live"} onClick={() => { doc.publish(); toast("Textos publicados"); }}>Publicar</button>
+          <button className="a-btn" type="button" disabled={!doc.dirty} onClick={async () => { if (await doc.saveDraft()) toast("Borrador guardado"); }}>Guardar borrador</button>
+          <button className="a-btn primary" type="button" disabled={doc.status === "live"} onClick={async () => { if (await doc.publish()) toast("Textos publicados"); }}>Publicar</button>
         </div>
       </div>
     </AdminPage>

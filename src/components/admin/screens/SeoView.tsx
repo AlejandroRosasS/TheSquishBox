@@ -5,7 +5,6 @@ import { useId, useMemo } from "react";
 import type { Seo, SeoPage } from "@/lib/types";
 import { asset } from "@/lib/assets";
 import { applyTemplate, SEO_LIMITS } from "@/lib/seo";
-import { docKey } from "@/lib/admin/storage";
 import { STATUS_LABEL, useDoc } from "@/lib/admin/useDoc";
 import { useAdmin } from "../AdminContext";
 import { AdminPage, DemoNote, Switch } from "../AdminPage";
@@ -45,7 +44,7 @@ function Serp({ url, title, description, favicon }: { url: string; title: string
 export function SeoView() {
   const { bundle, toast } = useAdmin();
   const { tenant, catalog } = bundle;
-  const doc = useDoc<Seo>(docKey(tenant.slug, "seo"), bundle.seo);
+  const doc = useDoc<Seo>("seo", bundle.seo);
   const seo = doc.value;
   const [stLabel, stCls] = STATUS_LABEL[doc.status];
   const set = (patch: Partial<Seo>) => doc.edit((p) => ({ ...p, ...patch }));
@@ -170,13 +169,13 @@ export function SeoView() {
         </div>
       </div>
 
-      <DemoNote>Demo (Fase 2): se guarda en este navegador. Google y las redes leen estos datos desde el servidor, así que se activan en vivo cuando conectemos la base de datos (Fase 3).</DemoNote>
+      <DemoNote untilDb>Demo (Fase 2): se guarda en este navegador. Google y las redes leen estos datos desde el servidor, así que se activan en vivo cuando conectemos la base de datos (Fase 3).</DemoNote>
 
       <div className="a-sticky">
         <span className="a-cap">{doc.status === "live" ? "Publicado." : "Los cambios se aplican al publicar."}</span>
         <div className="row g2">
-          <button className="a-btn" type="button" disabled={!doc.dirty} onClick={() => { doc.saveDraft(); toast("Borrador guardado"); }}>Guardar borrador</button>
-          <button className="a-btn primary" type="button" disabled={doc.status === "live" || !templateOk} onClick={() => { doc.publish(); toast("SEO publicado"); }}>Publicar</button>
+          <button className="a-btn" type="button" disabled={!doc.dirty} onClick={async () => { if (await doc.saveDraft()) toast("Borrador guardado"); }}>Guardar borrador</button>
+          <button className="a-btn primary" type="button" disabled={doc.status === "live" || !templateOk} onClick={async () => { if (await doc.publish()) toast("SEO publicado"); }}>Publicar</button>
         </div>
       </div>
     </AdminPage>

@@ -1,13 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useDb } from "../DbContext";
 import { useAdmin } from "../AdminContext";
 import { AdminPage } from "../AdminPage";
 import { ColorField } from "../ColorField";
 import { StorePreview } from "../StorePreview";
 import { AIAlert, AICheck } from "../AdminIcons";
 import { contrast, readableOn } from "@/lib/color";
-import { docKey } from "@/lib/admin/storage";
 import { STATUS_LABEL, useDoc } from "@/lib/admin/useDoc";
 import { TOKEN_KEYS, type TokenKey, type Tokens } from "@/lib/publishedTheme";
 import type { PaletteTokens } from "@/lib/types";
@@ -48,7 +48,8 @@ export function AppearanceView() {
   const { tenant } = bundle;
   const presets = tenant.palettes;
   const base: Appearance = useMemo(() => ({ key: tenant.defaultPalette, tokens: toTokens(presets[tenant.defaultPalette]) }), [tenant, presets]);
-  const doc = useDoc<Appearance>(docKey(tenant.slug, "appearance"), base);
+  const doc = useDoc<Appearance>("appearance", base);
+  const db = useDb();
   const [mode, setMode] = useState<"m" | "d">("m");
   const [justPublished, setJustPublished] = useState(false);
   const texts = useTextsDraft();
@@ -106,7 +107,7 @@ export function AppearanceView() {
       {justPublished && (
         <div className="a-banner ok" role="status">
           <AICheck size="sm" />
-          <span className="grow"><b>Paleta “{name}” publicada.</b> La tienda ya se ve con estos tonos. <span className="a-cap">(Demo: por ahora solo en este navegador.)</span></span>
+          <span className="grow"><b>Paleta “{name}” publicada.</b> La tienda ya se ve con estos tonos. {!db && <span className="a-cap">(Demo: por ahora solo en este navegador.)</span>}</span>
           <a className="a-btn sm" href="/" target="_blank" rel="noreferrer">Ver tienda actualizada</a>
         </div>
       )}
@@ -198,12 +199,12 @@ export function AppearanceView() {
       <div className="a-sticky">
         <span className="a-cap">{footNote}</span>
         <div className="row g2">
-          <button className="a-btn" type="button" disabled={!doc.dirty} onClick={() => { doc.saveDraft(); toast("Borrador guardado"); }}>Guardar borrador</button>
+          <button className="a-btn" type="button" disabled={!doc.dirty} onClick={async () => { if (await doc.saveDraft()) toast("Borrador guardado"); }}>Guardar borrador</button>
           <button
             className="a-btn primary"
             type="button"
             disabled={blocked || doc.status === "live"}
-            onClick={() => { doc.publish(); setJustPublished(true); toast(`Paleta “${name}” publicada`); }}
+            onClick={async () => { if (await doc.publish()) { setJustPublished(true); toast(`Paleta “${name}” publicada`); } }}
           >
             Publicar
           </button>

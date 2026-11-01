@@ -5,8 +5,8 @@ import { Header } from "@/components/Header";
 import { Rich } from "@/components/Rich";
 import { StoreShell } from "@/components/StoreShell";
 
-export default function NotFound() {
-  const { tenant, storefront: sf } = getTenantBundle();
+export default async function NotFound() {
+  const { tenant, storefront: sf } = await getTenantBundle();
   return (
     <StoreShell>
       <Header />

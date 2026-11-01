@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import type { PaletteTokens, Storefront, Tenant } from "./types";
+import type { Tokens } from "./publishedTheme";
 
 export function paletteVars(p: PaletteTokens): Record<string, string> {
   return {
@@ -15,8 +16,9 @@ export function paletteVars(p: PaletteTokens): Record<string, string> {
 }
 
 /** Variables CSS de la marca: 8 tokens de la paleta activa + colores fijos de marca + fuentes. */
-export function storeStyle(tenant: Tenant, sf: Storefront, paletteKey?: string): CSSProperties {
-  const palette = tenant.palettes[paletteKey ?? tenant.defaultPalette] ?? Object.values(tenant.palettes)[0];
+export function storeStyle(tenant: Tenant, sf: Storefront, paletteKey?: string, tokens?: Tokens | null): CSSProperties {
+  const base = tenant.palettes[paletteKey ?? tenant.defaultPalette] ?? Object.values(tenant.palettes)[0];
+  const palette = tokens ? { ...base, ...tokens } : base;
   const color = (v: string) => tenant.brandColors[v] ?? v;
   const vars: Record<string, string> = {
     ...paletteVars(palette),

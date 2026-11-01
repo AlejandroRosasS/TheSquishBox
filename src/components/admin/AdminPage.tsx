@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Logo } from "@/components/Logo";
 import { useAdmin } from "./AdminContext";
+import { useDb } from "./DbContext";
 import { AIBack } from "./AdminIcons";
 
 type Props = {
@@ -63,6 +64,9 @@ export function Switch({ on, onChange, label, disabled }: { on: boolean; onChang
   );
 }
 
-export function DemoNote({ children }: { children: ReactNode }) {
+/** Aviso de la demo. `untilDb`: deja de mostrarse cuando la tienda está conectada a la base de datos. */
+export function DemoNote({ children, untilDb }: { children: ReactNode; untilDb?: boolean }) {
+  const db = useDb();
+  if (untilDb && db) return null;
   return <p className="a-demo">{children}</p>;
 }
