@@ -34,7 +34,7 @@ export function CulqiSettings() {
       .eq("provider", "culqi")
       .maybeSingle();
     if (e) {
-      setError(/payment_accounts/.test(e.message) ? "Falta aplicar la migración de pagos en la base (0004_culqi.sql)." : e.message);
+      setError(/payment_accounts/.test(e.message) ? "Falta aplicar la migración de pagos en la base (0005_culqi.sql)." : e.message);
       setAcct(null);
       return;
     }

@@ -16,7 +16,7 @@ Yape y Plin siguen siendo manuales en el MVP; Culqi solo se usa para tarjeta.
 
 ## Configurar una marca
 
-1. Migración `supabase/migrations/0004_culqi.sql` aplicada en Supabase.
+1. Migración `supabase/migrations/0005_culqi.sql` aplicada en Supabase.
 2. Variable `SUPABASE_SECRET_KEY` en Vercel (servidor). Es la misma que usa Instagram.
 3. Admin › Ajustes › **Pago con tarjeta · Culqi**: pegar la llave pública y la secreta (CulqiPanel › Desarrollo › API Keys), prender *Cobrar con tarjeta* y guardar.
    La llave secreta se guarda en la tabla `payment_accounts`, que el navegador no puede leer.
