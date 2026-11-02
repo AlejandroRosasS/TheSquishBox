@@ -1,4 +1,7 @@
-/** Pedidos de la demo (Fase 1): se guardan en el navegador. En Fase 3 van a la base de datos. */
+/**
+ * Copia del pedido en el navegador para la página de confirmación (/pedido/<n>).
+ * Con Supabase el pedido de verdad vive en la base (la tienda no puede leerlo de vuelta); sin Supabase es el pedido de la demo.
+ */
 export type OrderLine = { productId: string; name: string; variantLabel: string; qty: number; price: number; image: string };
 
 export type Order = {
@@ -26,10 +29,10 @@ export function loadOrders(slug: string): Order[] {
   }
 }
 
-export function saveOrder(slug: string, data: Omit<Order, "id" | "createdAt">): Order {
-  const orders = loadOrders(slug);
+export function saveOrder(slug: string, data: Omit<Order, "id" | "createdAt">, id?: string): Order {
+  const orders = loadOrders(slug).filter((o) => o.id !== id);
   const next = orders.reduce((m, o) => Math.max(m, Number(o.id) || 0), 0) + 1;
-  const order: Order = { ...data, id: String(next).padStart(4, "0"), createdAt: new Date().toISOString() };
+  const order: Order = { ...data, id: id ?? String(next).padStart(4, "0"), createdAt: new Date().toISOString() };
   localStorage.setItem(key(slug), JSON.stringify([...orders, order]));
   return order;
 }
