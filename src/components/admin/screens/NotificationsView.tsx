@@ -6,10 +6,19 @@ import type { Channel } from "@/lib/admin/types";
 import { useAdmin } from "../AdminContext";
 import { AdminPage, DemoNote, Switch } from "../AdminPage";
 import { AIAlert, AIMail, AITelegram, AIWhatsApp } from "../AdminIcons";
+import { useDb } from "../DbContext";
+import { NotificationsLive } from "./NotificationsLive";
 
 type State = { telegram: Channel; email: Channel; whatsapp: Channel; events: boolean[] };
 
+/** Con Supabase: configuración real y envíos de verdad. Sin Supabase: la demo con datos de ejemplo. */
 export function NotificationsView() {
+  const db = useDb();
+  if (db?.state.phase === "ready") return <NotificationsLive />;
+  return <NotificationsDemo />;
+}
+
+function NotificationsDemo() {
   const { bundle, demo, toast } = useAdmin();
   const { tenant } = bundle;
   const [s, setS] = usePersisted<State>(dataKey(tenant.slug, "notifications"), { ...demo.notifications, events: [true, true, true, true] });
