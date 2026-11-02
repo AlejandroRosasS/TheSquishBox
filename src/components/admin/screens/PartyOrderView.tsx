@@ -4,6 +4,7 @@
 import { asset } from "@/lib/assets";
 import { money, PARTY_STATUS } from "@/lib/admin/format";
 import { useAdmin, useParty } from "../AdminContext";
+import { useOrdersFromDb } from "../AdminOrders";
 import { AdminPage, DemoNote } from "../AdminPage";
 import { AICheck, AIInfo, AIWhatsApp } from "../AdminIcons";
 import { waTo } from "./OrderView";
@@ -12,14 +13,15 @@ import { waTo } from "./OrderView";
 export function PartyOrderView({ id }: { id: string }) {
   const { bundle, toast } = useAdmin();
   const { tenant } = bundle;
-  const { requests, update } = useParty();
+  const { requests, update, hydrated } = useParty();
+  const fromDb = useOrdersFromDb();
   const cur = requests.find((r) => r.id === id);
   const label = tenant.customOrder.adminShort ?? tenant.customOrder.adminLabel ?? tenant.customOrder.label;
 
   if (!cur) {
     return (
       <AdminPage title="Pedido" back={{ href: "/admin/pedidos", label: "Pedidos" }}>
-        <h1 className="a-h1">No encontramos este pedido</h1>
+        <h1 className="a-h1">{hydrated ? "No encontramos este pedido" : "Cargando…"}</h1>
       </AdminPage>
     );
   }
@@ -44,14 +46,15 @@ export function PartyOrderView({ id }: { id: string }) {
             <span className={`st ${PARTY_STATUS[cur.status][1]}`}>{PARTY_STATUS[cur.status][0]}</span>
           </div>
           <dl className="kv">
+            {cur.box && <><dt>Caja</dt><dd>{cur.box}</dd></>}
             <dt>Cantidad</dt><dd>{cur.qty}</dd>
             <dt>Cada caja</dt><dd>{cur.size}</dd>
             <dt>Extras</dt><dd>{cur.extras}</dd>
-            <dt>Temática</dt><dd>{cur.theme}</dd>
+            {cur.theme && <><dt>Temática</dt><dd>{cur.theme}</dd></>}
             <dt>Fecha</dt><dd>{cur.date}</dd>
             <dt>Entrega</dt><dd>{cur.district}</dd>
           </dl>
-          <div style={{ background: "#F5F5F2", borderRadius: 10, padding: "12px 14px" }}><p className="a-label" style={{ marginBottom: 4 }}>Comentarios</p><p>{cur.idea}</p></div>
+          {cur.idea && <div style={{ background: "#F5F5F2", borderRadius: 10, padding: "12px 14px" }}><p className="a-label" style={{ marginBottom: 4 }}>Comentarios</p><p>{cur.idea}</p></div>}
           {cur.refs.length > 0 && (
             <>
               <p className="a-label">Fotos de referencia ({cur.refs.length})</p>
@@ -85,7 +88,7 @@ export function PartyOrderView({ id }: { id: string }) {
           )}
           {cur.status === "descartada" && <button className="a-btn" type="button" onClick={() => update(cur.id, { status: "nueva" })}>Volver a «Nuevo»</button>}
         </div>
-        <DemoNote>Solicitudes de ejemplo. Los cambios se guardan en este navegador.</DemoNote>
+        {!fromDb && <DemoNote>Solicitudes de ejemplo. Los cambios se guardan en este navegador.</DemoNote>}
       </section>
       </div>
     </AdminPage>

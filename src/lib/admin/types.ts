@@ -1,7 +1,8 @@
 import type { Line, Product } from "@/lib/types";
 
 export type OrderStatus = "nuevo" | "prep" | "listo" | "entregado" | "cancelado";
-export type DemoOrderLine = { productId: string; variantId: string; qty: number; price: number };
+/** `name` y `variantLabel`: copia guardada al comprar (pedidos de la base), por si el producto cambia o se borra. */
+export type DemoOrderLine = { productId: string; variantId: string; qty: number; price: number; name?: string; variantLabel?: string };
 export type LogEntry = { t: string; when: string };
 export type Note = { who: string; when: string; text: string };
 
@@ -36,6 +37,7 @@ export type PartyRequest = {
   mail: string;
   qty: string;
   theme: string;
+  box?: string;
   size: string;
   extras: string;
   date: string;

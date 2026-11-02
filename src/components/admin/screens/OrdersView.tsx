@@ -34,8 +34,7 @@ export function OrdersView() {
   const { catalog } = useAdminCatalog();
   const [f, setF] = useState<Filter>("all");
   const [q, setQ] = useState("");
-  const name = (id: string) => catalog.products.find((p) => p.id === id)?.name ?? id;
-  const items = (o: DemoOrder) => o.lines.map((l) => `${name(l.productId)}${l.qty > 1 ? ` ×${l.qty}` : ""}`).join(" + ");
+  const items = (o: DemoOrder) => o.lines.map((l) => `${catalog.products.find((p) => p.id === l.productId)?.name ?? l.name ?? l.productId}${l.qty > 1 ? ` ×${l.qty}` : ""}`).join(" + ");
   const defs: [Filter, string][] = [
     ["all", "Todos"], ["nuevo", "Nuevo"], ["prep", "En preparación"], ["listo", "Listo"], ["entregado", "Entregado"], ["cancelado", "Cancelado"],
     ...(parties.length ? ([["fiestas", partyLabel]] as [Filter, string][]) : []),

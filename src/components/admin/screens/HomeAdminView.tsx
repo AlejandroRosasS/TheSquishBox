@@ -38,7 +38,7 @@ export function HomeAdminView() {
   const partyLabel = tenant.customOrder.adminLabel ?? tenant.customOrder.label;
 
   const summary = (o: (typeof orders)[number]) =>
-    o.lines.map((l) => `${pname(l.productId)?.name ?? l.productId}${l.qty > 1 ? ` ×${l.qty}` : ""}`).join(" + ");
+    o.lines.map((l) => `${pname(l.productId)?.name ?? l.name ?? l.productId}${l.qty > 1 ? ` ×${l.qty}` : ""}`).join(" + ");
   const total = (o: (typeof orders)[number]) => o.lines.reduce((s, l) => s + l.price * l.qty, 0) + o.deliveryFee;
 
   return (
