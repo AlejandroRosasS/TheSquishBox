@@ -10,6 +10,7 @@ import { asset } from "@/lib/assets";
 import { hasOptions, variantImage } from "@/lib/catalog";
 import { formatPrice, plural } from "@/lib/format";
 import { saveOrder } from "@/lib/orders";
+import { orderCode, placeOrder } from "@/lib/db/orders";
 import { useToday } from "@/lib/useToday";
 import { IconAlert, IconBag, IconChevronLeft, IconLock, IconPin, IconTruck } from "@/components/Icons";
 
@@ -25,7 +26,7 @@ const digits = (s: string) => s.replace(/\D/g, "");
 const DEMO_FAIL_CODE = "000000";
 
 export function CheckoutView() {
-  const { tenant, storefront: sf } = useStore();
+  const { tenant, storefront: sf, source } = useStore();
   const cart = useCart();
   const router = useRouter();
   const cur = tenant.currency;
@@ -45,6 +46,7 @@ export function CheckoutView() {
   const [pay, setPay] = useState<Pay>(methods[0] ?? "yape");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [payError, setPayError] = useState(false);
+  const [orderError, setOrderError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const today = useToday();
 
@@ -112,8 +114,9 @@ export function CheckoutView() {
       return;
     }
     setSending(true);
+    setOrderError(null);
     // Pago simulado (Fase 1). En Fase 3 aquí se llama a Culqi.
-    setTimeout(() => {
+    setTimeout(async () => {
       if (pay === "yape" && digits(f.yapeCode) === DEMO_FAIL_CODE) {
         setPayError(true);
         setErrors({ yapeCode: "Código vencido o incorrecto." });
@@ -121,12 +124,44 @@ export function CheckoutView() {
         document.getElementById("co-4")?.scrollIntoView({ behavior: "smooth", block: "start" });
         return;
       }
+      const customer = { name: f.name.trim(), phone: f.phone.trim(), email: f.email.trim() };
+      const shipping = isDelivery
+        ? { type: "delivery" as const, address: f.address.trim(), district: f.district, reference: f.reference.trim(), date: f.date, recipient: f.recipient.trim(), gift: f.gift.trim() }
+        : { type: "pickup" as const, date: f.pickupDate };
+      const docInfo = doc === "boleta" ? { type: "boleta" as const, dni: digits(f.dni) } : { type: "factura" as const, ruc: digits(f.ruc), razon: f.razon.trim() };
+      let id: string | undefined;
+      let finalTotal = total;
+      // Con la base: el pedido se guarda allá (precio, stock y delivery los calcula la base).
+      if (source === "db") {
+        const items = cart.lines.map((l) => ({ variant_id: l.variant.dbId ?? "", qty: l.qty }));
+        try {
+          if (items.some((i) => !i.variant_id)) throw new Error("Producto no disponible");
+          const res = await placeOrder(tenant.slug, {
+            items,
+            customer: { ...customer, doc: docInfo },
+            delivery: shipping.type === "delivery"
+              ? { mode: "delivery", address: shipping.address, district: shipping.district, reference: shipping.reference, date: shipping.date, recipient: shipping.recipient }
+              : { mode: "pickup", date: shipping.date },
+            payment_method: pay,
+            gift_message: shipping.type === "delivery" ? shipping.gift : "",
+          });
+          id = orderCode(res.number);
+          finalTotal = res.total;
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : "";
+          setOrderError(
+            /stock|disponible/i.test(msg)
+              ? `${msg}. Revisa tu carrito: puede que alguien se haya llevado las últimas unidades.`
+              : "No pudimos registrar tu pedido. Revisa tu conexión e inténtalo otra vez. No se realizó ningún cobro.",
+          );
+          setSending(false);
+          return;
+        }
+      }
       const order = saveOrder(tenant.slug, {
-        customer: { name: f.name.trim(), phone: f.phone.trim(), email: f.email.trim() },
-        shipping: isDelivery
-          ? { type: "delivery", address: f.address.trim(), district: f.district, reference: f.reference.trim(), date: f.date, recipient: f.recipient.trim(), gift: f.gift.trim() }
-          : { type: "pickup", date: f.pickupDate },
-        doc: doc === "boleta" ? { type: "boleta", dni: digits(f.dni) } : { type: "factura", ruc: digits(f.ruc), razon: f.razon.trim() },
+        customer,
+        shipping,
+        doc: docInfo,
         payment: { method: pay },
         lines: cart.lines.map((l) => ({
           productId: l.productId,
@@ -138,8 +173,8 @@ export function CheckoutView() {
         })),
         subtotal: cart.subtotal,
         deliveryFee: isDelivery ? rate : 0,
-        total,
-      });
+        total: finalTotal,
+      }, id);
       router.push(`/pedido/${order.id}`);
       cart.clear();
     }, 700);
@@ -293,6 +328,7 @@ export function CheckoutView() {
                   ? "El costo final del delivery se confirma al coordinar tu entrega."
                   : "Te escribimos por WhatsApp para coordinar dónde y cuándo recoges."}
             </p>
+            {orderError && <div className="alert" role="alert"><IconAlert /><span className="small">{orderError}</span></div>}
             <button className="btn block" type="submit" disabled={sending}>
               {sending ? "Procesando…" : `${payError ? "Reintentar" : payLabel} · ${formatPrice(total, cur)}`}
             </button>

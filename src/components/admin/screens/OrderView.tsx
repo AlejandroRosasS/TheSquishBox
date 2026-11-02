@@ -8,6 +8,7 @@ import { whatsappLink } from "@/lib/format";
 import { money, ORDER_STATUS } from "@/lib/admin/format";
 import type { OrderStatus } from "@/lib/admin/types";
 import { useAdmin, useAdminCatalog, useOrders } from "../AdminContext";
+import { useOrdersFromDb } from "../AdminOrders";
 import { AdminPage, BackLink, DemoNote } from "../AdminPage";
 import { AIAlert, AICheck, AIInfo, AILink, AIWhatsApp } from "../AdminIcons";
 import { deliveryState, orderTotal } from "./OrdersView";
@@ -24,6 +25,7 @@ export function OrderView({ id }: { id: string }) {
   const { tenant } = bundle;
   const { orders, update, hydrated } = useOrders();
   const { catalog } = useAdminCatalog();
+  const fromDb = useOrdersFromDb();
   const [note, setNote] = useState("");
   const [realText, setRealText] = useState<string | null>(null);
   const o = orders.find((x) => x.id === id);
@@ -64,11 +66,14 @@ export function OrderView({ id }: { id: string }) {
       <div className="a-head">
         <div className="stack g1">
           <BackLink href="/admin/pedidos" label="Pedidos" />
-          <div className="row g3 wrap-row"><h1 className="a-h1">Pedido #{o.id}</h1><span className={`st ${sc}`}>{sl}</span><span className={`st ${o.payment === "Devuelto" ? "devuelto" : "pagado"}`}>{o.payment}</span></div>
+          <div className="row g3 wrap-row"><h1 className="a-h1">Pedido #{o.id}</h1><span className={`st ${sc}`}>{sl}</span><span className={`st ${o.payment === "Devuelto" ? "devuelto" : o.payment.startsWith("Pagado") ? "pagado" : "pend"}`}>{o.payment}</span></div>
           <p className="a-sub">{o.createdAt} · {o.client}</p>
         </div>
         <div className="row g2 wrap-row">
           {wa ? <a className="a-btn wa" href={wa} target="_blank" rel="noreferrer"><AIWhatsApp />Escribir por WhatsApp</a> : <button className="a-btn" type="button" disabled>WhatsApp sin número</button>}
+          {o.paymentStatus === "pending" && (
+            <button className="a-btn" type="button" onClick={() => { update(o.id, { paymentStatus: "paid", log: addLog("Pago confirmado por el equipo") }); toast(`Pedido #${o.id}: pago recibido`); }}>Marcar pago recibido</button>
+          )}
           <button className="a-btn" type="button" onClick={() => window.print()}>Imprimir tarjeta</button>
         </div>
       </div>
@@ -148,8 +153,8 @@ export function OrderView({ id }: { id: string }) {
               const v = p?.variants.find((x) => x.id === l.variantId);
               return (
                 <div className="row g3" key={i}>
-                  <span className="av lg">{p && <img src={asset(tenant.slug, p.images[0])} alt="" />}</span>
-                  <div className="grow"><b>{p?.name ?? l.productId}</b><p className="a-cap">{lineLabel(l.productId)} · <b>{v?.label}</b> · x{l.qty}</p></div>
+                  <span className="av lg">{p?.images[0] && <img src={asset(tenant.slug, p.images[0])} alt="" />}</span>
+                  <div className="grow"><b>{p?.name ?? l.name ?? l.productId}</b><p className="a-cap">{[lineLabel(l.productId), v?.label ?? l.variantLabel].filter(Boolean).join(" · ")} · x{l.qty}</p></div>
                   <span className="money" style={{ fontWeight: 700 }}>{money(l.price * l.qty)}</span>
                 </div>
               );
@@ -192,7 +197,7 @@ export function OrderView({ id }: { id: string }) {
               {!o.log.length && <p className="a-cap">Sin actividad registrada.</p>}
             </div>
           </section>
-          <DemoNote>Pedido de ejemplo. Los cambios se guardan en este navegador.</DemoNote>
+          {!fromDb && <DemoNote>Pedido de ejemplo. Los cambios se guardan en este navegador.</DemoNote>}
           <Link className="a-btn ghost sm" href="/admin/pedidos" style={{ alignSelf: "flex-start" }}>← Volver a pedidos</Link>
         </div>
       </div>
