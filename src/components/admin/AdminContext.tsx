@@ -35,7 +35,7 @@ export function useAdmin(): Ctx {
 }
 
 /** Producto de la tienda → producto editable. Sin control de stock = las unidades no se cuentan (quedan en 0 si luego se prende). */
-function adminProduct(p: Product): AdminProduct {
+export function adminProduct(p: Product): AdminProduct {
   const tracked = p.trackStock !== false;
   return {
     ...p,
@@ -49,21 +49,23 @@ function adminProduct(p: Product): AdminProduct {
   };
 }
 
-/** Catálogo editable (productos, líneas, costos). Se guarda en el navegador en esta fase. */
-export function useAdminCatalog() {
-  const { bundle, demo } = useAdmin();
-  const initial: AdminCatalog = useMemo(
-    () => ({
-      lines: [...bundle.catalog.lines].sort((a, b) => a.order - b.order),
-      products: bundle.catalog.products.map(adminProduct),
-      costs: demo.costs,
-      lineNotes: demo.lineNotes,
-    }),
-    [bundle, demo],
-  );
-  const [catalog, setCatalog, hydrated] = usePersisted<AdminCatalog>(dataKey(bundle.tenant.slug, "catalog"), initial);
-  const reset = useCallback(() => setCatalog(initial), [initial, setCatalog]);
-  return { catalog, setCatalog, hydrated, reset, initial };
+export type CatalogCtx = {
+  catalog: AdminCatalog;
+  /** Guarda el catálogo (en la base con Supabase; en el navegador en modo demo). */
+  setCatalog: (next: AdminCatalog | ((prev: AdminCatalog) => AdminCatalog)) => void;
+  /** false mientras se carga lo guardado. */
+  hydrated: boolean;
+  /** true mientras hay cambios yendo a la base. */
+  saving: boolean;
+};
+
+export const AdminCatalogCtx = createContext<CatalogCtx | null>(null);
+
+/** Catálogo editable (productos, líneas, costos y notas). Lo da AdminCatalogProvider. */
+export function useAdminCatalog(): CatalogCtx {
+  const v = useContext(AdminCatalogCtx);
+  if (!v) throw new Error("useAdminCatalog fuera de AdminCatalogProvider");
+  return v;
 }
 
 /** Cambios hechos a los pedidos de ejemplo (estado, delivery real, notas…). */
