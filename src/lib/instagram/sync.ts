@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { parseCaption } from "./caption";
-import { download, fetchMedia, IgError, mediaImages, refreshToken, type IgMedia } from "./graph";
+import { download, fetchMedia, IgError, mediaImages, type IgMedia } from "./graph";
 
 /**
  * Trae los posts de la cuenta conectada a la bandeja (ig_posts).
@@ -31,15 +31,12 @@ export async function syncTenant(db: SupabaseClient, slug: string, opts: { full?
   if (!acct || acct.status === "disconnected") return { ok: false, reason: "not-connected", message: "No hay una cuenta de Instagram conectada." };
 
   try {
-    let token: string = acct.access_token;
-    // Los tokens duran 60 días: se renuevan una vez al día como máximo.
-    if (new Date(acct.token_expires_at).getTime() - Date.now() < 59 * 864e5) {
-      const r = await refreshToken(token);
-      token = r.token;
-      await db.from("ig_accounts").update({ access_token: r.token, token_expires_at: r.expiresAt.toISOString() }).eq("tenant_id", tenant.id);
+    // El token del sistema no vence (según la configuración de Meta); si la configuración le puso fecha, avisamos.
+    if (acct.token_expires_at && new Date(acct.token_expires_at).getTime() < Date.now()) {
+      throw new IgError("El acceso a Instagram venció.", 190);
     }
 
-    const media = await fetchMedia(token, opts.full ? null : RECENT, slug);
+    const media = await fetchMedia(acct.access_token, acct.ig_user_id, opts.full ? null : RECENT, slug);
     const ids = media.map((m) => m.id);
     const [{ data: lines }, { data: posts }, { data: products }] = await Promise.all([
       db.from("product_lines").select("id, name").eq("tenant_id", tenant.id),

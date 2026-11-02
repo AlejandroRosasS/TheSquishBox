@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { exchangeCode, fetchMe, igMock } from "@/lib/instagram/graph";
+import { exchangeCode, fetchAccount, igMock } from "@/lib/instagram/graph";
+import { tenants } from "@/tenants";
 import { currentMember, redirectUri, STATE_COOKIE } from "@/lib/instagram/auth";
 import { serviceClient } from "@/lib/db/service";
 import { syncTenant } from "@/lib/instagram/sync";
@@ -20,17 +21,17 @@ export async function GET(req: NextRequest) {
 
   try {
     const auth = igMock()
-      ? { token: "mock", expiresAt: new Date(Date.now() + 60 * 864e5), userId: "mock" }
+      ? { token: "mock", expiresAt: null }
       : await exchangeCode(code, redirectUri(req));
-    const profile = await fetchMe(auth.token);
+    const profile = await fetchAccount(auth.token, tenants[me.slug]?.tenant.instagram);
     const db = serviceClient();
     const { error } = await db.from("ig_accounts").upsert({
       tenant_id: me.tenantId,
-      ig_user_id: profile.userId || auth.userId,
+      ig_user_id: profile.userId,
       username: profile.username,
       picture: profile.picture ?? null,
       access_token: auth.token,
-      token_expires_at: auth.expiresAt.toISOString(),
+      token_expires_at: auth.expiresAt?.toISOString() ?? null,
       status: "ok",
       last_error: null,
       connected_at: new Date().toISOString(),

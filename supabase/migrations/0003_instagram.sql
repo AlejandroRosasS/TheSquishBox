@@ -8,8 +8,8 @@ create table public.ig_accounts (
   ig_user_id text not null,
   username text not null,
   picture text,
-  access_token text not null,          -- token de 60 días; nunca se manda al navegador
-  token_expires_at timestamptz not null,
+  access_token text not null,          -- token de usuario del sistema de la marca (Unified login); nunca se manda al navegador
+  token_expires_at timestamptz,        -- null = no vence
   status text not null default 'ok' check (status in ('ok','error','disconnected')),
   last_error text,
   last_sync_at timestamptz,
