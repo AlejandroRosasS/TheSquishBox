@@ -5,6 +5,7 @@ import { AdminProvider } from "@/components/admin/AdminContext";
 import { DbProvider } from "@/components/admin/DbContext";
 import { AdminMediaProvider } from "@/components/admin/AdminMedia";
 import { AdminCatalogProvider } from "@/components/admin/AdminCatalog";
+import { OrdersProvider } from "@/components/admin/AdminOrders";
 
 const ADMIN_FONTS = "https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;500;600;700;800&display=swap";
 
@@ -26,9 +27,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <div className="adm" style={logoBg ? ({ "--logo-bg": logoBg } as React.CSSProperties) : undefined}>
         <AdminProvider bundle={bundle} demo={demo}>
           <DbProvider slug={bundle.tenant.slug}>
-            <AdminMediaProvider>
-              <AdminCatalogProvider>{children}</AdminCatalogProvider>
-            </AdminMediaProvider>
+            <OrdersProvider>
+              <AdminMediaProvider>
+                <AdminCatalogProvider>{children}</AdminCatalogProvider>
+              </AdminMediaProvider>
+            </OrdersProvider>
           </DbProvider>
         </AdminProvider>
       </div>

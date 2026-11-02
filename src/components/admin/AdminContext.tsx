@@ -2,9 +2,8 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { TenantBundle } from "@/tenants";
-import type { AdminCatalog, AdminDemo, AdminProduct, DemoOrder, PartyRequest } from "@/lib/admin/types";
+import type { AdminCatalog, AdminDemo, AdminProduct } from "@/lib/admin/types";
 import type { Product } from "@/lib/types";
-import { dataKey, usePersisted } from "@/lib/admin/storage";
 
 type Ctx = { bundle: TenantBundle; demo: AdminDemo; toast: (msg: string) => void };
 const AdminCtx = createContext<Ctx | null>(null);
@@ -68,29 +67,5 @@ export function useAdminCatalog(): CatalogCtx {
   return v;
 }
 
-/** Cambios hechos a los pedidos de ejemplo (estado, delivery real, notas…). */
-export function useOrders() {
-  const { bundle, demo } = useAdmin();
-  const [patches, setPatches, hydrated] = usePersisted<Record<string, Partial<DemoOrder> & { link?: string; refund?: string }>>(
-    dataKey(bundle.tenant.slug, "orders"),
-    {},
-  );
-  const orders = useMemo(() => demo.orders.map((o) => ({ ...o, link: "none", refund: "none", ...(patches[o.id] ?? {}) })), [demo, patches]);
-  const update = useCallback(
-    (id: string, patch: Partial<DemoOrder> & { link?: string; refund?: string }) =>
-      setPatches((prev) => ({ ...prev, [id]: { ...(prev[id] ?? {}), ...patch } })),
-    [setPatches],
-  );
-  return { orders, update, hydrated };
-}
-
-export function useParty() {
-  const { bundle, demo } = useAdmin();
-  const [patches, setPatches] = usePersisted<Record<string, Partial<PartyRequest>>>(dataKey(bundle.tenant.slug, "party"), {});
-  const requests = useMemo(() => demo.partyRequests.map((r) => ({ ...r, ...(patches[r.id] ?? {}) })), [demo, patches]);
-  const update = useCallback(
-    (id: string, patch: Partial<PartyRequest>) => setPatches((prev) => ({ ...prev, [id]: { ...(prev[id] ?? {}), ...patch } })),
-    [setPatches],
-  );
-  return { requests, update };
-}
+// Pedidos (tienda y fiestas): de la base o de la demo. Viven en AdminOrders.tsx.
+export { useOrders, useParty } from "./AdminOrders";

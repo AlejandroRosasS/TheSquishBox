@@ -7,8 +7,9 @@ import { Rich } from "@/components/Rich";
 import { asset } from "@/lib/assets";
 import { fill, formatPrice } from "@/lib/format";
 import { formatDate } from "@/lib/orders";
+import { partyCode, placePartyRequest } from "@/lib/db/orders";
 import { useToday } from "@/lib/useToday";
-import { IconCard, IconCheck, IconChat, IconPen } from "@/components/Icons";
+import { IconAlert, IconCard, IconCheck, IconChat, IconPen } from "@/components/Icons";
 import type { PartyBox } from "@/lib/types";
 
 /* eslint-disable @next/next/no-img-element */
@@ -19,7 +20,7 @@ const digits = (s: string) => s.replace(/\D/g, "");
 type Sent = { id: string; name: string; phone: string; rows: [string, string][] };
 
 export function PartyForm() {
-  const { tenant, catalog, storefront: sf } = useStore();
+  const { tenant, catalog, storefront: sf, source } = useStore();
   const party = sf.party;
   const product = catalog.products.find((p) => p.id === party.productId);
   // Tipos de caja configurados en Admin › Textos. Si aún no hay, se usan las opciones del producto de fiesta.
@@ -40,6 +41,8 @@ export function PartyForm() {
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sent, setSent] = useState<Sent | null>(null);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState(false);
   const today = useToday();
 
   const curBox = boxes[Math.min(box, boxes.length - 1)];
@@ -53,7 +56,7 @@ export function PartyForm() {
   };
   const quantity = otherQty.trim() || qty;
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const er: Record<string, string> = {};
     if (otherQty.trim() && !(Number(otherQty) >= 1)) er.qty = "Escribe una cantidad válida.";
@@ -66,17 +69,39 @@ export function PartyForm() {
       document.getElementById(`m-${Object.keys(er)[0]}`)?.focus();
       return;
     }
-    const n = Number(localStorage.getItem(`party:${tenant.slug}`) || "0") + 1;
-    localStorage.setItem(`party:${tenant.slug}`, String(n));
     const sizeLabel = sizes[size]?.label ?? "";
+    const qtyLabel = /^\d+$/.test(quantity) ? `${quantity} ${Number(quantity) === 1 ? "caja" : "cajas"}` : quantity;
+    let code: string;
+    if (source === "db") {
+      // Con la base: el pedido entra a Pedidos del admin para cotizarlo.
+      setSending(true);
+      setSendError(false);
+      try {
+        const n = await placePartyRequest(tenant.slug, {
+          customer: { name: name.trim(), phone: phone.trim(), email: email.trim() },
+          delivery: { district, date },
+          party: { box: curBox.name, qty: qtyLabel, size: sizeLabel, extras, idea: comments.trim(), refs: [] },
+        });
+        code = partyCode(n);
+      } catch {
+        setSendError(true);
+        setSending(false);
+        return;
+      }
+      setSending(false);
+    } else {
+      const n = Number(localStorage.getItem(`party:${tenant.slug}`) || "0") + 1;
+      localStorage.setItem(`party:${tenant.slug}`, String(n));
+      code = partyCode(n);
+    }
     setSent({
-      id: `F-${String(n).padStart(4, "0")}`,
+      id: code,
       name: name.trim().split(" ")[0],
       phone: phone.trim(),
       rows: [
         ["Caja", curBox.name],
-        ["Cantidad", /^\d+$/.test(quantity) ? `${quantity} ${Number(quantity) === 1 ? "caja" : "cajas"}` : quantity],
-        ["Squishies por caja", sizeLabel],
+        ["Cantidad", qtyLabel],
+        [party.sizeQuestion.replace(/[¿?]/g, ""), sizeLabel],
         [party.extrasLabel.replace(/[¿?]/g, ""), extras],
         ["Fecha del cumple", formatDate(date)],
         ["Entrega", district],
@@ -201,7 +226,8 @@ export function PartyForm() {
               <div className={fieldCls("email")}><label htmlFor="m-email">Correo <span className="muted" style={{ fontWeight: 500 }}>(opcional)</span></label><input id="m-email" className="input" type="email" placeholder="tucorreo@ejemplo.com" value={email} onChange={(e) => setEmail(e.target.value)} aria-invalid={!!errors.email || undefined} />{err("email")}</div>
             </div>
           </div>
-          <button className="btn block" type="submit">Pedir cotización</button>
+          {sendError && <div className="alert" role="alert"><IconAlert /><span className="small">No pudimos enviar tu pedido. Revisa tu conexión e inténtalo otra vez.</span></div>}
+          <button className="btn block" type="submit" disabled={sending}>{sending ? "Enviando…" : "Pedir cotización"}</button>
           <p className="small muted" style={{ textAlign: "center" }}>{party.footnote}</p>
         </form>
       </div>
