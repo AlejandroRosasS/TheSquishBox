@@ -60,6 +60,13 @@ export type IgPost = {
   caption?: string;
   variants?: string[];
   line?: string;
+  /** Solo con Instagram conectado (datos reales de ig_posts). */
+  mediaId?: string;
+  images?: string[];
+  /** Precio sugerido desde el caption por opción (mismo orden que variants); null = el caption no lo dice. */
+  prices?: (number | null)[];
+  permalink?: string;
+  deleted?: boolean;
 };
 
 export type Channel = { on: boolean; status: string; recipients: string[]; bot?: string; detail?: string; bad?: string };
@@ -86,9 +93,10 @@ export type AdminDemo = {
 /** Catálogo que edita el admin: el del tenant + costos internos y notas por línea. */
 /**
  * `igImages`: las fotos que trajo Instagram (se guardan aunque el equipo las reemplace).
+ * `igPostId`: id del post en Meta del que salió el producto (products.ig_post_id).
  * `photosSynced`: false cuando el equipo cambió las fotos a mano; la sincronización ya no las toca.
  */
-export type AdminProduct = Product & { stockMode?: "stock" | "none"; available?: boolean; lowAlert?: boolean; igSynced?: boolean; igImages?: string[]; photosSynced?: boolean };
+export type AdminProduct = Product & { stockMode?: "stock" | "none"; available?: boolean; lowAlert?: boolean; igSynced?: boolean; igImages?: string[]; photosSynced?: boolean; igPostId?: string };
 export type AdminCatalog = {
   lines: Line[];
   products: AdminProduct[];
