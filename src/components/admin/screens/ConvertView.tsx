@@ -18,13 +18,16 @@ export function ConvertView() {
   const { bundle, toast } = useAdmin();
   const { tenant } = bundle;
   const router = useRouter();
-  const { posts, st, setSt } = useIg();
+  const { posts, st, setSt, markConverted } = useIg();
   const { catalog, setCatalog } = useAdminCatalog();
   const selected = st.sel.map((id) => posts.find((p) => p.id === id)).filter((p) => p && p.kind !== "done") as typeof posts;
   const [items, setItems] = useState<Record<string, Item>>({});
   const get = (id: string): Item => {
     const p = posts.find((x) => x.id === id)!;
-    return items[id] ?? { name: p.name, line: p.line ?? catalog.lines[0]?.id ?? "", mode: "stock", vars: (p.variants?.length ? p.variants : ["Única"]).map((label) => ({ label, price: "", cost: "", qty: 0 })) };
+    // Línea sugerida solo si existe en el catálogo; precio solo si el caption lo dice (nunca se inventa).
+    const line = p.line && catalog.lines.some((l) => l.id === p.line) ? p.line : catalog.lines[0]?.id ?? "";
+    const vars = (p.variants?.length ? p.variants : ["Única"]).map((label, i) => ({ label, price: p.prices?.[i] != null ? String(p.prices[i]) : "", cost: "", qty: 0 }));
+    return items[id] ?? { name: p.name, line, mode: "stock", vars };
   };
   const set = (id: string, patch: Partial<Item>) => setItems((s) => ({ ...s, [id]: { ...get(id), ...patch } }));
   const setVar = (id: string, i: number, patch: Partial<Item["vars"][number]>) => set(id, { vars: get(id).vars.map((v, j) => (j === i ? { ...v, ...patch } : v)) });
@@ -43,10 +46,11 @@ export function ConvertView() {
       ids.add(id);
       const variants = it.vars.map((v, i) => ({ id: it.vars.length === 1 ? "unica" : String(i + 1), label: v.label, price: parseFloat(v.price) || 0, priceIsReference: false, stock: it.mode === "stock" ? v.qty : 99 }));
       costs[id] = Object.fromEntries(variants.map((v, i) => [v.id, parseFloat(it.vars[i].cost) || 0]));
-      newProducts.push({ id, name: it.name, line: it.line, status, kind: variants.length > 1 ? "options" : "simple", description: p.caption ?? "", variants, images: [p.img], stockMode: it.mode, available: true, lowAlert: true, igSynced: true });
+      const images = p.images?.length ? p.images : [p.img];
+      newProducts.push({ id, name: it.name, line: it.line, status, kind: variants.length > 1 ? "options" : "simple", description: p.caption ?? "", variants, images, igImages: images, photosSynced: true, stockMode: it.mode, available: true, lowAlert: true, igSynced: true, igPostId: p.mediaId });
     });
     setCatalog({ ...catalog, products: [...catalog.products, ...newProducts], costs });
-    setSt((s) => ({ ...s, converted: [...s.converted, ...selected.map((p) => p.id)], sel: [] }));
+    void markConverted(selected.map((p) => p.id));
     toast(status === "draft" ? "Guardados como borradores" : `${newProducts.length} ${newProducts.length === 1 ? "producto publicado" : "productos publicados"}`);
     router.push("/admin/productos");
   };
