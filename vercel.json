@@ -1,4 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "crons": [{ "path": "/api/instagram/cron?full=1", "schedule": "0 9 * * *" }]
 }

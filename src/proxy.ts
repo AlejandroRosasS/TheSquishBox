@@ -13,7 +13,8 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (COMING_SOON_HOSTS.test(host)) {
-    if (pathname === "/pronto") return NextResponse.next();
+    // /pronto y las rutas del servidor (cron de Instagram) siguen funcionando.
+    if (pathname === "/pronto" || pathname.startsWith("/api/")) return NextResponse.next();
     return NextResponse.rewrite(new URL("/pronto", request.url));
   }
 
