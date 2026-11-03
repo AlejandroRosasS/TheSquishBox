@@ -5,7 +5,8 @@ import { useMemo, useState } from "react";
 import { dataKey, usePersisted } from "@/lib/admin/storage";
 import { useAdmin, useAdminCatalog } from "../AdminContext";
 import { AdminPage, DemoNote, Switch } from "../AdminPage";
-import { AIChevron, AICard, AIBox, AIInstagram } from "../AdminIcons";
+import { AIChevron, AIBox, AIInstagram } from "../AdminIcons";
+import { CulqiSettings } from "../CulqiSettings";
 
 type Rate = { name: string; fee: string; cost: string; on: boolean };
 type Settings = { rates: Rate[]; pickup: { on: boolean; point: string; hours: string }; store: { name: string; ruc: string; whatsapp: string; email: string } };
@@ -90,8 +91,7 @@ export function SettingsView() {
         <section className="a-card" aria-labelledby="aj-con">
           <h2 className="a-h2" id="aj-con">Conexiones</h2>
           <div className="row g3"><span className="ch-ico"><AIInstagram /></span><div className="grow"><b>Instagram</b><p className="a-cap">@{tenant.instagram} · sincroniza cada 15 min</p></div><span className="st pagado">Conectado</span></div>
-          <div className="row g3"><span className="ch-ico"><AICard /></span><div className="grow"><b>Pasarela de pago</b><p className="a-cap">{tenant.payments.provider === "culqi" ? "Culqi" : tenant.payments.provider} · {tenant.payments.methods.join(" y ")}</p></div><span className="st prep">Modo prueba</span></div>
-          <div className="a-banner warn" style={{ fontSize: 13, padding: "10px 12px" }}><span>La pasarela está en modo prueba: no se cobra dinero real. Activa el modo producción antes de lanzar.</span></div>
+          <CulqiSettings />
           <div className="row g3"><span className="ch-ico"><AIBox /></span><div className="grow"><b>Líneas</b><p className="a-cap">{catalog.lines.length} líneas ({catalog.lines.map((l) => l.name).join(", ")}) · se ordenan desde Productos</p></div><Link className="a-btn sm" href="/admin/productos">Ordenar</Link></div>
         </section>
       </div>

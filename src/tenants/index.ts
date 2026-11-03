@@ -20,6 +20,8 @@ export type TenantBundle = {
   source?: "db" | "files";
   /** Encuadres y datos de las fotos de la marca (por src). */
   media?: MediaMap;
+  /** Llave pública de Culqi de la marca, si el cobro con tarjeta está activo (solo con Supabase). */
+  culqiKey?: string | null;
 };
 
 /**

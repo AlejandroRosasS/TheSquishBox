@@ -23,7 +23,7 @@ export async function placeOrder(slug: string, input: PlaceOrderInput) {
   const { data, error } = await publicClient().rpc("place_order", { tenant_slug: slug, p: input });
   if (error) throw new Error(error.message);
   const row = (Array.isArray(data) ? data[0] : data) as { order_id: string; order_number: number; order_total: number };
-  return { number: row.order_number, total: Number(row.order_total) };
+  return { id: row.order_id, number: row.order_number, total: Number(row.order_total) };
 }
 
 export type PlacePartyInput = {

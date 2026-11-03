@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useStore } from "@/components/StoreContext";
 import { useCart } from "@/components/cart/CartProvider";
 import { Rich } from "@/components/Rich";
@@ -12,6 +12,7 @@ import { formatPrice, plural } from "@/lib/format";
 import { saveOrder } from "@/lib/orders";
 import { orderCode, placeOrder } from "@/lib/db/orders";
 import { useToday } from "@/lib/useToday";
+import { authenticate3DS, chargeOrder, deviceFingerprint, openCulqiCheckout, preloadCulqi } from "@/lib/culqi/client";
 import { IconAlert, IconBag, IconChevronLeft, IconLock, IconPin, IconTruck } from "@/components/Icons";
 
 /* eslint-disable @next/next/no-img-element */
@@ -26,12 +27,16 @@ const digits = (s: string) => s.replace(/\D/g, "");
 const DEMO_FAIL_CODE = "000000";
 
 export function CheckoutView() {
-  const { tenant, storefront: sf, source } = useStore();
+  const { tenant, storefront: sf, source, culqiKey } = useStore();
   const cart = useCart();
   const router = useRouter();
   const cur = tenant.currency;
   const rates = sf.checkout.deliveryRates;
-  const methods = (["yape", "tarjeta"] as Pay[]).filter((m) => tenant.payments.methods.includes(m));
+  // Con la base, la tarjeta solo aparece si la marca activó su cuenta de Culqi en Admin › Ajustes.
+  const cardLive = source === "db" && !!culqiKey;
+  const methods = (["yape", "tarjeta"] as Pay[]).filter(
+    (m) => tenant.payments.methods.includes(m) && (m !== "tarjeta" || source !== "db" || cardLive),
+  );
 
   const [f, setF] = useState({
     name: "", phone: "", email: "",
@@ -46,9 +51,17 @@ export function CheckoutView() {
   const [pay, setPay] = useState<Pay>(methods[0] ?? "yape");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [payError, setPayError] = useState(false);
+  /** Mensaje del banco cuando la tarjeta no pasa (null = error de Yape de la demo). */
+  const [cardMsg, setCardMsg] = useState<string | null>(null);
+  /** Pedido ya creado que espera el pago con tarjeta: al reintentar se cobra el mismo, no se crea otro. */
+  const [pending, setPending] = useState<{ id: string; number: number; total: number } | null>(null);
   const [orderError, setOrderError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const today = useToday();
+
+  useEffect(() => {
+    if (cardLive && pay === "tarjeta") preloadCulqi();
+  }, [cardLive, pay]);
 
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setF((prev) => ({ ...prev, [k]: e.target.value }));
@@ -96,12 +109,117 @@ export function CheckoutView() {
     if (pay === "yape") {
       if (digits(f.yapePhone).length !== 9) e.yapePhone = "Escribe el celular de tu Yape.";
       if (digits(f.yapeCode).length !== 6) e.yapeCode = "El código tiene 6 dígitos.";
-    } else {
+    } else if (!cardLive) {
       if (digits(f.cardNumber).length < 15) e.cardNumber = "Revisa el número de tarjeta.";
       if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(f.cardExp.trim())) e.cardExp = "Usa el formato MM/AA.";
       if (!/^\d{3,4}$/.test(f.cardCvv.trim())) e.cardCvv = "3 o 4 dígitos.";
     }
     return e;
+  };
+
+  const customerInfo = () => ({ name: f.name.trim(), phone: f.phone.trim(), email: f.email.trim() });
+  const shippingInfo = () =>
+    isDelivery
+      ? { type: "delivery" as const, address: f.address.trim(), district: f.district, reference: f.reference.trim(), date: f.date, recipient: f.recipient.trim(), gift: f.gift.trim() }
+      : { type: "pickup" as const, date: f.pickupDate };
+  const docData = () => (doc === "boleta" ? { type: "boleta" as const, dni: digits(f.dni) } : { type: "factura" as const, ruc: digits(f.ruc), razon: f.razon.trim() });
+
+  const orderErrorText = (msg: string) =>
+    /stock|disponible/i.test(msg)
+      ? `${msg}. Revisa tu carrito: puede que alguien se haya llevado las últimas unidades.`
+      : "No pudimos registrar tu pedido. Revisa tu conexión e inténtalo otra vez. No se realizó ningún cobro.";
+
+  /** Copia local para la página de confirmación y vuelta a empezar. */
+  const finish = (id: string | undefined, finalTotal: number) => {
+    const shipping = shippingInfo();
+    const order = saveOrder(tenant.slug, {
+      customer: customerInfo(),
+      shipping,
+      doc: docData(),
+      payment: { method: pay },
+      lines: cart.lines.map((l) => ({
+        productId: l.productId,
+        name: l.product.name,
+        variantLabel: hasOptions(l.product) ? l.variant.label : "",
+        qty: l.qty,
+        price: l.variant.price,
+        image: variantImage(l.product, l.variant),
+      })),
+      subtotal: cart.subtotal,
+      deliveryFee: isDelivery ? rate : 0,
+      total: finalTotal,
+    }, id);
+    router.push(`/pedido/${order.id}`);
+    cart.clear();
+  };
+
+  const showCardError = (msg: string) => {
+    setPayError(true);
+    setCardMsg(msg);
+    setSending(false);
+    document.getElementById("co-4")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  /** Tarjeta con Culqi: 1) el pedido se crea en la base (precio y stock los calcula la base), 2) Culqi tokeniza la tarjeta, 3) el servidor cobra. */
+  const payWithCard = async () => {
+    let order = pending;
+    if (!order) {
+      const items = cart.lines.map((l) => ({ variant_id: l.variant.dbId ?? "", qty: l.qty }));
+      const shipping = shippingInfo();
+      try {
+        if (items.some((i) => !i.variant_id)) throw new Error("Producto no disponible");
+        order = await placeOrder(tenant.slug, {
+          items,
+          customer: { ...customerInfo(), doc: docData() },
+          delivery: shipping.type === "delivery"
+            ? { mode: "delivery", address: shipping.address, district: shipping.district, reference: shipping.reference, date: shipping.date, recipient: shipping.recipient }
+            : { mode: "pickup", date: shipping.date },
+          payment_method: "tarjeta",
+          gift_message: shipping.type === "delivery" ? shipping.gift : "",
+        });
+        setPending(order);
+      } catch (e) {
+        setOrderError(orderErrorText(e instanceof Error ? e.message : ""));
+        setSending(false);
+        return;
+      }
+    }
+    const amountCents = Math.round(order.total * 100);
+    const [firstName, ...rest] = f.name.trim().split(/\s+/);
+    let token: string;
+    try {
+      // Si el cliente cierra la ventana de Culqi no llega respuesta: el botón vuelve a quedar activo.
+      setSending(false);
+      token = await openCulqiCheckout({
+        publicKey: culqiKey as string,
+        title: tenant.name,
+        amountCents,
+        email: f.email.trim(),
+        firstName: firstName ?? "",
+        lastName: rest.join(" "),
+        color: cssToken("--primary"),
+        textColor: cssToken("--on-primary"),
+      });
+    } catch (e) {
+      showCardError(e instanceof Error ? e.message : "No pudimos validar tu tarjeta.");
+      return;
+    }
+    setSending(true);
+    try {
+      const deviceId = await deviceFingerprint(culqiKey as string);
+      let res = await chargeOrder(order.id, token, deviceId);
+      if (!res.ok && res.review) {
+        const auth = await authenticate3DS({ publicKey: culqiKey as string, tokenId: token, amountCents, email: f.email.trim() });
+        res = await chargeOrder(order.id, token, deviceId, auth);
+      }
+      if (!res.ok) {
+        showCardError(res.message || "Tu banco no aprobó el pago.");
+        return;
+      }
+      finish(orderCode(res.number), order.total);
+    } catch (e) {
+      showCardError(e instanceof Error ? e.message : "No pudimos procesar tu pago.");
+    }
   };
 
   const submit = (ev: React.FormEvent) => {
@@ -115,30 +233,31 @@ export function CheckoutView() {
     }
     setSending(true);
     setOrderError(null);
-    // Pago simulado (Fase 1). En Fase 3 aquí se llama a Culqi.
+    if (cardLive && pay === "tarjeta") {
+      void payWithCard();
+      return;
+    }
+    // Pago simulado (demo y Yape). La tarjeta con la base va por Culqi (payWithCard).
     setTimeout(async () => {
       if (pay === "yape" && digits(f.yapeCode) === DEMO_FAIL_CODE) {
         setPayError(true);
+        setCardMsg(null);
         setErrors({ yapeCode: "Código vencido o incorrecto." });
         setSending(false);
         document.getElementById("co-4")?.scrollIntoView({ behavior: "smooth", block: "start" });
         return;
       }
-      const customer = { name: f.name.trim(), phone: f.phone.trim(), email: f.email.trim() };
-      const shipping = isDelivery
-        ? { type: "delivery" as const, address: f.address.trim(), district: f.district, reference: f.reference.trim(), date: f.date, recipient: f.recipient.trim(), gift: f.gift.trim() }
-        : { type: "pickup" as const, date: f.pickupDate };
-      const docInfo = doc === "boleta" ? { type: "boleta" as const, dni: digits(f.dni) } : { type: "factura" as const, ruc: digits(f.ruc), razon: f.razon.trim() };
       let id: string | undefined;
       let finalTotal = total;
       // Con la base: el pedido se guarda allá (precio, stock y delivery los calcula la base).
       if (source === "db") {
         const items = cart.lines.map((l) => ({ variant_id: l.variant.dbId ?? "", qty: l.qty }));
+        const shipping = shippingInfo();
         try {
           if (items.some((i) => !i.variant_id)) throw new Error("Producto no disponible");
           const res = await placeOrder(tenant.slug, {
             items,
-            customer: { ...customer, doc: docInfo },
+            customer: { ...customerInfo(), doc: docData() },
             delivery: shipping.type === "delivery"
               ? { mode: "delivery", address: shipping.address, district: shipping.district, reference: shipping.reference, date: shipping.date, recipient: shipping.recipient }
               : { mode: "pickup", date: shipping.date },
@@ -148,35 +267,12 @@ export function CheckoutView() {
           id = orderCode(res.number);
           finalTotal = res.total;
         } catch (e) {
-          const msg = e instanceof Error ? e.message : "";
-          setOrderError(
-            /stock|disponible/i.test(msg)
-              ? `${msg}. Revisa tu carrito: puede que alguien se haya llevado las últimas unidades.`
-              : "No pudimos registrar tu pedido. Revisa tu conexión e inténtalo otra vez. No se realizó ningún cobro.",
-          );
+          setOrderError(orderErrorText(e instanceof Error ? e.message : ""));
           setSending(false);
           return;
         }
       }
-      const order = saveOrder(tenant.slug, {
-        customer,
-        shipping,
-        doc: docInfo,
-        payment: { method: pay },
-        lines: cart.lines.map((l) => ({
-          productId: l.productId,
-          name: l.product.name,
-          variantLabel: hasOptions(l.product) ? l.variant.label : "",
-          qty: l.qty,
-          price: l.variant.price,
-          image: variantImage(l.product, l.variant),
-        })),
-        subtotal: cart.subtotal,
-        deliveryFee: isDelivery ? rate : 0,
-        total: finalTotal,
-      }, id);
-      router.push(`/pedido/${order.id}`);
-      cart.clear();
+      finish(id, finalTotal);
     }, 700);
   };
 
@@ -267,8 +363,17 @@ export function CheckoutView() {
                 <div className="alert" role="alert">
                   <IconAlert />
                   <div className="stack g1">
-                    <b>No pudimos procesar tu pago con Yape</b>
-                    <span className="small">El código de aprobación venció o es incorrecto. <b>No se realizó ningún cobro.</b> Genera un código nuevo en tu app Yape e inténtalo otra vez{methods.includes("tarjeta") ? ", o paga con tarjeta" : ""}.</span>
+                    {cardMsg === null ? (
+                      <>
+                        <b>No pudimos procesar tu pago con Yape</b>
+                        <span className="small">El código de aprobación venció o es incorrecto. <b>No se realizó ningún cobro.</b> Genera un código nuevo en tu app Yape e inténtalo otra vez{methods.includes("tarjeta") ? ", o paga con tarjeta" : ""}.</span>
+                      </>
+                    ) : (
+                      <>
+                        <b>No pudimos procesar tu pago con tarjeta</b>
+                        <span className="small">{cardMsg} <b>No se realizó ningún cobro.</b> Revisa los datos e inténtalo otra vez{methods.includes("yape") ? ", usa otra tarjeta o paga con Yape" : " o usa otra tarjeta"}.</span>
+                      </>
+                    )}
                   </div>
                 </div>
               )}
@@ -291,7 +396,10 @@ export function CheckoutView() {
                     <button className={`opt ${pay === "tarjeta" ? "on" : ""}`} type="button" role="radio" aria-checked={pay === "tarjeta"} onClick={() => setPay("tarjeta")}>
                       <span className="radio" /><span className="grow"><b>Tarjeta de crédito o débito</b><br /><span className="small muted">Visa, Mastercard, Amex, Diners</span></span><span className="pay-logos"><span className="pay-logo">VISA</span><span className="pay-logo">MC</span></span>
                     </button>
-                    {pay === "tarjeta" && (
+                    {pay === "tarjeta" && cardLive && (
+                      <div className="note"><IconLock size="sm" /><span>Al pagar se abre la ventana segura de Culqi para que escribas los datos de tu tarjeta.</span></div>
+                    )}
+                    {pay === "tarjeta" && !cardLive && (
                       <div className="stack g3" style={{ padding: "4px 0 8px" }}>
                         <div className={fieldCls("cardNumber")}><label htmlFor="c-cardNumber">Número de tarjeta</label><input className="input" inputMode="numeric" autoComplete="cc-number" placeholder="0000 0000 0000 0000" value={f.cardNumber} onChange={set("cardNumber")} {...aria("cardNumber")} />{err("cardNumber")}</div>
                         <div className="grid2" style={{ gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
@@ -304,7 +412,13 @@ export function CheckoutView() {
                 )}
               </div>
               <p className="small muted">Procesado por Culqi. No guardamos los datos de tu tarjeta.</p>
-              <p className="demo-note">Demo: el pago es simulado y no se cobra nada. Con el código de Yape {DEMO_FAIL_CODE} puedes ver el error de pago.</p>
+              {cardLive && pay === "tarjeta" ? (
+                culqiKey?.startsWith("pk_test_") && (
+                  <p className="demo-note">Modo prueba de Culqi: no se cobra dinero real. Usa la tarjeta 4111 1111 1111 1111, vence 09/30, CVV 123.</p>
+                )
+              ) : (
+                <p className="demo-note">Demo: el pago es simulado y no se cobra nada. Con el código de Yape {DEMO_FAIL_CODE} puedes ver el error de pago.</p>
+              )}
             </section>
           </div>
 
@@ -338,6 +452,13 @@ export function CheckoutView() {
       </form>
     </>
   );
+}
+
+/** Color de la marca (token CSS de la tienda) para pintar la ventana de Culqi. */
+function cssToken(name: string): string | undefined {
+  const el = document.querySelector(".store") ?? document.documentElement;
+  const v = getComputedStyle(el).getPropertyValue(name).trim();
+  return /^#[0-9a-f]{3,8}$/i.test(v) ? v : undefined;
 }
 
 function CheckoutHeader() {

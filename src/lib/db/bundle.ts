@@ -11,6 +11,7 @@ export type DbBundle = {
   seo: Seo;
   appearance: { key: string | null; tokens: Tokens } | null;
   media: MediaMap;
+  culqiKey: string | null;
 };
 
 type ProductRow = {
@@ -29,7 +30,7 @@ export async function loadBundleFromDb(slug: string): Promise<DbBundle | null> {
   if (error) throw new Error(`Supabase: ${error.message}`);
   if (!t) return null;
 
-  const [docs, lines, products, media] = await Promise.all([
+  const [docs, lines, products, media, culqi] = await Promise.all([
     db.from("site_docs").select("kind, body").eq("tenant_id", t.id).eq("stage", "published"),
     db.from("product_lines").select("id, name, position").eq("tenant_id", t.id).order("position"),
     db.from("products")
@@ -38,6 +39,8 @@ export async function loadBundleFromDb(slug: string): Promise<DbBundle | null> {
       .neq("status", "draft")
       .order("position"),
     db.from("media").select("src, origin, width, height, alt, frames").eq("tenant_id", t.id),
+    // Si la migración de pagos aún no está aplicada, la tienda sigue sin tarjeta (no se rompe).
+    db.rpc("culqi_public_key", { tenant_slug: slug }),
   ]);
   for (const r of [docs, lines, products, media]) if (r.error) throw new Error(`Supabase: ${r.error.message}`);
 
@@ -81,6 +84,7 @@ export async function loadBundleFromDb(slug: string): Promise<DbBundle | null> {
     storefront: doc.storefront as Storefront,
     seo: doc.seo as Seo,
     appearance: (doc.appearance as DbBundle["appearance"]) ?? null,
+    culqiKey: !culqi.error && typeof culqi.data === "string" && culqi.data ? culqi.data : null,
     media: Object.fromEntries((media.data ?? []).map((m) => [m.src, { src: m.src, origin: m.origin, width: m.width ?? undefined, height: m.height ?? undefined, alt: m.alt, frames: m.frames ?? {} }])) as MediaMap,
   };
 }
