@@ -57,6 +57,8 @@ export function CheckoutView() {
   const [pending, setPending] = useState<{ id: string; number: number; total: number } | null>(null);
   const [orderError, setOrderError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
+  /** Compra terminada: mientras navega a la confirmación no se muestra «carrito vacío». */
+  const [done, setDone] = useState(false);
   const today = useToday();
 
   useEffect(() => {
@@ -67,6 +69,8 @@ export function CheckoutView() {
     setF((prev) => ({ ...prev, [k]: e.target.value }));
 
   if (!cart.ready) return <div style={{ minHeight: "60vh" }} />;
+
+  if (done) return <div style={{ minHeight: "60vh" }} aria-busy="true" />;
 
   if (cart.lines.length === 0) {
     return (
@@ -149,6 +153,7 @@ export function CheckoutView() {
       deliveryFee: isDelivery ? rate : 0,
       total: finalTotal,
     }, id);
+    setDone(true);
     router.push(`/pedido/${order.id}`);
     cart.clear();
   };
