@@ -22,6 +22,9 @@ export const TEXT_SECTIONS: TextSection[] = [
   { id: "models", title: "Modelos", where: "Inicio", onHome: true, keys: ["models"] },
   { id: "tips", title: "Tips", where: "Inicio", onHome: true, keys: ["tips"] },
   { id: "footer", title: "Pie de página", where: "Todas las páginas", onHome: true, keys: ["footer"] },
+  { id: "business", title: "Empresa y contacto", where: "Pie de página, Contacto (/contacto), páginas legales y Libro de reclamaciones", onHome: true, keys: ["business", "contact"] },
+  { id: "legalPages", title: "Términos y políticas", where: "Términos, Cambios y devoluciones, Entregas y Privacidad", onHome: false, keys: ["legalPages"] },
+  { id: "complaints", title: "Libro de reclamaciones", where: "Libro de reclamaciones (/libro-de-reclamaciones)", onHome: false, keys: ["complaints"] },
   { id: "catalog", title: "Catálogo", where: "Tienda (/tienda)", onHome: false, keys: ["catalog"] },
   { id: "product", title: "Página de producto", where: "Cada producto", onHome: false, keys: ["product"] },
   { id: "cart", title: "Carrito", where: "Carrito", onHome: false, keys: ["cart"] },
@@ -32,7 +35,7 @@ export const TEXT_SECTIONS: TextSection[] = [
 ];
 
 /** Claves que no son texto (o se editan en otra pantalla): no se muestran en Textos. */
-export const HIDDEN_KEYS = new Set(["_note", "brand", "deliveryRates", "deliveryRatesAreExample", "defaultDistrict", "productId", "max"]);
+export const HIDDEN_KEYS = new Set(["_note", "legal", "legalLinks", "brand", "deliveryRates", "deliveryRatesAreExample", "defaultDistrict", "productId", "max"]);
 
 /** Claves que guardan ids de productos: se editan con casillas. */
 export const PRODUCT_LIST_KEYS = new Set(["productIds", "popularIds"]);
@@ -71,8 +74,21 @@ const LABELS: Record<string, string> = {
   about: "Sobre la marca",
   shop: "Columna «Tienda»",
   help: "Columna «Ayuda»",
-  legal: "Texto legal",
-  legalLinks: "Links legales",
+  business: "Datos de la empresa",
+  legalName: "Razón social",
+  ruc: "RUC",
+  address: "Dirección (la del RUC)",
+  email: "Correo de atención",
+  phone: "Teléfono / WhatsApp",
+  hours: "Horario de atención",
+  contact: "Página de contacto",
+  legalPages: "Páginas legales",
+  terms: "Términos y condiciones",
+  returns: "Cambios y devoluciones",
+  shipping: "Entregas",
+  privacy: "Privacidad",
+  sections: "Secciones",
+  complaints: "Libro de reclamaciones",
   catalog: "Catálogo",
   allLabel: "Filtro «todas»",
   priceRanges: "Rangos de precio",
@@ -124,7 +140,7 @@ const LABELS: Record<string, string> = {
 };
 
 /** Nombre de cada elemento de una lista (si no está, se usa el de la lista). */
-const ITEM_LABELS: Record<string, string> = { boxes: "Caja", sizes: "Opción" };
+const ITEM_LABELS: Record<string, string> = { boxes: "Caja", sizes: "Opción", sections: "Sección" };
 export const itemLabelFor = (key: string) => ITEM_LABELS[key] ?? labelFor(key);
 
 export function labelFor(key: string): string {

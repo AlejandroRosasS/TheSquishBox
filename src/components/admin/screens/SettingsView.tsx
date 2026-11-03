@@ -7,21 +7,25 @@ import { useAdmin, useAdminCatalog } from "../AdminContext";
 import { AdminPage, DemoNote, Switch } from "../AdminPage";
 import { AIChevron, AIBox, AIInstagram } from "../AdminIcons";
 import { CulqiSettings } from "../CulqiSettings";
+import { useTextsDraft } from "./useTextsDraft";
+import { businessOf, isPlaceholder } from "@/lib/legal";
 
 type Rate = { name: string; fee: string; cost: string; on: boolean };
-type Settings = { rates: Rate[]; pickup: { on: boolean; point: string; hours: string }; store: { name: string; ruc: string; whatsapp: string; email: string } };
+type Settings = { rates: Rate[]; pickup: { on: boolean; point: string; hours: string } };
 
 export function SettingsView() {
-  const { bundle, demo, toast } = useAdmin();
+  const { bundle, demo } = useAdmin();
   const { tenant, storefront } = bundle;
   const { catalog } = useAdminCatalog();
+  // Lo publicado (o el borrador) de Textos, para mostrar los datos de la empresa al día.
+  const { bundle: live } = useTextsDraft();
+  const biz = businessOf(tenant, live.storefront);
   const initial: Settings = useMemo(
     () => ({
       rates: Object.entries(storefront.checkout.deliveryRates).map(([name, fee]) => ({ name, fee: fee === null ? "" : String(fee), cost: demo.deliveryCosts[name] !== undefined ? String(demo.deliveryCosts[name]) : "", on: fee !== null })),
       pickup: { on: true, point: "", hours: "" },
-      store: { name: tenant.name, ruc: "", whatsapp: /x/i.test(tenant.whatsapp) ? "" : tenant.whatsapp, email: "" },
     }),
-    [storefront, demo, tenant],
+    [storefront, demo],
   );
   const [s, setS] = usePersisted<Settings>(dataKey(tenant.slug, "settings"), initial);
   const [newD, setNewD] = useState<string | null>(null);
@@ -32,6 +36,7 @@ export function SettingsView() {
     { href: "/admin/textos", label: "Textos de la tienda" },
     { href: "/admin/seo", label: "SEO y redes" },
     { href: "/admin/notificaciones", label: "Notificaciones" },
+    { href: "/admin/reclamaciones", label: "Libro de reclamaciones" },
     { href: "/admin/ventas", label: "Ventas y márgenes" },
   ];
 
@@ -79,14 +84,12 @@ export function SettingsView() {
 
       <div className="a-cols even">
         <section className="a-card" aria-labelledby="aj-store">
-          <h2 className="a-h2" id="aj-store">Datos de la tienda</h2>
-          <div className="a-field"><label htmlFor="s-n">Nombre</label><input id="s-n" className="a-input" value={s.store.name} onChange={(e) => setS((x) => ({ ...x, store: { ...x.store, name: e.target.value } }))} /></div>
-          <div className="a-grid2">
-            <div className="a-field"><label htmlFor="s-ruc">RUC</label><input id="s-ruc" className="a-input" inputMode="numeric" placeholder="[RUC]" value={s.store.ruc} onChange={(e) => setS((x) => ({ ...x, store: { ...x.store, ruc: e.target.value } }))} /></div>
-            <div className="a-field"><label htmlFor="s-wa">WhatsApp de atención</label><input id="s-wa" className="a-input" inputMode="tel" placeholder={tenant.whatsapp} value={s.store.whatsapp} onChange={(e) => setS((x) => ({ ...x, store: { ...x.store, whatsapp: e.target.value } }))} /></div>
-          </div>
-          <div className="a-field"><label htmlFor="s-mail">Correo</label><input id="s-mail" className="a-input" type="email" placeholder={`hola@${tenant.domain}`} value={s.store.email} onChange={(e) => setS((x) => ({ ...x, store: { ...x.store, email: e.target.value } }))} /></div>
-          <button className="a-btn primary" type="button" style={{ alignSelf: "flex-start" }} onClick={() => toast("Ajustes guardados")}>Guardar</button>
+          <h2 className="a-h2" id="aj-store">Datos de la empresa</h2>
+          <p className="a-cap">Se muestran en el pie de la tienda, Contacto, Términos y el Libro de reclamaciones (lo que pide Culqi e INDECOPI).</p>
+          {([["Razón social", biz.legalName], ["RUC", biz.ruc], ["Dirección", biz.address], ["Correo", biz.email], ["WhatsApp", biz.phone]] as const).map(([k, v]) => (
+            <div key={k} className="row between g3"><span className="a-cap">{k}</span>{isPlaceholder(v) ? <span className="st pend">Falta</span> : <b style={{ textAlign: "right", overflowWrap: "anywhere" }}>{v}</b>}</div>
+          ))}
+          <Link className="a-btn" href="/admin/textos" style={{ alignSelf: "flex-start" }}>Editar en Textos › Empresa y contacto</Link>
         </section>
         <section className="a-card" aria-labelledby="aj-con">
           <h2 className="a-h2" id="aj-con">Conexiones</h2>

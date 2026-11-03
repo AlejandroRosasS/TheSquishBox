@@ -6,7 +6,7 @@ import { Suspense, type ReactNode } from "react";
 import { Logo } from "@/components/Logo";
 import { useAdmin, useAdminCatalog, useOrders, useParty } from "./AdminContext";
 import { AuthGate, SignOutButton } from "./AuthGate";
-import { AIBell, AIBox, AIChart, AIGlobe, AIHome, AIInstagram, AIMore, AIOrders, AIPalette, AISettings, AIText, AIImage } from "./AdminIcons";
+import { AIBell, AIBox, AIChart, AIGlobe, AIHome, AIInstagram, AIMore, AIOrders, AIPalette, AISettings, AIText, AIImage, AIBook } from "./AdminIcons";
 import { isSoldOut, totalStock, LOW_STOCK } from "@/lib/catalog";
 
 type Item = { href: string; label: string; icon: ReactNode; count?: number; exact?: boolean };
@@ -63,6 +63,7 @@ function ShellInner({ children, path }: { children: ReactNode; path: string }) {
   ];
   const config: Item[] = [
     { href: "/admin/notificaciones", label: "Notificaciones", icon: <AIBell /> },
+    { href: "/admin/reclamaciones", label: "Reclamaciones", icon: <AIBook /> },
     { href: "/admin/ajustes", label: "Ajustes", icon: <AISettings /> },
   ];
   const tabs: Item[] = [main[0], main[1], main.find((i) => i.href === "/admin/productos")!, main.find((i) => i.href === "/admin/instagram")!];
