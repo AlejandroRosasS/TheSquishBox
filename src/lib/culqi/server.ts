@@ -19,6 +19,8 @@ export type CulqiCharge = {
   email?: string;
   paid?: boolean;
   outcome?: { type?: string; code?: string; user_message?: string; merchant_message?: string };
+  response_code?: string;
+  state?: string;
   metadata?: Record<string, string>;
   source?: { card_number?: string; last_four?: string; iin?: { card_brand?: string } };
 };
@@ -88,7 +90,7 @@ export async function createCharge(acct: CulqiAccount, input: ChargeInput): Prom
   if (input.authentication3DS) body.authentication_3DS = input.authentication3DS;
 
   const r = await call<CulqiCharge & CulqiError>(acct.secretKey, "/charges", body);
-  if (r.ok && r.json.object === "charge" && (r.json.paid ?? r.json.outcome?.type === "venta_exitosa")) {
+  if (r.ok && r.json.object === "charge" && chargeSucceeded(r.json)) {
     return { kind: "paid", charge: r.json };
   }
   // Culqi pide 3DS con una respuesta 2xx que no es un cargo (action_code "REVIEW").
@@ -98,6 +100,20 @@ export async function createCharge(acct: CulqiAccount, input: ChargeInput): Prom
     code: r.json.decline_code || r.json.code || r.json.outcome?.code || String(r.status),
     message: r.json.user_message || r.json.outcome?.user_message || "Tu banco no aprobó el pago.",
   };
+}
+
+/**
+ * ¿El cobro fue aprobado? Culqi responde `paid: false` en cargos recién autorizados (se liquidan después),
+ * así que se mira el resultado de la autorización: venta_exitosa / AUT0000.
+ */
+export function chargeSucceeded(c: CulqiCharge): boolean {
+  return (
+    c.paid === true ||
+    c.outcome?.type === "venta_exitosa" ||
+    c.outcome?.code === "AUT0000" ||
+    c.response_code === "venta_exitosa" ||
+    /^exitosa$/i.test(c.state ?? "")
+  );
 }
 
 export async function getCharge(acct: CulqiAccount, id: string): Promise<CulqiCharge | null> {
@@ -128,7 +144,9 @@ export async function markPaid(db: SupabaseClient, acct: CulqiAccount, orderId: 
     .maybeSingle();
   if (!o) return false;
   if (o.payment_status === "paid") return o.payment_ref === charge.id;
-  if (charge.amount !== toCents(o.total) || charge.metadata?.order_id !== orderId) return false;
+  // El monto debe coincidir; el pedido, si Culqi lo devuelve en metadata.
+  if (Number(charge.amount) !== toCents(o.total)) return false;
+  if (charge.metadata?.order_id && charge.metadata.order_id !== orderId) return false;
   const { data: upd, error } = await db
     .from("orders")
     .update({ payment_status: "paid", payment_method: "tarjeta", payment_ref: charge.id })
