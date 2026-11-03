@@ -98,62 +98,6 @@
     "phone": "+51 984 775 300",
     "hours": "Lunes a viernes, 9 a. m. a 5 p. m."
   },
-  "contact": {
-    "eyebrow": "Contacto",
-    "title": "¿Tienes una *pregunta*?",
-    "lead": "Escríbenos por WhatsApp, Instagram o correo. Te respondemos en nuestro horario de atención."
-  },
-  "legalPages": {
-    "terms": {
-      "title": "Términos y condiciones",
-      "lead": "Estas son las reglas para comprar en la tienda online de {name}. Al hacer un pedido, aceptas estos términos.",
-      "sections": [
-        { "title": "Quiénes somos", "text": "Esta tienda es operada por **{legalName}**, con RUC {ruc} y domicilio en {address}. Puedes escribirnos a {email} o por WhatsApp al {phone}." },
-        { "title": "Productos", "text": "Vendemos squishies sorpresa: cajas, sobres y mini box. En los productos sorpresa (mystery) el modelo que recibes es al azar: las fotos muestran ejemplos de los modelos que te pueden tocar, no un modelo garantizado." },
-        { "title": "Precios y pagos", "text": "Los precios están en soles (S/). El delivery se calcula según tu distrito y se muestra antes de pagar. Puedes pagar con tarjeta de crédito o débito (procesado de forma segura por Culqi; no guardamos los datos de tu tarjeta) o con Yape. Los pedidos pagados con Yape se confirman cuando verificamos el pago." },
-        { "title": "Pedidos y stock", "text": "Tu pedido queda confirmado cuando el pago es aprobado. Si un producto se agota después de tu compra, te avisamos por WhatsApp y te ofrecemos otro producto o la devolución del 100 % de tu dinero." },
-        { "title": "Entregas", "text": "Hacemos delivery en Lima Metropolitana y coordinamos fecha y hora contigo por WhatsApp. Más detalles en [Entregas](/entregas)." },
-        { "title": "Cambios y devoluciones", "text": "Revisa nuestra [Política de cambios y devoluciones](/cambios-y-devoluciones)." },
-        { "title": "Comprobantes", "text": "Emitimos boleta o factura electrónica según lo que elijas al comprar." },
-        { "title": "Libro de reclamaciones", "text": "Conforme al Código de Protección y Defensa del Consumidor, contamos con un [Libro de reclamaciones virtual](/libro-de-reclamaciones)." },
-        { "title": "Cambios a estos términos", "text": "Podemos actualizar estos términos. Siempre aplican los que estaban publicados el día de tu compra." }
-      ]
-    },
-    "returns": {
-      "title": "Cambios y devoluciones",
-      "lead": "Queremos que disfrutes tus sorpresas. Si algo salió mal con tu pedido, lo solucionamos.",
-      "sections": [
-        { "title": "Producto con fallas o equivocado", "text": "Si tu producto llegó dañado, con fallas de fábrica o no es el que compraste, escríbenos por WhatsApp al {phone} o a {email} dentro de los **7 días calendario** desde que lo recibiste, con fotos del producto y tu número de pedido. Te lo cambiamos por uno igual o, si no hay stock, te devolvemos tu dinero." },
-        { "title": "Productos sorpresa", "text": "Como el modelo de cada squishy es al azar, no aceptamos cambios por modelo repetido o porque no te gustó el modelo que te tocó. ¡Para eso están los intercambios con tus amigos!" },
-        { "title": "Condiciones", "text": "Para un cambio por falla, el producto debe estar con su empaque y sin daños causados por mal uso." },
-        { "title": "Devolución del dinero", "text": "Si corresponde una devolución, la hacemos por el mismo medio de pago: en tarjeta, el banco puede tardar entre 7 y 15 días hábiles en mostrarla; en Yape, te la enviamos al mismo número." },
-        { "title": "Costo del envío", "text": "Si el cambio es por falla o error nuestro, nosotros cubrimos el envío." }
-      ]
-    },
-    "shipping": {
-      "title": "Entregas",
-      "lead": "Así llevamos tus sorpresas hasta tu casa.",
-      "sections": [
-        { "title": "Dónde entregamos", "text": "Hacemos delivery en Lima Metropolitana. El costo depende de tu distrito y lo ves en el checkout antes de pagar. Si tu distrito dice «A coordinar», te escribimos con el precio." },
-        { "title": "Cuándo llega", "text": "Después de tu compra te escribimos por WhatsApp para acordar el día y la hora de entrega. La fecha que eliges al comprar es tentativa hasta que la confirmamos contigo." },
-        { "title": "Recojo", "text": "También puedes recoger tu pedido gratis en un punto de entrega que coordinamos por WhatsApp." }
-      ]
-    },
-    "privacy": {
-      "title": "Privacidad",
-      "lead": "Cómo usamos tus datos personales, conforme a la Ley N.º 29733, Ley de Protección de Datos Personales.",
-      "sections": [
-        { "title": "Qué datos pedimos", "text": "Tu nombre, celular, correo, dirección de entrega y DNI o RUC para el comprobante. Los datos de tu tarjeta los procesa Culqi: nosotros no los vemos ni los guardamos." },
-        { "title": "Para qué los usamos", "text": "Para procesar y entregar tu pedido, emitir tu comprobante, coordinar contigo por WhatsApp y atender tus consultas o reclamos. No vendemos ni compartimos tus datos con terceros, salvo con quienes nos ayudan a cumplir tu pedido (pagos y delivery)." },
-        { "title": "Tus derechos", "text": "Puedes pedirnos acceder, corregir o eliminar tus datos escribiendo a {email}." },
-        { "title": "Responsable", "text": "{legalName}, RUC {ruc}, {address}." }
-      ]
-    }
-  },
-  "complaints": {
-    "title": "Libro de reclamaciones",
-    "lead": "Conforme a lo establecido en el Código de Protección y Defensa del Consumidor, contamos con un Libro de reclamaciones virtual a tu disposición. Completa la hoja: al enviarla verás tu constancia con su número para guardarla o imprimirla."
-  },
   "catalog": {
     "title": "Todas las *sorpresas*",
     "lead": "Cajas, sobres y mini box con squishies sorpresa. Cada uno viene escondido en su sobre. ¿Cuál te tocará?",
