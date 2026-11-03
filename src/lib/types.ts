@@ -33,7 +33,12 @@ export type Tenant = {
   palettes: Record<string, PaletteTokens>;
   highlights: string[];
   customOrder: { enabled: boolean; label: string; description: string; adminLabel?: string; adminShort?: string };
-  payments: { provider: string; methods: string[] };
+  payments: {
+    provider: string;
+    methods: string[];
+    /** Yape manual: el cliente yapea a este número (o QR) y manda la captura por WhatsApp. */
+    yape?: { phone: string; holder?: string; qr?: string };
+  };
   fulfillment: { delivery: string; pickup: string };
   salesChannels: string[];
   notes?: string;
