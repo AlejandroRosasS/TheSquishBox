@@ -467,3 +467,51 @@ body.no-scroll { overflow: hidden; }
 }
 @media (prefers-reduced-motion: reduce) { .soon-photos img, .soon-logo { animation: none; } }
 .store:has(.soon) .palette-demo { display: none; }
+
+/* ─────────── Páginas legales, contacto y libro de reclamaciones ─────────── */
+.footer .legal-links { display: flex; gap: 6px 16px; flex-wrap: wrap; }
+.footer .legal-links a, .footer .book-link { min-height: 44px; display: inline-flex; align-items: center; }
+.footer .legal-links a:hover, .footer .book-link:hover span { text-decoration: underline; text-underline-offset: 3px; }
+.footer .book-link { gap: 10px; margin-top: 8px; padding: 0 16px; border: 1px solid color-mix(in oklab, var(--on-primary) 35%, transparent); border-radius: var(--r-pill); font-size: 13px; font-weight: 700; }
+.footer a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+
+.legal-page { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 64px; padding-block: 48px 96px; align-items: start; }
+.legal-page article { max-width: 720px; }
+.legal-page section { scroll-margin-top: 96px; }
+.legal-aside { position: sticky; top: 96px; padding: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); }
+.legal-aside .link { min-height: 32px; display: inline-flex; align-items: center; }
+.prose { font-size: 16px; line-height: 1.7; margin: 0; color: var(--text); }
+@container page (max-width: 980px) { .legal-page { grid-template-columns: minmax(0, 1fr); gap: 40px; } .legal-aside { position: static; } }
+
+.contact-card { background: var(--surface); border: 1px solid var(--border); border-radius: 26px; padding: clamp(20px, 4vw, 32px); }
+.contact-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 18px; }
+.contact-list li { display: flex; gap: 14px; align-items: flex-start; }
+.contact-list li > .ico { color: var(--primary); margin-top: 2px; flex: none; }
+.contact-list li div { display: flex; flex-direction: column; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
+
+.hoja-prov { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 20px; padding: 16px 20px; background: var(--surface-2, var(--surface)); border: 1px solid var(--border); border-radius: var(--r-md); }
+.hoja-prov div { display: flex; flex-direction: column; gap: 2px; overflow-wrap: anywhere; }
+@container page (max-width: 760px) { .hoja-prov { grid-template-columns: minmax(0, 1fr); } }
+.lr-form { background: var(--surface); border: 1px solid var(--border); border-radius: 26px; padding: clamp(20px, 4vw, 32px); }
+.lr-form .tap { min-height: 44px; cursor: pointer; }
+.lr-form input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); flex: none; }
+.lr-form .seg-opt .p { white-space: normal; }
+.ok-dot { width: 48px; height: 48px; border-radius: 50%; background: var(--primary); color: var(--on-primary); display: flex; align-items: center; justify-content: center; flex: none; }
+
+.hoja { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-md); padding: clamp(18px, 4vw, 28px); display: flex; flex-direction: column; gap: 18px; color: var(--text); }
+.hoja-h { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: flex-end; padding-bottom: 14px; border-bottom: 2px solid var(--text); }
+.hoja-s { display: flex; flex-direction: column; gap: 8px; }
+.hoja-s h2 { margin: 0; }
+.hoja-s dl { margin: 0; display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.hoja-s dl > div { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 12px; padding: 8px 12px; font-size: 14px; }
+.hoja-s dl > div + div { border-top: 1px solid var(--border); }
+.hoja-s dt { color: var(--text-2); }
+.hoja-s dd { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+@container page (max-width: 760px) { .hoja-s dl > div { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+.hoja-notes p { margin: 0; }
+
+@media print {
+  .store > header, .store .announce, .store .header, .store .footer, .no-print, .drawer-root, .palette-demo { display: none !important; }
+  .hoja { border: 0; padding: 0; }
+}
+.footer .legal { align-items: center; }
