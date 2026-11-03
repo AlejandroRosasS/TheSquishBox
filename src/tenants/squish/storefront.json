@@ -91,12 +91,12 @@
     ]
   },
   "business": {
-    "legalName": "[Razón social]",
-    "ruc": "[N.º de RUC]",
-    "address": "[Dirección]",
-    "email": "[correo de atención]",
+    "legalName": "Soluciones Comerciales Prep4sales E.I.R.L.",
+    "ruc": "20613418793",
+    "address": "Av. Valles del Sur 281, Santiago de Surco, Lima",
+    "email": "alejandro@prep4sales.com",
     "phone": "+51 984 775 300",
-    "hours": "[Horario de atención]"
+    "hours": "Lunes a viernes, 9 a. m. a 5 p. m."
   },
   "contact": {
     "eyebrow": "Contacto",
@@ -123,7 +123,7 @@
       "title": "Cambios y devoluciones",
       "lead": "Queremos que disfrutes tus sorpresas. Si algo salió mal con tu pedido, lo solucionamos.",
       "sections": [
-        { "title": "Producto con fallas o equivocado", "text": "Si tu producto llegó dañado, con fallas de fábrica o no es el que compraste, escríbenos por WhatsApp al {phone} o a {email} dentro de los **[7] días calendario** desde que lo recibiste, con fotos del producto y tu número de pedido. Te lo cambiamos por uno igual o, si no hay stock, te devolvemos tu dinero." },
+        { "title": "Producto con fallas o equivocado", "text": "Si tu producto llegó dañado, con fallas de fábrica o no es el que compraste, escríbenos por WhatsApp al {phone} o a {email} dentro de los **7 días calendario** desde que lo recibiste, con fotos del producto y tu número de pedido. Te lo cambiamos por uno igual o, si no hay stock, te devolvemos tu dinero." },
         { "title": "Productos sorpresa", "text": "Como el modelo de cada squishy es al azar, no aceptamos cambios por modelo repetido o porque no te gustó el modelo que te tocó. ¡Para eso están los intercambios con tus amigos!" },
         { "title": "Condiciones", "text": "Para un cambio por falla, el producto debe estar con su empaque y sin daños causados por mal uso." },
         { "title": "Devolución del dinero", "text": "Si corresponde una devolución, la hacemos por el mismo medio de pago: en tarjeta, el banco puede tardar entre 7 y 15 días hábiles en mostrarla; en Yape, te la enviamos al mismo número." },
