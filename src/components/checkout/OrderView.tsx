@@ -72,7 +72,7 @@ export function OrderView({ id }: { id: string }) {
               <ol className="steps" style={{ marginTop: 6, padding: 0, listStyle: "none" }}>
                 <li className="stp done"><span className="b"><IconCheck size="sm" /></span><div><b>Pago recibido</b><p className="small muted">Ya estamos armando tu pedido.</p></div></li>
                 <li className="stp"><span className="b"><IconChat size="sm" /></span><div><b>Te escribiremos por WhatsApp</b><p className="small muted">{s.type === "delivery" ? "Para coordinar la entrega y confirmar el costo final del delivery." : "Para coordinar dónde y cuándo recoges tu pedido."}</p></div></li>
-                <li className="stp" style={{ paddingBottom: 0 }}><span className="b"><IconTruck size="sm" /></span><div><b>{s.type === "delivery" ? "Entrega" : "Recojo"}</b><p className="small muted">Fecha preferida: {dateText.replace(/\.$/, "")}. La confirmamos contigo.</p></div></li>
+                <li className="stp" style={{ paddingBottom: 0 }}><span className="b"><IconTruck size="sm" /></span><div><b>{s.type === "delivery" ? "Entrega" : "Recojo"}</b><p className="small muted">Fecha tentativa: {dateText.replace(/\.$/, "")}. Aún no está confirmada: te escribimos por WhatsApp para confirmarla.</p></div></li>
               </ol>
             </div>
             {s.type === "delivery" && (

@@ -328,7 +328,7 @@ export function CheckoutView() {
                     <b style={{ whiteSpace: "nowrap" }}>{estLabel}</b>
                   </div>
                   <div className="grid2">
-                    <div className={fieldCls("date")}><label htmlFor="c-date">Fecha preferida</label><input className="input" type="date" min={today} value={f.date} onChange={set("date")} {...aria("date")} /><span className="hint">Coordinamos la hora por WhatsApp.</span>{err("date")}</div>
+                    <div className={fieldCls("date")}><label htmlFor="c-date">Fecha preferida</label><input className="input" type="date" min={today} value={f.date} onChange={set("date")} {...aria("date")} /><span className="hint">Es una fecha tentativa: te la confirmamos por WhatsApp, junto con la hora.</span>{err("date")}</div>
                     <div className="field"><label htmlFor="c-recipient">¿Quién recibe? <span className="muted" style={{ fontWeight: 500 }}>(opcional)</span></label><input id="c-recipient" className="input" placeholder="Si no eres tú" value={f.recipient} onChange={set("recipient")} /></div>
                   </div>
                   <div className={fieldCls("gift")}><label htmlFor="c-gift">¿Es un regalo? Déjale un mensaje <span className="muted" style={{ fontWeight: 500 }}>(opcional)</span></label><textarea className="textarea" style={{ minHeight: 88 }} maxLength={120} value={f.gift} onChange={set("gift")} {...aria("gift")} /><span className="hint">{sf.checkout.giftHint} ({f.gift.length}/120)</span>{err("gift")}</div>
@@ -336,7 +336,7 @@ export function CheckoutView() {
               ) : (
                 <div className="stack g4">
                   <div className="note"><IconPin size="sm" /><span><Rich text={sf.checkout.pickupNote} /></span></div>
-                  <div className={fieldCls("pickupDate")}><label htmlFor="c-pickupDate">Fecha preferida de recojo</label><input className="input" type="date" min={today} value={f.pickupDate} onChange={set("pickupDate")} {...aria("pickupDate")} />{err("pickupDate")}</div>
+                  <div className={fieldCls("pickupDate")}><label htmlFor="c-pickupDate">Fecha preferida de recojo</label><input className="input" type="date" min={today} value={f.pickupDate} onChange={set("pickupDate")} {...aria("pickupDate")} /><span className="hint">Es una fecha tentativa: te confirmamos el día y el lugar por WhatsApp.</span>{err("pickupDate")}</div>
                 </div>
               )}
             </section>

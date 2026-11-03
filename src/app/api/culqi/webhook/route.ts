@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { serviceClient, serviceConfigured } from "@/lib/db/service";
 import { tenantSlug } from "@/lib/tenant";
-import { culqiAccount, getCharge, markPaid } from "@/lib/culqi/server";
+import { chargeSucceeded, culqiAccount, getCharge, markPaid } from "@/lib/culqi/server";
 
 /**
  * Webhook de Culqi (CulqiPanel › Eventos › Webhook): <dominio de la tienda>/api/culqi/webhook
@@ -50,6 +50,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  if (charge.paid ?? charge.outcome?.type === "venta_exitosa") await markPaid(db, acct, orderId, charge);
+  if (chargeSucceeded(charge)) await markPaid(db, acct, orderId, charge);
   return NextResponse.json({ ok: true });
 }
