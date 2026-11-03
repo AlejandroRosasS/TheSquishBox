@@ -61,3 +61,8 @@ export function productSeo(seo: Seo, p: Product): SeoPage {
 export function productMetadata(bundle: TenantBundle, p: Product): Metadata {
   return build(bundle, productSeo(bundle.seo, p), p.images[0]);
 }
+
+/** Metadatos de una página sin entrada propia en SEO (páginas legales, contacto). */
+export function plainMetadata(bundle: TenantBundle, page: SeoPage): Metadata {
+  return build(bundle, page);
+}

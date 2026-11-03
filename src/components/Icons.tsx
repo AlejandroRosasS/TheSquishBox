@@ -33,3 +33,7 @@ export const IconPen = (p: P) => <Svg {...p}><path d="M4 20h4L19 9l-4-4L4 16z" /
 export const IconCard = (p: P) => <Svg {...p}><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 10h18" /></Svg>;
 export const IconUpload = (p: P) => <Svg {...p}><path d="M12 16V4M7 9l5-5 5 5" /><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" /></Svg>;
 export const IconGift = (p: P) => <Svg {...p}><rect x="3.5" y="9" width="17" height="11.5" rx="1.5" /><path d="M2.5 9h19V6.5h-19zM12 6.5v14" /><path d="M12 6.5C10.5 3.5 7 3.5 7.5 5.5s4.5 1 4.5 1 4-1 4.5-1S13.5 3.5 12 6.5z" /></Svg>;
+export const IconMail = (p: P) => <Svg {...p}><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></Svg>;
+export const IconBook = (p: P) => <Svg {...p}><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z" /><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5" /><path d="M8 7h8M8 11h6" /></Svg>;
+export const IconClock = (p: P) => <Svg {...p}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></Svg>;
+export const IconPrint = (p: P) => <Svg {...p}><path d="M7 9V3h10v6" /><rect x="3" y="9" width="18" height="8" rx="2" /><path d="M7 14h10v7H7z" /></Svg>;

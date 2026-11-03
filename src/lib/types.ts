@@ -101,6 +101,10 @@ export type PartyBox = { name: string; sizes: { name: string; price: number }[] 
 type Img = { image: string; imageMobile?: string; alt: string };
 
 /** Textos e imágenes de la tienda pública (lo que en los mockups estaba escrito a mano). */
+export type Business = { legalName: string; ruc: string; address: string; email: string; phone: string; hours: string };
+export type LegalPageKey = "terms" | "returns" | "shipping" | "privacy";
+export type LegalDoc = { title: string; lead: string; sections: { title: string; text: string }[] };
+
 export type Storefront = {
   brand: {
     ink: string;
@@ -123,7 +127,13 @@ export type Storefront = {
   inside: Img & { eyebrow: string; title: string; lead: string; body: string };
   models: { eyebrow: string; title: string; footnote: string; max: number };
   tips: { eyebrow: string; title: string; items: { title: string; text: string }[] };
-  footer: { about: string; shop: Link[]; help: Link[]; legal: string; legalLinks: string };
+  /** `legal` y `legalLinks` son de la versión anterior (antes de las páginas legales): ya no se muestran. */
+  footer: { about: string; shop: Link[]; help: Link[]; legal?: string; legalLinks?: string };
+  /** Datos de la empresa: se muestran en el pie, Contacto, páginas legales y Libro de reclamaciones. */
+  business: Business;
+  contact: { eyebrow: string; title: string; lead: string };
+  legalPages: Record<LegalPageKey, LegalDoc>;
+  complaints: { title: string; lead: string };
   catalog: {
     title: string;
     lead: string;
