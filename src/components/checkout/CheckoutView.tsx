@@ -23,8 +23,6 @@ type Pay = "yape" | "tarjeta";
 
 const digits = (s: string) => s.replace(/\D/g, "");
 
-/** Código de Yape que simula un pago rechazado (solo demo de Fase 1). */
-const DEMO_FAIL_CODE = "000000";
 
 export function CheckoutView() {
   const { tenant, storefront: sf, source, culqiKey } = useStore();
@@ -35,7 +33,10 @@ export function CheckoutView() {
   // Con la base, la tarjeta solo aparece si la marca activó su cuenta de Culqi en Admin › Ajustes.
   const cardLive = source === "db" && !!culqiKey;
   const methods = (["yape", "tarjeta"] as Pay[]).filter(
-    (m) => tenant.payments.methods.includes(m) && (m !== "tarjeta" || source !== "db" || cardLive),
+    (m) =>
+      tenant.payments.methods.includes(m) &&
+      (m !== "tarjeta" || source !== "db" || cardLive) &&
+      (m !== "yape" || !!tenant.payments.yape?.phone),
   );
 
   const [f, setF] = useState({
@@ -43,7 +44,6 @@ export function CheckoutView() {
     address: "", district: sf.checkout.defaultDistrict, reference: "", date: "", recipient: "", gift: "",
     pickupDate: "",
     dni: "", ruc: "", razon: "",
-    yapePhone: "", yapeCode: "",
     cardNumber: "", cardExp: "", cardCvv: "",
   });
   const [ship, setShip] = useState<Ship>("delivery");
@@ -51,12 +51,16 @@ export function CheckoutView() {
   const [pay, setPay] = useState<Pay>(methods[0] ?? "yape");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [payError, setPayError] = useState(false);
-  /** Mensaje del banco cuando la tarjeta no pasa (null = error de Yape de la demo). */
-  const [cardMsg, setCardMsg] = useState<string | null>(null);
+  /** Mensaje del banco cuando la tarjeta no pasa. */
+  const [cardMsg, setCardMsg] = useState<string>("");
+  const [copied, setCopied] = useState(false);
+  const yape = tenant.payments.yape;
   /** Pedido ya creado que espera el pago con tarjeta: al reintentar se cobra el mismo, no se crea otro. */
   const [pending, setPending] = useState<{ id: string; number: number; total: number } | null>(null);
   const [orderError, setOrderError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
+  /** Compra terminada: mientras navega a la confirmación no se muestra «carrito vacío». */
+  const [done, setDone] = useState(false);
   const today = useToday();
 
   useEffect(() => {
@@ -67,6 +71,8 @@ export function CheckoutView() {
     setF((prev) => ({ ...prev, [k]: e.target.value }));
 
   if (!cart.ready) return <div style={{ minHeight: "60vh" }} />;
+
+  if (done) return <div style={{ minHeight: "60vh" }} aria-busy="true" />;
 
   if (cart.lines.length === 0) {
     return (
@@ -89,7 +95,7 @@ export function CheckoutView() {
   const total = cart.subtotal + (rate || 0);
   const estLabel = !isDelivery ? "Gratis" : coordinate ? "A coordinar" : formatPrice(rate as number, cur);
   const totalLabel = formatPrice(total, cur) + (coordinate ? " + delivery" : "");
-  const payLabel = pay === "yape" ? "Pagar con Yape" : "Pagar con tarjeta";
+  const payLabel = pay === "yape" ? "Confirmar pedido" : "Pagar con tarjeta";
 
   const validate = () => {
     const e: Record<string, string> = {};
@@ -106,10 +112,7 @@ export function CheckoutView() {
       if (digits(f.ruc).length !== 11) e.ruc = "El RUC tiene 11 dígitos.";
       if (!f.razon.trim()) e.razon = "Escribe la razón social.";
     }
-    if (pay === "yape") {
-      if (digits(f.yapePhone).length !== 9) e.yapePhone = "Escribe el celular de tu Yape.";
-      if (digits(f.yapeCode).length !== 6) e.yapeCode = "El código tiene 6 dígitos.";
-    } else if (!cardLive) {
+    if (pay === "tarjeta" && !cardLive) {
       if (digits(f.cardNumber).length < 15) e.cardNumber = "Revisa el número de tarjeta.";
       if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(f.cardExp.trim())) e.cardExp = "Usa el formato MM/AA.";
       if (!/^\d{3,4}$/.test(f.cardCvv.trim())) e.cardCvv = "3 o 4 dígitos.";
@@ -149,6 +152,7 @@ export function CheckoutView() {
       deliveryFee: isDelivery ? rate : 0,
       total: finalTotal,
     }, id);
+    setDone(true);
     router.push(`/pedido/${order.id}`);
     cart.clear();
   };
@@ -237,16 +241,9 @@ export function CheckoutView() {
       void payWithCard();
       return;
     }
-    // Pago simulado (demo y Yape). La tarjeta con la base va por Culqi (payWithCard).
+    // Yape es manual: el pedido se guarda «por confirmar» y el cliente manda la captura por WhatsApp.
+    // La tarjeta con la base va por Culqi (payWithCard); sin base, el pago es simulado.
     setTimeout(async () => {
-      if (pay === "yape" && digits(f.yapeCode) === DEMO_FAIL_CODE) {
-        setPayError(true);
-        setCardMsg(null);
-        setErrors({ yapeCode: "Código vencido o incorrecto." });
-        setSending(false);
-        document.getElementById("co-4")?.scrollIntoView({ behavior: "smooth", block: "start" });
-        return;
-      }
       let id: string | undefined;
       let finalTotal = total;
       // Con la base: el pedido se guarda allá (precio, stock y delivery los calcula la base).
@@ -363,17 +360,8 @@ export function CheckoutView() {
                 <div className="alert" role="alert">
                   <IconAlert />
                   <div className="stack g1">
-                    {cardMsg === null ? (
-                      <>
-                        <b>No pudimos procesar tu pago con Yape</b>
-                        <span className="small">El código de aprobación venció o es incorrecto. <b>No se realizó ningún cobro.</b> Genera un código nuevo en tu app Yape e inténtalo otra vez{methods.includes("tarjeta") ? ", o paga con tarjeta" : ""}.</span>
-                      </>
-                    ) : (
-                      <>
-                        <b>No pudimos procesar tu pago con tarjeta</b>
-                        <span className="small">{cardMsg} <b>No se realizó ningún cobro.</b> Revisa los datos e inténtalo otra vez{methods.includes("yape") ? ", usa otra tarjeta o paga con Yape" : " o usa otra tarjeta"}.</span>
-                      </>
-                    )}
+                    <b>No pudimos procesar tu pago con tarjeta</b>
+                    <span className="small">{cardMsg} <b>No se realizó ningún cobro.</b> Revisa los datos e inténtalo otra vez{methods.includes("yape") ? ", usa otra tarjeta o paga con Yape" : " o usa otra tarjeta"}.</span>
                   </div>
                 </div>
               )}
@@ -381,12 +369,24 @@ export function CheckoutView() {
                 {methods.includes("yape") && (
                   <>
                     <button className={`opt ${pay === "yape" ? "on" : ""}`} type="button" role="radio" aria-checked={pay === "yape"} onClick={() => setPay("yape")}>
-                      <span className="radio" /><span className="grow"><b>Yape</b><br /><span className="small muted">Con tu celular y código de aprobación</span></span><span className="pay-logo">YAPE</span>
+                      <span className="radio" /><span className="grow"><b>Yape</b><br /><span className="small muted">Yapeas al número de la tienda y nos mandas la captura</span></span><span className="pay-logo">YAPE</span>
                     </button>
-                    {pay === "yape" && (
-                      <div className="grid2" style={{ padding: "4px 0 8px" }}>
-                        <div className={fieldCls("yapePhone")}><label htmlFor="c-yapePhone">Celular de Yape</label><input className="input" type="tel" inputMode="numeric" value={f.yapePhone} onChange={set("yapePhone")} {...aria("yapePhone")} />{err("yapePhone")}</div>
-                        <div className={fieldCls("yapeCode")}><label htmlFor="c-yapeCode">Código de aprobación</label><input className="input" inputMode="numeric" autoComplete="one-time-code" placeholder="6 dígitos" value={f.yapeCode} onChange={set("yapeCode")} {...aria("yapeCode")} /><span className="hint">Yape › Menú › Código de aprobación</span>{err("yapeCode")}</div>
+                    {pay === "yape" && yape && (
+                      <div className="stack g3" style={{ padding: "4px 0 8px" }}>
+                        <div className="row g4" style={{ alignItems: "center", flexWrap: "wrap" }}>
+                          {yape.qr && <img src={asset(tenant.slug, yape.qr)} alt={`QR de Yape de ${tenant.name}`} width={132} height={132} style={{ borderRadius: 12, background: "#fff", border: "1px solid var(--border)" }} />}
+                          <div className="stack g1">
+                            <span className="small muted">Yapea {formatPrice(total, cur)} al</span>
+                            <b style={{ fontSize: 22, letterSpacing: ".02em" }}>{yape.phone}</b>
+                            {yape.holder && <span className="small muted">A nombre de {yape.holder}</span>}
+                            <button className="btn ghost sm" type="button" style={{ alignSelf: "flex-start" }} onClick={() => void navigator.clipboard?.writeText(digits(yape.phone).replace(/^51(?=\d{9}$)/, "")).then(() => setCopied(true))}>{copied ? "Número copiado" : "Copiar número"}</button>
+                          </div>
+                        </div>
+                        <ol className="small" style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 4 }}>
+                          <li>Yapea el total {coordinate ? "(sin el delivery, que coordinamos aparte)" : ""} desde tu app.</li>
+                          <li>Toca <b>Confirmar pedido</b>.</li>
+                          <li>Envíanos la captura del Yape por WhatsApp. Confirmamos tu pago y empezamos a preparar tu pedido.</li>
+                        </ol>
                       </div>
                     )}
                   </>
@@ -411,13 +411,13 @@ export function CheckoutView() {
                   </>
                 )}
               </div>
-              <p className="small muted">Procesado por Culqi. No guardamos los datos de tu tarjeta.</p>
+              {pay === "tarjeta" && <p className="small muted">Procesado por Culqi. No guardamos los datos de tu tarjeta.</p>}
               {cardLive && pay === "tarjeta" ? (
                 culqiKey?.startsWith("pk_test_") && (
                   <p className="demo-note">Modo prueba de Culqi: no se cobra dinero real. Usa la tarjeta 4111 1111 1111 1111, vence 09/30, CVV 123.</p>
                 )
               ) : (
-                <p className="demo-note">Demo: el pago es simulado y no se cobra nada. Con el código de Yape {DEMO_FAIL_CODE} puedes ver el error de pago.</p>
+                pay === "tarjeta" && <p className="demo-note">Demo: el pago con tarjeta es simulado y no se cobra nada.</p>
               )}
             </section>
           </div>

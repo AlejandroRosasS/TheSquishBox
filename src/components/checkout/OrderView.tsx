@@ -51,7 +51,15 @@ export function OrderView({ id }: { id: string }) {
 
   const firstName = order.customer.name.split(" ")[0];
   const s = order.shipping;
-  const wa = whatsappLink(tenant.whatsapp, `Hola, hice el pedido N.º ${order.id} en la web.`);
+  // Yape es manual: el pedido queda por confirmar hasta que el equipo vea la captura.
+  const yapePending = order.payment.method === "yape";
+  const yape = tenant.payments.yape;
+  const wa = whatsappLink(
+    tenant.whatsapp,
+    yapePending
+      ? `Hola, hice el pedido N.º ${order.id} en la web y te envío la captura de mi Yape por ${formatPrice(order.total, cur)}.`
+      : `Hola, hice el pedido N.º ${order.id} en la web.`,
+  );
   const dateText = s.date ? formatDate(s.date, { weekday: "short", day: "numeric", month: "short" }) : "";
 
   return (
@@ -63,14 +71,18 @@ export function OrderView({ id }: { id: string }) {
             <span style={{ width: 64, height: 64, borderRadius: "50%", background: "var(--primary)", color: "var(--on-primary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <IconCheck style={{ width: 30, height: 30 }} />
             </span>
-            <p className="eyebrow">Pedido N.º {order.id} · Pagado con {PAY_NAMES[order.payment.method] ?? order.payment.method}</p>
+            <p className="eyebrow">Pedido N.º {order.id} · {yapePending ? "Pago con Yape por confirmar" : `Pagado con ${PAY_NAMES[order.payment.method] ?? order.payment.method}`}</p>
             <h1 className="h1"><Rich text={fill(sf.confirmation.title, { name: firstName })} /></h1>
             <p className="lead">{fill(sf.confirmation.lead, { email: order.customer.email })}</p>
 
             <div className="stack g3" style={{ background: "var(--primary-soft)", borderRadius: 20, padding: 24 }}>
               <p className="h4">Próximos pasos</p>
               <ol className="steps" style={{ marginTop: 6, padding: 0, listStyle: "none" }}>
-                <li className="stp done"><span className="b"><IconCheck size="sm" /></span><div><b>Pago recibido</b><p className="small muted">Ya estamos armando tu pedido.</p></div></li>
+                {yapePending ? (
+                  <li className="stp"><span className="b"><IconChat size="sm" /></span><div><b>Envíanos la captura de tu Yape</b><p className="small muted">Yapea {formatPrice(order.total, cur)}{yape?.phone ? ` al ${yape.phone}` : ""} y mándanos la captura por WhatsApp. Cuando la veamos, confirmamos tu pago y empezamos a armar tu pedido.</p></div></li>
+                ) : (
+                  <li className="stp done"><span className="b"><IconCheck size="sm" /></span><div><b>Pago recibido</b><p className="small muted">Ya estamos armando tu pedido.</p></div></li>
+                )}
                 <li className="stp"><span className="b"><IconChat size="sm" /></span><div><b>Te escribiremos por WhatsApp</b><p className="small muted">{s.type === "delivery" ? "Para coordinar la entrega y confirmar el costo final del delivery." : "Para coordinar dónde y cuándo recoges tu pedido."}</p></div></li>
                 <li className="stp" style={{ paddingBottom: 0 }}><span className="b"><IconTruck size="sm" /></span><div><b>{s.type === "delivery" ? "Entrega" : "Recojo"}</b><p className="small muted">Fecha tentativa: {dateText.replace(/\.$/, "")}. Aún no está confirmada: te escribimos por WhatsApp para confirmarla.</p></div></li>
               </ol>
@@ -83,7 +95,7 @@ export function OrderView({ id }: { id: string }) {
             )}
             <div className="row g3 wrap-row">
               {wa ? (
-                <a className="btn" href={wa} target="_blank" rel="noreferrer">Escribirnos por WhatsApp</a>
+                <a className="btn" href={wa} target="_blank" rel="noreferrer">{yapePending ? "Enviar captura por WhatsApp" : "Escribirnos por WhatsApp"}</a>
               ) : (
                 <span className="btn disabled" aria-disabled="true" title={`WhatsApp por definir (${tenant.whatsapp})`}>Escribirnos por WhatsApp</span>
               )}
@@ -107,7 +119,7 @@ export function OrderView({ id }: { id: string }) {
             ) : (
               <div className="sum-row"><span className="muted">Recojo acordado</span><span>Gratis</span></div>
             )}
-            <div className="sum-row total"><span>Total pagado</span><span>{formatPrice(order.total, cur)}</span></div>
+            <div className="sum-row total"><span>{yapePending ? "Total a yapear" : "Total pagado"}</span><span>{formatPrice(order.total, cur)}</span></div>
             <hr className="hr" />
             <div className="stack g2 small">
               {s.type === "delivery" && (
