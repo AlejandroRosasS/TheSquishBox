@@ -12,23 +12,20 @@ type State = { telegram: Channel; email: Channel; whatsapp: Channel; events: boo
 export function NotificationsView() {
   const { bundle, demo, toast } = useAdmin();
   const { tenant } = bundle;
-  const [s, setS] = usePersisted<State>(dataKey(tenant.slug, "notifications"), { ...demo.notifications, events: [true, true, true, true] });
+  const [s, setS] = usePersisted<State>(dataKey(tenant.slug, "notifications"), { ...demo.notifications, events: [true, true, true] });
   const [prev, setPrev] = useState(0);
   const [adding, setAdding] = useState<keyof Omit<State, "events"> | null>(null);
   const [newRcp, setNewRcp] = useState("");
-  const party = tenant.customOrder.enabled ? (tenant.customOrder.adminLabel ?? tenant.customOrder.label).toLowerCase() : null;
   const allOff = !s.telegram.on && !s.email.on && !s.whatsapp.on;
 
   const evDefs: [string, string][] = [
     ["Nuevo pedido pagado", "Apenas se confirma el pago"],
-    ...(party ? [[`Nuevo pedido especial`, `Cuando llega una solicitud de ${party}`] as [string, string]] : []),
     ["Pago de diferencia de delivery", "Cuando el cliente paga el link"],
     ["Stock bajo", "Cuando una variante llega al mínimo"],
   ];
   const o = demo.orders[0];
   const previews = [
     `Nuevo pedido #${o.id}\n${o.client} · ${o.district} · ${o.date}`,
-    ...(party ? [`Nuevo pedido especial ${demo.partyRequests[0]?.id}\n${demo.partyRequests[0]?.name} · ${demo.partyRequests[0]?.date}\n${demo.partyRequests[0]?.qty} · ${demo.partyRequests[0]?.size}`] : []),
     `Diferencia pagada · pedido #${demo.orders[2]?.id}\n${demo.orders[2]?.client} pagó la diferencia de delivery`,
     "Stock bajo\nRevisa Productos: hay variantes en el mínimo",
   ];
