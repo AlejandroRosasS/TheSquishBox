@@ -12,7 +12,7 @@ import { useAdmin } from "./AdminContext";
 import { useDb } from "./DbContext";
 
 export type OrderPatch = Partial<DemoOrder> & { link?: string; refund?: string; paymentStatus?: string };
-export type AdminOrder = DemoOrder & { link: string; refund: string; dbId?: string; paymentStatus?: string };
+export type AdminOrder = DemoOrder & { link: string; refund: string; dbId?: string; paymentStatus?: string; createdIso?: string };
 
 type Ctx = {
   orders: DbOrder[];

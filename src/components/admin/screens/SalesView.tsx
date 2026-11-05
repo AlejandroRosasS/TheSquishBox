@@ -5,27 +5,38 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { asset } from "@/lib/assets";
 import { moneyShort, money } from "@/lib/admin/format";
-import { dataKey, usePersisted } from "@/lib/admin/storage";
 import { useAdmin, useAdminCatalog, useOrders } from "../AdminContext";
 import { useOrdersFromDb } from "../AdminOrders";
 import { useCampaigns } from "../AdminCampaigns";
 import { CAMPAIGN_STATE, campaignRange, campaignState } from "@/lib/campaigns";
 import { AdminPage, DemoNote } from "../AdminPage";
+import { limaToday, useManualSales, type ManualSale } from "../AdminSales";
+import { salesToCsv, type ExportSale } from "@/lib/sales/csv";
 
-export type ManualSale = { id: string; date: string; channel: string; client: string; pay: string; lines: { productId: string; variantId: string; qty: number; price: number; campaignId?: string; campaign?: string; listPrice?: number }[]; dIn: number; dOut: number; note: string };
 export const CHANNELS: [string, string][] = [["web", "Web"], ["ig", "Instagram"], ["feria", "Ferias"], ["otros", "Otros"]];
 
 const CAMP_COLS = "minmax(0, 1.4fr) minmax(0, 1.2fr) 80px 100px 100px 110px";
 
-export function useManualSales() {
-  const { bundle } = useAdmin();
-  return usePersisted<ManualSale[]>(dataKey(bundle.tenant.slug, "sales"), []);
+/** Texto bajo cada venta: medio de pago, delivery, cliente y nota. */
+function saleCaption(s: ManualSale, money: (n: number) => string) {
+  if (!s.day) return s.note; // guardadas antes en el navegador: la nota ya traía todo
+  return [s.pay, s.dIn ? `delivery ${money(s.dIn)}` : "sin delivery", s.client, s.note].filter(Boolean).join(" · ");
+}
+
+/** Descarga un texto como archivo (CSV con BOM para que Excel lea bien las tildes). */
+export function download(name: string, text: string) {
+  const url = URL.createObjectURL(new Blob(["\uFEFF", text], { type: "text/csv;charset=utf-8" }));
+  const a = Object.assign(document.createElement("a"), { href: url, download: name });
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 export function SalesView() {
   const { bundle, demo, toast } = useAdmin();
   const { catalog } = useAdminCatalog();
-  const [manual] = useManualSales();
+  const { sales: manual } = useManualSales();
   const [period, setPeriod] = useState<"mes" | "tri" | "ano">("mes");
   const [line, setLine] = useState("all");
   const [chan, setChan] = useState("all");
@@ -100,16 +111,29 @@ export function SalesView() {
       const r = s.lines.reduce((a, l) => a + l.price * l.qty, 0);
       const c = s.lines.reduce((a, l) => a + cost(l.productId, l.variantId) * l.qty, 0);
       const camps = [...new Set(s.lines.filter((l) => l.campaignId).map((l) => campName(l.campaignId!, l.campaign)))];
-      return { date: s.date, detail: s.lines.map((l) => `${prod(l.productId)?.name ?? l.productId} x${l.qty}`).join(" + "), note: camps.length ? `${s.note} · campaña ${camps.join(", ")}` : s.note, channel: s.channel, revenue: r + s.dIn, contribution: r - c + s.dIn - s.dOut };
+      return { date: s.date, detail: s.lines.map((l) => `${prod(l.productId)?.name ?? l.productId} x${l.qty}`).join(" + "), note: camps.length ? `${saleCaption(s, money)} · campaña ${camps.join(", ")}` : saleCaption(s, money), channel: s.channel, revenue: r + s.dIn, contribution: r - c + s.dIn - s.dOut };
     }),
     ...demo.sales.recent,
   ];
+
+  const exportCsv = () => {
+    const list: ExportSale[] = manual.filter((s) => s.day).map((s) => ({ ref: s.ref ?? s.id, day: s.day!, channel: s.channel, client: s.client, pay: s.pay, lines: s.lines, dIn: s.dIn, dOut: s.dOut, note: s.note }));
+    const webSales: ExportSale[] = fromDb
+      ? dbOrders
+          .filter((o) => o.createdIso && o.status !== "cancelado" && !["failed", "refunded"].includes(o.paymentStatus ?? ""))
+          .map((o) => ({ ref: `web-${o.id}`, day: new Date(Date.parse(o.createdIso!) - 5 * 3600_000).toISOString().slice(0, 10), channel: "web", client: o.client, pay: o.payment, lines: o.lines, dIn: o.deliveryFee, dOut: o.deliveryReal ?? o.deliveryFee, note: "" }))
+      : [];
+    const all = [...list, ...webSales].sort((a, b) => a.day.localeCompare(b.day));
+    if (!all.length) return toast("Todavía no hay ventas registradas para exportar");
+    download(`ventas-${bundle.tenant.slug}-${limaToday()}.csv`, salesToCsv(all, catalog));
+    toast(`${all.length} ${all.length === 1 ? "venta exportada" : "ventas exportadas"}`);
+  };
 
   return (
     <AdminPage title="Ventas" topRight={<Link className="a-btn primary sm" href="/admin/ventas/nueva">+ Venta</Link>}>
       <div className="a-head">
         <div className="stack g1"><h1 className="a-h1">Ventas y márgenes</h1><p className="a-sub">Todos los canales en un solo lugar. Montos aproximados según los costos cargados.</p></div>
-        <div className="row g2 wrap-row"><button className="a-btn" type="button" onClick={() => toast("Exportar CSV llega con la Fase 3")}>Exportar CSV</button><Link className="a-btn primary only-d" href="/admin/ventas/nueva">+ Registrar venta</Link></div>
+        <div className="row g2 wrap-row"><Link className="a-btn" href="/admin/ventas/importar">Importar ventas</Link><button className="a-btn" type="button" onClick={exportCsv}>Exportar CSV</button><Link className="a-btn primary only-d" href="/admin/ventas/nueva">+ Registrar venta</Link></div>
       </div>
       <div className="row g3 wrap-row">
         <div className="a-seg" role="group" aria-label="Período">
