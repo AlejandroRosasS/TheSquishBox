@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from "react";
 import type { Campaign } from "@/lib/types";
 import type { AdminCatalog } from "@/lib/admin/types";
 import { asset } from "@/lib/assets";
-import { money } from "@/lib/admin/format";
 import { CAMPAIGN_STATE, campaignRange, campaignState, discountPct, isoToLima, limaToIso } from "@/lib/campaigns";
 import { useAdmin, useAdminCatalog } from "../AdminContext";
 import { useCampaigns } from "../AdminCampaigns";
@@ -20,7 +19,7 @@ const parse = (s: string): number | null => {
 };
 const show = (n: number | undefined | null) => (n === undefined || n === null ? "" : String(n));
 
-type Drafts = { regular: Record<string, string>; offer: Record<string, Record<string, string>>; campaigns: Campaign[] };
+type Drafts = { regular: Record<string, string>; cost: Record<string, string>; offer: Record<string, Record<string, string>>; campaigns: Campaign[] };
 const k = (pid: string, vid: string) => `${pid}\u0000${vid}`;
 
 function newCampaign(): Campaign {
@@ -66,8 +65,9 @@ export function PricesPanel() {
     return [...campaigns].sort((a, b) => rank[campaignState(a, t)] - rank[campaignState(b, t)] || b.startsAt.localeCompare(a.startsAt));
   }, [campaigns, t]);
 
-  const edit = (fn: (d: Drafts) => Drafts) => setDrafts((d) => fn(d ?? { regular: {}, offer: {}, campaigns: camp.campaigns }));
+  const edit = (fn: (d: Drafts) => Drafts) => setDrafts((d) => fn(d ?? { regular: {}, cost: {}, offer: {}, campaigns: camp.campaigns }));
   const regularOf = (pid: string, vid: string, base: number) => drafts?.regular[k(pid, vid)] ?? show(base);
+  const costOf = (pid: string, vid: string) => drafts?.cost[k(pid, vid)] ?? show(catalog.costs[pid]?.[vid]);
   const offerOf = (c: Campaign, pid: string, vid: string) => drafts?.offer[c.id]?.[k(pid, vid)] ?? show(c.prices[pid]?.[vid]);
   const patchCampaign = (id: string, patch: Partial<Campaign>) => edit((d) => ({ ...d, campaigns: d.campaigns.map((c) => (c.id === id ? { ...c, ...patch } : c)) }));
 
@@ -96,12 +96,13 @@ export function PricesPanel() {
   for (const { p, v } of rows) {
     const r = parse(regularOf(p.id, v.id, v.price));
     if (r === null || Number.isNaN(r)) errors.push(`Revisa el precio de ${p.name}${p.variants.length > 1 ? ` · ${v.label}` : ""}`);
+    if (Number.isNaN(parse(costOf(p.id, v.id)))) errors.push(`Revisa el costo de ${p.name}${p.variants.length > 1 ? ` · ${v.label}` : ""}`);
     for (const c of campaigns) {
       const o = parse(offerOf(c, p.id, v.id));
       if (Number.isNaN(o)) errors.push(`Revisa el precio de oferta de ${p.name}`);
     }
   }
-  const dirty = !!drafts && (Object.keys(drafts.regular).length > 0 || Object.keys(drafts.offer).length > 0 || JSON.stringify(drafts.campaigns) !== JSON.stringify(camp.campaigns));
+  const dirty = !!drafts && (Object.keys(drafts.regular).length > 0 || Object.keys(drafts.cost).length > 0 || Object.keys(drafts.offer).length > 0 || JSON.stringify(drafts.campaigns) !== JSON.stringify(camp.campaigns));
 
   const saveAll = async () => {
     if (!drafts) return;
@@ -124,10 +125,21 @@ export function PricesPanel() {
     });
     let ok = true;
     if (JSON.stringify(nextCampaigns) !== JSON.stringify(camp.campaigns)) ok = await camp.save(nextCampaigns);
-    if (ok && Object.keys(drafts.regular).length) {
+    if (ok && (Object.keys(drafts.regular).length || Object.keys(drafts.cost).length)) {
       const reg = drafts.regular;
+      // Costos internos (no se ven en la tienda). Vacío = sin costo cargado.
+      const costs: AdminCatalog["costs"] = JSON.parse(JSON.stringify(catalog.costs));
+      for (const [key, val] of Object.entries(drafts.cost)) {
+        const [pid, vid] = key.split("\u0000");
+        const n = parse(val);
+        if (n === null || Number.isNaN(n)) {
+          if (costs[pid]) delete costs[pid][vid];
+          if (costs[pid] && !Object.keys(costs[pid]).length) delete costs[pid];
+        } else (costs[pid] ??= {})[vid] = n;
+      }
       setCatalog((prev: AdminCatalog) => ({
         ...prev,
+        costs,
         products: prev.products.map((p) => {
           if (!p.variants.some((v) => reg[k(p.id, v.id)] !== undefined)) return p;
           return { ...p, variants: p.variants.map((v) => (reg[k(p.id, v.id)] !== undefined ? { ...v, price: parse(reg[k(p.id, v.id)]) ?? v.price } : v)) };
@@ -141,7 +153,7 @@ export function PricesPanel() {
     }
   };
 
-  const cols = current ? "minmax(0, 1.6fr) 90px 130px 130px 90px 90px" : "minmax(0, 1.6fr) 90px 130px 90px";
+  const cols = current ? "minmax(0, 1.6fr) 120px 130px 130px 90px 80px" : "minmax(0, 1.6fr) 120px 130px 80px";
   const st = current && now ? campaignState(current, now) : null;
   const overlap = current && now
     ? campaigns.filter((c) => c.id !== current.id && Date.parse(c.startsAt) < Date.parse(current.endsAt) && Date.parse(c.endsAt) > Date.parse(current.startsAt))
@@ -208,7 +220,9 @@ export function PricesPanel() {
             const off = current ? offerOf(current, p.id, v.id) : "";
             const offN = parse(off);
             const sell = current && offN !== null && !Number.isNaN(offN) ? offN : regN;
-            const cost = catalog.costs[p.id]?.[v.id];
+            const costTxt = costOf(p.id, v.id);
+            const costN = parse(costTxt);
+            const cost = costN === null || Number.isNaN(costN) ? undefined : costN;
             const margin = sell && !Number.isNaN(sell) && cost !== undefined ? Math.round(((sell - cost) / sell) * 100) : null;
             const label = `${p.name}${p.variants.length > 1 ? ` · ${v.label}` : ""}`;
             const high = current && offN !== null && regN !== null && !Number.isNaN(offN) && offN >= regN;
@@ -220,10 +234,13 @@ export function PricesPanel() {
                     <b style={{ fontWeight: first ? 700 : 500 }}>{first ? p.name || "Producto sin título" : v.label}</b>
                     {first && p.variants.length > 1 && <span className="a-cap">{v.label}</span>}
                     {p.status === "draft" && first && <span className="a-cap">Borrador</span>}
-                    <span className="c-m a-cap">{[`Costo ${cost !== undefined ? money(cost) : "—"}`, `margen ${margin !== null ? `${margin}%` : "—"}`, current && offN !== null && regN && !Number.isNaN(offN) && !high ? `oferta −${discountPct(regN, offN)}%` : ""].filter(Boolean).join(" · ")}</span>
+                    <span className="c-m a-cap">{[`Margen ${margin !== null ? `${margin}%` : "—"}`, current && offN !== null && regN && !Number.isNaN(offN) && !high ? `oferta −${discountPct(regN, offN)}%` : ""].filter(Boolean).join(" · ")}</span>
                   </span>
                 </span>
-                <span className="a-cap c-d">{cost !== undefined ? money(cost) : "—"}</span>
+                <label className="pt-cell">
+                  <span className="c-m a-cap">Costo</span>
+                  <span className="a-prefix"><span>S/</span><input inputMode="decimal" placeholder="—" aria-label={`Costo de ${label}`} aria-invalid={Number.isNaN(costN)} value={costTxt} onChange={(e) => { const val = e.target.value; edit((d) => ({ ...d, cost: { ...d.cost, [k(p.id, v.id)]: val } })); }} /></span>
+                </label>
                 <label className="pt-cell">
                   <span className="c-m a-cap">Regular</span>
                   <span className="a-prefix"><span>S/</span><input inputMode="decimal" aria-label={`Precio regular de ${label}`} aria-invalid={regN === null || Number.isNaN(regN)} value={reg} onChange={(e) => { const val = e.target.value; edit((d) => ({ ...d, regular: { ...d.regular, [k(p.id, v.id)]: val } })); }} /></span>
