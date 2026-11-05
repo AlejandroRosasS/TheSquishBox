@@ -103,7 +103,7 @@ export function ProductsView() {
   return (
     <AdminPage title="Productos" topRight={<Link className="a-btn primary sm" href="/admin/instagram">+ Desde IG</Link>}>
       <div className="a-head">
-        <div className="stack g1"><h1 className="a-h1">Productos</h1><p className="a-sub">{tab === "precios" ? "Precios regulares y de oferta de todas las opciones en una sola tabla." : "Agrupados por línea. El orden de aquí es el orden de la tienda."}</p></div>
+        <div className="stack g1"><h1 className="a-h1">Productos</h1><p className="a-sub">{tab === "precios" ? "Costos, precios regulares y de oferta de todas las opciones en una sola tabla." : "Agrupados por línea. El orden de aquí es el orden de la tienda."}</p></div>
         {tab === "productos" && <div className="row g2 wrap-row only-d">
           <button className="a-btn" type="button" onClick={() => { setNewLineAt("top"); setNewLine(""); }}>+ Nueva línea</button>
           <Link className="a-btn primary" href="/admin/instagram"><AIInstagram />Convertir post en producto</Link>
