@@ -8,17 +8,19 @@ import { money } from "@/lib/admin/format";
 import { useAdmin, useAdminCatalog } from "../AdminContext";
 import { AdminPage, BackLink, Switch } from "../AdminPage";
 import { AIPlus, AITrash } from "../AdminIcons";
-import { useManualSales, type ManualSale } from "./SalesView";
+import { newRef, useManualSales, type ManualSale } from "../AdminSales";
 import { useCampaigns } from "../AdminCampaigns";
 import { bestCampaign, limaToIso } from "@/lib/campaigns";
+import { PAY_METHODS } from "@/lib/sales/csv";
 
 const CH: [string, string, string][] = [["ig", "Instagram", "Venta por DM o WhatsApp"], ["feria", "Feria o evento", "Asociada a una feria"], ["otros", "Otros", "Colegios, referidos, empresas"]];
-const PAYS = ["Yape", "Plin", "Efectivo", "Transferencia", "Tarjeta (POS)"];
+const PAYS = PAY_METHODS;
 
 export function NewSaleView() {
   const { bundle, demo, toast } = useAdmin();
   const { catalog } = useAdminCatalog();
-  const [, setSales] = useManualSales();
+  const { add } = useManualSales();
+  const [saving, setSaving] = useState(false);
   const router = useRouter();
   const products = catalog.products.filter((p) => p.status !== "draft" || p.variants.length);
   const [chan, setChan] = useState("feria");
@@ -57,10 +59,13 @@ export function NewSaleView() {
   const d = del ? (parseFloat(dIn) || 0) - (parseFloat(dOut) || 0) : 0;
   const contrib = rev - cst + d;
 
-  const save = (again: boolean) => {
+  const save = async (again: boolean) => {
     if (!lines.length) return toast("Agrega al menos un producto");
-    const sale: ManualSale = { id: `m${Date.now()}`, date: new Intl.DateTimeFormat("es-PE", { day: "numeric", month: "short" }).format(new Date(`${date}T12:00:00`)).replace(".", ""), channel: chan, client, pay, lines, dIn: del ? parseFloat(dIn) || 0 : 0, dOut: del ? parseFloat(dOut) || 0 : 0, note: `${pay}${del ? ` · delivery ${money(parseFloat(dIn) || 0)}` : " · sin delivery"}${client ? ` · ${client}` : ""}` };
-    setSales((s) => [...s, sale]);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return toast("Elige la fecha de la venta");
+    setSaving(true);
+    const ok = await add([{ ref: newRef(), day: date, channel: chan, client: client.trim(), pay, lines, dIn: del ? parseFloat(dIn) || 0 : 0, dOut: del ? parseFloat(dOut) || 0 : 0, note: "" }], "admin");
+    setSaving(false);
+    if (!ok) return;
     toast("Venta registrada");
     if (again) { setLines(lines.slice(0, 1).map((l) => ({ ...l, qty: 1 }))); setClient(""); }
     else router.push("/admin/ventas");
@@ -126,8 +131,8 @@ export function NewSaleView() {
           <div className="sumrow"><span>Delivery (cobrado − costo)</span><span className="money" style={{ color: d >= 0 ? "#1F6B35" : "#B42318" }}>{del ? `${d >= 0 ? "+ " : "− "}${money(Math.abs(d))}` : "—"}</span></div>
           <div className="sumrow big"><span>Contribución</span><span className="money">{money(contrib)}</span></div>
           <p className="a-cap">Margen {rev ? Math.round((contrib / rev) * 100) : 0}% · {units} unidades · canal {CH.find((c) => c[0] === chan)?.[1]}</p>
-          <button className="a-btn primary block" type="button" onClick={() => save(false)}>Guardar venta</button>
-          <button className="a-btn block" type="button" onClick={() => save(true)}>Guardar y registrar otra</button>
+          <button className="a-btn primary block" type="button" disabled={saving} onClick={() => void save(false)}>Guardar venta</button>
+          <button className="a-btn block" type="button" disabled={saving} onClick={() => void save(true)}>Guardar y registrar otra</button>
         </aside>
       </div>
     </AdminPage>

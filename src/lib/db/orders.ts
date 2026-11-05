@@ -142,7 +142,7 @@ function eventsOf(events: EventRow[], orderId: string) {
   return { notes, log };
 }
 
-export type DbOrder = DemoOrder & { link: string; refund: string; dbId: string; paymentStatus: string };
+export type DbOrder = DemoOrder & { link: string; refund: string; dbId: string; paymentStatus: string; createdIso: string };
 
 /** Pedido de la base → forma que usan las pantallas del admin. Los ítems guardan nombre y precio del momento de compra. */
 export function toAdminOrder(r: OrderRow, events: EventRow[], catalog: { products: Product[] }): DbOrder {
@@ -157,6 +157,7 @@ export function toAdminOrder(r: OrderRow, events: EventRow[], catalog: { product
     phone: str(c.phone),
     email: str(c.email),
     createdAt: whenLong(r.created_at),
+    createdIso: r.created_at,
     payment: paymentLabel(r),
     paymentStatus: r.payment_status,
     lines: r.items.map((it) => {
