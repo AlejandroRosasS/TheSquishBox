@@ -462,3 +462,9 @@ html:has(.adm), body:has(.adm) { background: #F5F5F2; }
 .lib-grid .lib-ph { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: var(--a-sunken); }
 @container page (max-width: 760px) { .slot-pair { grid-template-columns: minmax(0, 1fr); } .lib-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .a-btn.disabled { background: var(--a-sunken); color: var(--a-text-2); border-color: var(--a-border); cursor: not-allowed; pointer-events: none; }
+
+/* Tabs de página (Ajustes): mismo look que .a-seg, con área táctil ≥ 44 px y scroll horizontal en móvil. */
+.a-tabs { display: grid; max-width: 100%; overflow-x: auto; align-self: flex-start; }
+.a-tabs button { min-height: 44px; }
+.a-tabs button:focus-visible { outline: 2px solid var(--a-text); outline-offset: 1px; }
+@container page (max-width: 760px) { .a-tabs { align-self: stretch; } .a-tabs button { padding: 4px 8px; white-space: normal; line-height: 1.2; } }
