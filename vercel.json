@@ -1,5 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "crons": [{ "path": "/api/instagram/cron?full=1", "schedule": "0 9 * * *" }]
+  "crons": [
+    {
+      "path": "/api/instagram/cron?full=1",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/alerts/dispatch",
+      "schedule": "0 13 * * *"
+    }
+  ]
 }

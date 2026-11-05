@@ -5,7 +5,7 @@ import type { DemoOrder, PartyRequest } from "@/lib/admin/types";
 import { dataKey, usePersisted } from "@/lib/admin/storage";
 import { PARTY_STATUS } from "@/lib/admin/format";
 import {
-  ORDER_COLUMNS, PARTY_TO_DB, STATUS_TO_DB, toAdminOrder, toAdminParty, orderCode, partyCode,
+  ORDER_COLUMNS, PARTY_TO_DB, kickAlerts, STATUS_TO_DB, toAdminOrder, toAdminParty, orderCode, partyCode,
   type DbOrder, type DbParty, type EventRow, type OrderRow,
 } from "@/lib/db/orders";
 import { useAdmin } from "./AdminContext";
@@ -66,6 +66,8 @@ function OrdersProviderInner({ children }: { children: ReactNode }) {
     setRows(list);
     setEvents(evs);
     setLoaded(true);
+    // Respaldo del cron: si algún aviso quedó pendiente, se envía ahora.
+    kickAlerts();
   }, [client, tenantId, toast]);
 
   // Carga al entrar y vuelve a cargar al regresar a la pestaña o cada minuto, para ver los pedidos nuevos.

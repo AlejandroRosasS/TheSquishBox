@@ -10,7 +10,7 @@ import { asset } from "@/lib/assets";
 import { hasOptions, variantImage } from "@/lib/catalog";
 import { formatPrice, plural } from "@/lib/format";
 import { saveOrder } from "@/lib/orders";
-import { orderCode, placeOrder } from "@/lib/db/orders";
+import { kickAlerts, orderCode, placeOrder } from "@/lib/db/orders";
 import { useToday } from "@/lib/useToday";
 import { authenticate3DS, chargeOrder, deviceFingerprint, openCulqiCheckout, preloadCulqi } from "@/lib/culqi/client";
 import { IconAlert, IconBag, IconChevronLeft, IconLock, IconPin, IconTruck } from "@/components/Icons";
@@ -220,6 +220,7 @@ export function CheckoutView() {
         showCardError(res.message || "Tu banco no aprobó el pago.");
         return;
       }
+      kickAlerts(); // el aviso al equipo se programa al aprobarse el pago
       finish(orderCode(res.number), order.total);
     } catch (e) {
       showCardError(e instanceof Error ? e.message : "No pudimos procesar tu pago.");

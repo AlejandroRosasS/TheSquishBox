@@ -23,7 +23,17 @@ export async function placeOrder(slug: string, input: PlaceOrderInput) {
   const { data, error } = await publicClient().rpc("place_order", { tenant_slug: slug, p: input });
   if (error) throw new Error(error.message);
   const row = (Array.isArray(data) ? data[0] : data) as { order_id: string; order_number: number; order_total: number };
+  kickAlerts();
   return { id: row.order_id, number: row.order_number, total: Number(row.order_total) };
+}
+
+/**
+ * Pide al servidor que envíe ya los avisos al equipo. Los avisos ya quedaron en cola dentro de la base
+ * al guardar el pedido; si esta llamada falla, el cron los manda igual.
+ */
+export function kickAlerts() {
+  if (typeof window === "undefined") return;
+  void fetch("/api/alerts/dispatch", { method: "POST", keepalive: true }).catch(() => {});
 }
 
 export type PlacePartyInput = {
@@ -35,6 +45,7 @@ export type PlacePartyInput = {
 export async function placePartyRequest(slug: string, input: PlacePartyInput): Promise<number> {
   const { data, error } = await publicClient().rpc("place_party_request", { tenant_slug: slug, p: input });
   if (error) throw new Error(error.message);
+  kickAlerts();
   return Number(data);
 }
 
