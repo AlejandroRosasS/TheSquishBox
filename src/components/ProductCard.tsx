@@ -2,12 +2,14 @@ import Link from "next/link";
 import type { Catalog, Product } from "@/lib/types";
 import { Photo } from "@/components/Photo";
 import { SLOTS } from "@/lib/media";
-import { isSoldOut, lineName, priceLabel, productBadge } from "@/lib/catalog";
+import { isSoldOut, lineName, priceLabel, productBadge, saleListPrice } from "@/lib/catalog";
+import { formatPrice } from "@/lib/format";
 
 type Props = { product: Product; catalog: Catalog; slug: string; currency: string; soldOutSuffix?: string; showBadge?: boolean };
 
 export function ProductCard({ product: p, catalog, currency, soldOutSuffix, showBadge = true }: Props) {
   const badge = showBadge ? productBadge(p) : null;
+  const was = isSoldOut(p) ? undefined : saleListPrice(p);
   return (
     <Link className="pcard" href={`/p/${p.id}`}>
       <div className={`ph r45 ${isSoldOut(p) ? "dim" : ""}`}>
@@ -17,7 +19,10 @@ export function ProductCard({ product: p, catalog, currency, soldOutSuffix, show
       <div className="meta">
         <p className="coll">{lineName(catalog, p.line)}</p>
         <p className="name">{p.name}</p>
-        <p className="from">{priceLabel(p, currency, soldOutSuffix)}</p>
+        <p className="from">
+          {priceLabel(p, currency, soldOutSuffix)}
+          {was && <s className="was"><span className="visually-hidden">Precio regular </span>{formatPrice(was, currency)}</s>}
+        </p>
       </div>
     </Link>
   );

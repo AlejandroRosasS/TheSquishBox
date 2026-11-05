@@ -154,7 +154,7 @@ export function OrderView({ id }: { id: string }) {
               return (
                 <div className="row g3" key={i}>
                   <span className="av lg">{p?.images[0] && <img src={asset(tenant.slug, p.images[0])} alt="" />}</span>
-                  <div className="grow"><b>{p?.name ?? l.name ?? l.productId}</b><p className="a-cap">{[lineLabel(l.productId), v?.label ?? l.variantLabel].filter(Boolean).join(" · ")} · x{l.qty}</p></div>
+                  <div className="grow"><b>{p?.name ?? l.name ?? l.productId}</b><p className="a-cap">{[lineLabel(l.productId), v?.label ?? l.variantLabel].filter(Boolean).join(" · ")} · x{l.qty}</p>{l.campaign && <p className="a-cap">Precio de campaña «{l.campaign}»{l.listPrice ? ` · regular ${money(l.listPrice)}` : ""}</p>}</div>
                   <span className="money" style={{ fontWeight: 700 }}>{money(l.price * l.qty)}</span>
                 </div>
               );

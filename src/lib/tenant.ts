@@ -3,6 +3,7 @@ import { adminDemos, tenants, type TenantBundle } from "@/tenants";
 import { dbConfigured } from "@/lib/db/env";
 import { loadBundleFromDb } from "@/lib/db/bundle";
 import { withDefaults } from "@/lib/defaults";
+import { applyCampaigns } from "@/lib/campaigns";
 
 /** Marca activa del despliegue (variable TENANT, por defecto "squish"). */
 export function tenantSlug(): string {
@@ -25,19 +26,30 @@ export async function getTenantBundle(): Promise<TenantBundle> {
   "use cache";
   const slug = tenantSlug();
   cacheTag(tenantTag(slug));
-  cacheLife("hours");
-  if (!dbConfigured()) return fileBundle(slug);
+  if (!dbConfigured()) return hours(fileBundle(slug));
   const fromDb = await loadBundleFromDb(slug);
-  if (!fromDb) return fileBundle(slug);
+  if (!fromDb) return hours(fileBundle(slug));
+  const { campaigns, nextPriceChange, ...rest } = fromDb;
+  const now = Date.now();
+  // Si una campaña empieza o termina pronto, la tienda se vuelve a armar a esa hora (como mínimo cada minuto).
+  const untilChange = nextPriceChange ? Math.ceil((Date.parse(nextPriceChange) - now) / 1000) : Infinity;
+  if (untilChange < 3600) cacheLife({ stale: 300, revalidate: Math.max(60, untilChange), expire: 86400 });
+  else cacheLife("hours");
   // Lo publicado manda; los archivos completan las claves nuevas que el código agregó después.
   const files = tenants[slug];
   return {
-    ...fromDb,
+    ...rest,
+    catalog: applyCampaigns(fromDb.catalog, campaigns, now),
     tenant: files ? withDefaults(files.tenant, fromDb.tenant) : fromDb.tenant,
     storefront: files ? withDefaults(files.storefront, fromDb.storefront) : fromDb.storefront,
     seo: files ? withDefaults(files.seo, fromDb.seo) : fromDb.seo,
     source: "db",
   };
+}
+
+function hours<T>(v: T): T {
+  cacheLife("hours");
+  return v;
 }
 
 /** Versión sin base de datos: para lo que debe resolverse sin red (p. ej. la página "en construcción"). */

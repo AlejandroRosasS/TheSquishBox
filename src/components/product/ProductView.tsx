@@ -9,6 +9,7 @@ import { Rich } from "@/components/Rich";
 import { Photo } from "@/components/Photo";
 import { SLOTS } from "@/lib/media";
 import { formatPrice } from "@/lib/format";
+import { campaignDate } from "@/lib/campaigns";
 import { hasOptions, isSoldOut, LOW_STOCK, unitsLeft, variantStockLabel } from "@/lib/catalog";
 import { IconInstagram, IconMinus, IconPlus, IconTruck } from "@/components/Icons";
 
@@ -109,6 +110,9 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
             <h1 className="h1">{p.name}</h1>
             <div className="row g3" style={{ marginTop: 6 }}>
               <span className="price-lg">{formatPrice(v.price, cur)}</span>
+              {v.listPrice !== undefined && v.listPrice > v.price && (
+                <s className="was"><span className="visually-hidden">Precio regular </span>{formatPrice(v.listPrice, cur)}</s>
+              )}
               {stockBadge && (
                 <span className={`badge ${curOut ? "sold" : "low"}`}>
                   <span className="dot" />
@@ -116,6 +120,9 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
                 </span>
               )}
             </div>
+            {v.campaign && v.listPrice !== undefined && (
+              <p className="small muted">{v.campaign.name} · precio de oferta hasta el {campaignDate(v.campaign.endsAt)}</p>
+            )}
           </div>
 
           {options && (
@@ -135,7 +142,7 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
                       onClick={() => pickVariant(x.id)}
                     >
                       <span className="t">{x.label}</span>
-                      <span className="p">{formatPrice(x.price, cur)}{s ? ` · ${s}` : ""}</span>
+                      <span className="p">{formatPrice(x.price, cur)}{x.listPrice !== undefined && x.listPrice > x.price && <> <s className="was">{formatPrice(x.listPrice, cur)}</s></>}{s ? ` · ${s}` : ""}</span>
                     </button>
                   );
                 })}
