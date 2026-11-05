@@ -46,7 +46,6 @@ export function NotificationsLive() {
   const [rcpError, setRcpError] = useState("");
   const [tg, setTg] = useState<TgLink | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
-  const party = tenant.customOrder.enabled;
 
   const loadRecent = useCallback(async () => {
     const { data } = await db.client
@@ -271,8 +270,7 @@ export function NotificationsLive() {
   };
 
   const evDefs: { key: AlertEvent | null; label: string; desc: string }[] = [
-    { key: "order_new", label: "Nuevo pedido", desc: "Apenas el cliente confirma su compra" },
-    ...(party ? [{ key: "party_new" as const, label: "Nuevo pedido especial", desc: `Cuando llega una solicitud de ${(tenant.customOrder.adminLabel ?? tenant.customOrder.label).toLowerCase()}` }] : []),
+    { key: "order_new", label: "Nuevo pedido", desc: "Apenas el cliente confirma su compra (con tarjeta, cuando se aprueba el pago)" },
     { key: null, label: "Pago de diferencia de delivery", desc: "Pronto" },
     { key: null, label: "Stock bajo", desc: "Pronto" },
   ];

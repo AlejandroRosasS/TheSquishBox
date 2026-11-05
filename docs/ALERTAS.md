@@ -9,6 +9,8 @@ Cada pedido de la tienda y cada pedido especial (fiestas) le avisa al equipo por
 3. **Hay respaldos.** El cron (cada minuto, ver abajo) y el panel (cada vez que recarga Pedidos) también envían lo que quede pendiente.
 4. **Todo queda a la vista.** La actividad de cada pedido dice «Aviso enviado por Telegram a …» o por qué falló. Notificaciones muestra los últimos avisos y avisa si alguno no llegó en las últimas 24 horas, o si ningún canal está activo.
 
+**Pagos con tarjeta (Culqi):** el pedido se crea antes de cobrar, así que su aviso sale recién cuando el pago queda aprobado (migración `0007_alerts_paid.sql`). Los cobros rechazados o abandonados no avisan. Los pedidos especiales usan el mismo interruptor de «Nuevo pedido».
+
 Los errores que no se arreglan reintentando (correo mal escrito, número sin WhatsApp, bot sacado del grupo) se marcan como fallidos de inmediato.
 
 ## Cuentas (una para toda la plataforma)
@@ -61,7 +63,7 @@ Costo: Meta cobra cada plantilla de utilidad que se envía (en Perú, unos centa
 
 ## Base de datos
 
-Aplica `supabase/migrations/0004_alerts.sql` después de 0001, 0002 y 0003. Crea:
+Aplica `supabase/migrations/0004_alerts.sql` después de 0001, 0002 y 0003, y `0007_alerts_paid.sql` después de 0005. Crea:
 
 - `alert_outbox`: la cola de avisos. El equipo la puede leer; solo el servidor la escribe.
 - `telegram_link_codes`: códigos para vincular chats de Telegram. Solo el servidor.
