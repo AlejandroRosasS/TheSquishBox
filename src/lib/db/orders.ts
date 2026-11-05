@@ -60,7 +60,7 @@ export type OrderRow = {
   payment_status: string;
   customer: Record<string, unknown>;
   delivery: Record<string, unknown>;
-  items: { variant_id?: string; product?: string; name?: string; variant?: string; price?: number; qty?: number }[];
+  items: { variant_id?: string; product?: string; name?: string; variant?: string; price?: number; qty?: number; list_price?: number; campaign_id?: string; campaign?: string }[];
   party: Record<string, unknown> | null;
   proposal: string | null;
   subtotal: number;
@@ -162,7 +162,10 @@ export function toAdminOrder(r: OrderRow, events: EventRow[], catalog: { product
     lines: r.items.map((it) => {
       const p = catalog.products.find((x) => x.id === it.product);
       const v = p?.variants.find((x) => x.dbId === it.variant_id);
-      return { productId: str(it.product), variantId: v?.id ?? "", qty: Number(it.qty ?? 1), price: Number(it.price ?? 0), name: str(it.name), variantLabel: str(it.variant) };
+      return {
+        productId: str(it.product), variantId: v?.id ?? "", qty: Number(it.qty ?? 1), price: Number(it.price ?? 0), name: str(it.name), variantLabel: str(it.variant),
+        ...(it.campaign_id ? { campaignId: it.campaign_id, campaign: str(it.campaign), listPrice: Number(it.list_price ?? it.price ?? 0) } : {}),
+      };
     }),
     district: pickup ? "Recojo" : str(d.district),
     address: pickup ? "" : str(d.address),

@@ -54,6 +54,15 @@ export function priceLabel(p: Product, currency: string, soldOutSuffix?: string)
   return `${same ? "" : "Desde "}${formatPrice(min, currency)}`;
 }
 
+/** Precio regular a mostrar tachado en la tarjeta: el de la opción más barata, si está en oferta. */
+export function saleListPrice(p: Product): number | undefined {
+  if (!p.variants.length) return undefined;
+  const cheapest = p.variants.reduce((a, v) => (v.price < a.price ? v : a));
+  return cheapest.listPrice && cheapest.listPrice > cheapest.price ? cheapest.listPrice : undefined;
+}
+
+export const onSale = (p: Product) => p.variants.some((v) => v.listPrice !== undefined && v.listPrice > v.price);
+
 export type BadgeInfo = { text: string; cls: string } | null;
 
 /** Badge de la tarjeta: agotado y stock bajo se calculan; el resto viene del catálogo. */
@@ -61,6 +70,7 @@ export function productBadge(p: Product): BadgeInfo {
   if (isSoldOut(p)) return { text: "Agotado", cls: "sold" };
   const stock = totalStock(p);
   if (tracksStock(p) && stock <= LOW_STOCK) return { text: `Últimas ${stock}`, cls: "low" };
+  if (onSale(p)) return { text: "Oferta", cls: "new" };
   if (!p.badge) return null;
   if (/^nuevo/i.test(p.badge)) return { text: p.badge, cls: "new" };
   if (/^últim/i.test(p.badge)) return { text: p.badge, cls: "low" };

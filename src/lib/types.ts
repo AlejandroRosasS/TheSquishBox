@@ -54,7 +54,17 @@ export type Variant = {
   dbId?: string;
   /** Foto opcional de esta opción (una de las fotos del producto). */
   image?: string;
+  /** Con una campaña vigente: `price` es el de oferta y este el regular (se muestra tachado). */
+  listPrice?: number;
+  /** Campaña vigente que da el precio de oferta. */
+  campaign?: { id: string; name: string; endsAt: string };
 };
+
+/**
+ * Campaña de oferta: entre `startsAt` y `endsAt` (ISO) las opciones listadas se venden a su precio de campaña.
+ * `prices`: {"<id del producto>": {"<id de la opción>": 59}}. Se editan en Admin › Productos › Precios.
+ */
+export type Campaign = { id: string; name: string; startsAt: string; endsAt: string; prices: Record<string, Record<string, number>> };
 
 /**
  * simple: un solo precio (exactamente 1 variante, varias fotos).

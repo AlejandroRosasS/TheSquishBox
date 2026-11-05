@@ -468,3 +468,20 @@ html:has(.adm), body:has(.adm) { background: #F5F5F2; }
 .a-tabs button { min-height: 44px; }
 .a-tabs button:focus-visible { outline: 2px solid var(--a-text); outline-offset: 1px; }
 @container page (max-width: 760px) { .a-tabs { align-self: stretch; } .a-tabs button { padding: 4px 8px; white-space: normal; line-height: 1.2; } }
+
+/* Productos › Precios: campañas y tabla de precios editable. */
+.pc-form { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+.pt-table .a-tr { min-height: 60px; }
+.pt-tr.sub { border-top: 0; }
+.pt-cell { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.pt-cell .a-prefix input { min-height: 40px; font-size: 14px; }
+.pt-cell .a-prefix input[aria-invalid="true"] { color: var(--a-red); }
+@container page (max-width: 760px) {
+  .pc-form { grid-template-columns: minmax(0, 1fr); }
+  .pt-table .a-tr.pt-tr { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; gap: 8px 12px; }
+  .pt-tr > :first-child { grid-column: 1 / -1; }
+}
+/* Ventas: campañas como subcategoría del canal. */
+.chbar.sub { padding-left: 18px; }
+.chbar.sub b { font-weight: 600; }
+.chbar.sub .track i { background: #DDE3D8; }

@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { asset } from "@/lib/assets";
 import { hasOptions, isSoldOut } from "@/lib/catalog";
 import { formatPrice } from "@/lib/format";
@@ -11,6 +11,11 @@ import { useAdmin, useAdminCatalog } from "../AdminContext";
 import { AdminPage } from "../AdminPage";
 import { AIInstagram, AISearch } from "../AdminIcons";
 import { LineHeader } from "../LineHeader";
+import { PricesPanel } from "./PricesPanel";
+
+const TABS = [{ id: "productos", label: "Productos" }, { id: "precios", label: "Precios" }] as const;
+type TabId = (typeof TABS)[number]["id"];
+const isTab = (s: string): s is TabId => TABS.some((t) => t.id === s);
 
 type Filter = "all" | "pub" | "draft" | "low";
 
@@ -38,6 +43,27 @@ export function ProductsView() {
   const [newLine, setNewLine] = useState<string | null>(null);
   const [newLineAt, setNewLineAt] = useState<"top" | "bottom">("top");
   const a = (p: string) => asset(bundle.tenant.slug, p);
+  // Tab activo: se refleja en el hash (#precios) para poder enlazarlo y volver con «Atrás».
+  const [tab, setTab] = useState<TabId>("productos");
+  const tabRefs = useRef<Record<TabId, HTMLButtonElement | null>>({ productos: null, precios: null });
+  useEffect(() => {
+    const sync = () => { const h = window.location.hash.slice(1); if (isTab(h)) setTab(h); };
+    sync();
+    window.addEventListener("hashchange", sync);
+    return () => window.removeEventListener("hashchange", sync);
+  }, []);
+  const pick = (id: TabId, focus = false) => {
+    setTab(id);
+    history.replaceState(null, "", `#${id}`);
+    if (focus) tabRefs.current[id]?.focus();
+  };
+  const onTabKey = (e: React.KeyboardEvent) => {
+    const i = TABS.findIndex((t) => t.id === tab);
+    const next = e.key === "ArrowRight" ? i + 1 : e.key === "ArrowLeft" ? i - 1 : e.key === "Home" ? 0 : e.key === "End" ? TABS.length - 1 : null;
+    if (next === null) return;
+    e.preventDefault();
+    pick(TABS[(next + TABS.length) % TABS.length].id, true);
+  };
 
   const match = (p: AdminProduct) => {
     if (q && !p.name.toLowerCase().includes(q.toLowerCase())) return false;
@@ -77,13 +103,24 @@ export function ProductsView() {
   return (
     <AdminPage title="Productos" topRight={<Link className="a-btn primary sm" href="/admin/instagram">+ Desde IG</Link>}>
       <div className="a-head">
-        <div className="stack g1"><h1 className="a-h1">Productos</h1><p className="a-sub">Agrupados por línea. El orden de aquí es el orden de la tienda.</p></div>
-        <div className="row g2 wrap-row only-d">
+        <div className="stack g1"><h1 className="a-h1">Productos</h1><p className="a-sub">{tab === "precios" ? "Precios regulares y de oferta de todas las opciones en una sola tabla." : "Agrupados por línea. El orden de aquí es el orden de la tienda."}</p></div>
+        {tab === "productos" && <div className="row g2 wrap-row only-d">
           <button className="a-btn" type="button" onClick={() => { setNewLineAt("top"); setNewLine(""); }}>+ Nueva línea</button>
           <Link className="a-btn primary" href="/admin/instagram"><AIInstagram />Convertir post en producto</Link>
-        </div>
+        </div>}
       </div>
 
+      <div className="a-seg a-tabs" role="tablist" aria-label="Secciones de productos" onKeyDown={onTabKey}>
+        {TABS.map((t) => (
+          <button key={t.id} ref={(el) => { tabRefs.current[t.id] = el; }} id={`pr-tab-${t.id}`} type="button" role="tab" className={tab === t.id ? "on" : ""} aria-selected={tab === t.id} aria-controls={`pr-panel-${t.id}`} tabIndex={tab === t.id ? 0 : -1} onClick={() => pick(t.id)}>{t.label}</button>
+        ))}
+      </div>
+
+      <div role="tabpanel" id="pr-panel-precios" aria-labelledby="pr-tab-precios" hidden={tab !== "precios"}>
+        {tab === "precios" && <PricesPanel />}
+      </div>
+
+      <div role="tabpanel" id="pr-panel-productos" aria-labelledby="pr-tab-productos" hidden={tab !== "productos"} className={tab === "productos" ? "stack g5" : undefined}>
       {newLine !== null && newLineAt === "top" && newLineForm}
 
       <div className="filters-bar">
@@ -138,6 +175,7 @@ export function ProductsView() {
       {newLine !== null && newLineAt === "bottom" ? newLineForm : (
         <button className="a-btn block" type="button" onClick={() => { setNewLineAt("bottom"); setNewLine(""); }}>+ Nueva línea</button>
       )}
+      </div>
     </AdminPage>
   );
 }

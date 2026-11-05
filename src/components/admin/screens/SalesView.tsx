@@ -2,15 +2,20 @@
 
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { asset } from "@/lib/assets";
 import { moneyShort, money } from "@/lib/admin/format";
 import { dataKey, usePersisted } from "@/lib/admin/storage";
-import { useAdmin, useAdminCatalog } from "../AdminContext";
+import { useAdmin, useAdminCatalog, useOrders } from "../AdminContext";
+import { useOrdersFromDb } from "../AdminOrders";
+import { useCampaigns } from "../AdminCampaigns";
+import { CAMPAIGN_STATE, campaignRange, campaignState } from "@/lib/campaigns";
 import { AdminPage, DemoNote } from "../AdminPage";
 
-export type ManualSale = { id: string; date: string; channel: string; client: string; pay: string; lines: { productId: string; variantId: string; qty: number; price: number }[]; dIn: number; dOut: number; note: string };
+export type ManualSale = { id: string; date: string; channel: string; client: string; pay: string; lines: { productId: string; variantId: string; qty: number; price: number; campaignId?: string; campaign?: string; listPrice?: number }[]; dIn: number; dOut: number; note: string };
 export const CHANNELS: [string, string][] = [["web", "Web"], ["ig", "Instagram"], ["feria", "Ferias"], ["otros", "Otros"]];
+
+const CAMP_COLS = "minmax(0, 1.4fr) minmax(0, 1.2fr) 80px 100px 100px 110px";
 
 export function useManualSales() {
   const { bundle } = useAdmin();
@@ -25,23 +30,61 @@ export function SalesView() {
   const [line, setLine] = useState("all");
   const [chan, setChan] = useState("all");
   const [rank, setRank] = useState<"c" | "u">("c");
+  const [campF, setCampF] = useState("all");
+  const { campaigns } = useCampaigns();
+  const fromDb = useOrdersFromDb();
+  const { orders: dbOrders } = useOrders();
+  const [now, setNow] = useState<number | null>(null);
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- la hora es solo del navegador
+  useEffect(() => setNow(Date.now()), []);
   const scale = period === "mes" ? 1 : period === "tri" ? 2.6 : 7.4;
   const prod = (id: string) => catalog.products.find((p) => p.id === id);
+  const sum = <K extends "rev" | "listRev" | "cost" | "units" | "orders" | "dIn" | "dOut">(arr: { [k in K]: number }[], k: K) => arr.reduce((a, r) => a + r[k], 0);
   const price = (pid: string, vid: string) => prod(pid)?.variants.find((v) => v.id === vid)?.price ?? 0;
   const cost = (pid: string, vid: string) => catalog.costs[pid]?.[vid] ?? 0;
 
   const base = demo.sales.lines.map(([pid, vid, ch, u, dIn, dOut, o]) => {
     const units = Math.max(1, Math.round(u * scale));
-    return { pid, ch, line: prod(pid)?.line ?? "", units, rev: price(pid, vid) * units, cost: cost(pid, vid) * units, dIn: dIn * scale, dOut: dOut * scale, orders: Math.max(1, Math.round(o * scale)) };
+    const rev = price(pid, vid) * units;
+    return { pid, ch, line: prod(pid)?.line ?? "", units, rev, listRev: rev, cost: cost(pid, vid) * units, dIn: dIn * scale, dOut: dOut * scale, orders: Math.max(1, Math.round(o * scale)), camp: "", campName: "" };
   });
-  const extra = manual.flatMap((s) => s.lines.map((l, i) => ({ pid: l.productId, ch: s.channel, line: prod(l.productId)?.line ?? "", units: l.qty, rev: l.price * l.qty, cost: cost(l.productId, l.variantId) * l.qty, dIn: i ? 0 : s.dIn, dOut: i ? 0 : s.dOut, orders: i ? 0 : 1 })));
-  const rows = [...base, ...extra];
-  const byLine = rows.filter((r) => line === "all" || r.line === line);
+  type Row = (typeof base)[number];
+  const saleLine = (l: ManualSale["lines"][number], ch: string, first: boolean, dIn: number, dOut: number): Row => ({
+    pid: l.productId, ch, line: prod(l.productId)?.line ?? "", units: l.qty, rev: l.price * l.qty, listRev: (l.listPrice ?? l.price) * l.qty,
+    cost: cost(l.productId, l.variantId) * l.qty, dIn: first ? dIn : 0, dOut: first ? dOut : 0, orders: first ? 1 : 0, camp: l.campaignId ?? "", campName: l.campaign ?? "",
+  });
+  const extra = manual.flatMap((s) => s.lines.map((l, i) => saleLine(l, s.channel, !i, s.dIn, s.dOut)));
+  // Pedidos reales de la web (con la base): los cancelados, fallidos o devueltos no cuentan.
+  const web = fromDb
+    ? dbOrders
+        .filter((o) => o.status !== "cancelado" && !["failed", "refunded"].includes(o.paymentStatus ?? ""))
+        .flatMap((o) => o.lines.map((l, i) => saleLine(l, "web", !i, o.deliveryFee, o.deliveryReal ?? o.deliveryFee)))
+    : [];
+  const rows = [...base, ...extra, ...web];
+  const campName = (id: string, fallback = "") => campaigns.find((c) => c.id === id)?.name || fallback || "Campaña borrada";
+  const campOk = (r: Row) => campF === "all" || (campF === "none" ? !r.camp : r.camp === campF);
+  const byLine = rows.filter((r) => (line === "all" || r.line === line) && campOk(r));
   const f = byLine.filter((r) => chan === "all" || r.ch === chan);
-  const sum = <K extends "rev" | "cost" | "units" | "orders" | "dIn" | "dOut">(arr: typeof rows, k: K) => arr.reduce((a, r) => a + r[k], 0);
+  // Campañas: las creadas en Precios y las que aparecen en ventas (aunque se hayan borrado).
+  const campIds = [...new Set([...campaigns.map((c) => c.id), ...rows.filter((r) => r.camp).map((r) => r.camp)])];
+  const campOf = (id: string) => campaigns.find((c) => c.id === id);
+  const lineRows = rows.filter((r) => line === "all" || r.line === line);
+  const campAgg = campIds.map((id) => {
+    const a = lineRows.filter((r) => r.camp === id);
+    const fallback = a.find((r) => r.campName)?.campName ?? "";
+    return { id, name: campName(id, fallback), c: campOf(id), rev: sum(a, "rev"), contrib: sum(a, "rev") - sum(a, "cost"), units: sum(a, "units"), discount: sum(a, "listRev") - sum(a, "rev"), byCh: CHANNELS.map(([k, l]) => ({ k, l, rev: sum(a.filter((r) => r.ch === k), "rev") })).filter((x) => x.rev > 0) };
+  });
   const rev = sum(f, "rev"), cst = sum(f, "cost"), units = sum(f, "units"), orders = sum(f, "orders"), del = sum(f, "dIn") - sum(f, "dOut");
 
-  const chanAgg = CHANNELS.map(([k, label]) => { const a = byLine.filter((r) => r.ch === k); return { k, label, rev: sum(a, "rev"), contrib: sum(a, "rev") - sum(a, "cost"), units: sum(a, "units") }; });
+  const chanAgg = CHANNELS.map(([k, label]) => {
+    const a = byLine.filter((r) => r.ch === k);
+    // Subcategorías del canal: lo vendido con precio de cada campaña.
+    const subs = [...new Set(a.filter((r) => r.camp).map((r) => r.camp))].map((id) => {
+      const b = a.filter((r) => r.camp === id);
+      return { id, label: campName(id, b.find((r) => r.campName)?.campName), rev: sum(b, "rev"), contrib: sum(b, "rev") - sum(b, "cost"), units: sum(b, "units") };
+    });
+    return { k, label, rev: sum(a, "rev"), contrib: sum(a, "rev") - sum(a, "cost"), units: sum(a, "units"), subs };
+  });
   const maxRev = Math.max(1, ...chanAgg.map((c) => c.rev));
   const prodAgg = catalog.products.map((p) => { const a = f.filter((r) => r.pid === p.id); return { p, units: sum(a, "units"), contrib: sum(a, "rev") - sum(a, "cost") }; }).filter((x) => x.units > 0);
   prodAgg.sort((a, b) => (rank === "c" ? b.contrib - a.contrib : b.units - a.units));
@@ -56,7 +99,8 @@ export function SalesView() {
     ...manual.slice().reverse().map((s) => {
       const r = s.lines.reduce((a, l) => a + l.price * l.qty, 0);
       const c = s.lines.reduce((a, l) => a + cost(l.productId, l.variantId) * l.qty, 0);
-      return { date: s.date, detail: s.lines.map((l) => `${prod(l.productId)?.name ?? l.productId} x${l.qty}`).join(" + "), note: s.note, channel: s.channel, revenue: r + s.dIn, contribution: r - c + s.dIn - s.dOut };
+      const camps = [...new Set(s.lines.filter((l) => l.campaignId).map((l) => campName(l.campaignId!, l.campaign)))];
+      return { date: s.date, detail: s.lines.map((l) => `${prod(l.productId)?.name ?? l.productId} x${l.qty}`).join(" + "), note: camps.length ? `${s.note} · campaña ${camps.join(", ")}` : s.note, channel: s.channel, revenue: r + s.dIn, contribution: r - c + s.dIn - s.dOut };
     }),
     ...demo.sales.recent,
   ];
@@ -75,6 +119,13 @@ export function SalesView() {
           <option value="all">Todas las líneas</option>
           {catalog.lines.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
         </select>
+        {campIds.length > 0 && (
+          <select className="a-select" style={{ width: "auto", minWidth: 200 }} value={campF} onChange={(e) => setCampF(e.target.value)} aria-label="Campaña">
+            <option value="all">Con y sin campaña</option>
+            <option value="none">Solo precio regular</option>
+            {campAgg.map((c) => <option key={c.id} value={c.id}>Campaña: {c.name}</option>)}
+          </select>
+        )}
       </div>
       <div className="a-scroll-x" role="group" aria-label="Canal">
         {[["all", "Todos los canales"], ...CHANNELS].map(([k, l]) => <button key={k} className={`a-chip ${chan === k ? "on" : ""}`} type="button" aria-pressed={chan === k} onClick={() => setChan(k)}>{l}</button>)}
@@ -90,10 +141,19 @@ export function SalesView() {
         <section className="a-card" aria-labelledby="v-ch">
           <div className="a-card-h"><h2 className="a-h2" id="v-ch">Por canal</h2><div className="legend"><span><i style={{ background: "#C9CFC3" }} />Ingresos</span><span><i style={{ background: "#1F2A22" }} />Contribución</span></div></div>
           {chanAgg.map((c) => (
-            <div className="chbar" key={c.k}>
-              <span><b>{c.label}</b><br /><span className="a-cap">{c.units} u.</span></span>
-              <div className="track" role="img" aria-label={`${c.label}: ingresos ${moneyShort(c.rev)}, contribución ${moneyShort(c.contrib)}`}><i style={{ width: `${(c.rev / maxRev) * 100}%` }} /><b style={{ width: `${(Math.max(0, c.contrib) / maxRev) * 100}%` }} /></div>
-              <span className="money" style={{ textAlign: "right" }}><b>{moneyShort(c.rev)}</b><br /><span className="a-cap">{moneyShort(c.contrib)}</span></span>
+            <div key={c.k}>
+              <div className="chbar">
+                <span><b>{c.label}</b><br /><span className="a-cap">{c.units} u.</span></span>
+                <div className="track" role="img" aria-label={`${c.label}: ingresos ${moneyShort(c.rev)}, contribución ${moneyShort(c.contrib)}`}><i style={{ width: `${(c.rev / maxRev) * 100}%` }} /><b style={{ width: `${(Math.max(0, c.contrib) / maxRev) * 100}%` }} /></div>
+                <span className="money" style={{ textAlign: "right" }}><b>{moneyShort(c.rev)}</b><br /><span className="a-cap">{moneyShort(c.contrib)}</span></span>
+              </div>
+              {c.subs.map((x) => (
+                <div className="chbar sub" key={x.id}>
+                  <span><b>↳ {x.label}</b><br /><span className="a-cap">{x.units} u.</span></span>
+                  <div className="track" role="img" aria-label={`${c.label}, campaña ${x.label}: ingresos ${moneyShort(x.rev)}, contribución ${moneyShort(x.contrib)}`}><i style={{ width: `${(x.rev / maxRev) * 100}%` }} /><b style={{ width: `${(Math.max(0, x.contrib) / maxRev) * 100}%` }} /></div>
+                  <span className="money" style={{ textAlign: "right" }}>{moneyShort(x.rev)}<br /><span className="a-cap">{moneyShort(x.contrib)}</span></span>
+                </div>
+              ))}
             </div>
           ))}
         </section>
@@ -113,6 +173,31 @@ export function SalesView() {
           </div>
         </section>
       </div>
+      {campAgg.length > 0 && (
+        <section className="a-card flush" aria-labelledby="v-camp">
+          <div className="a-card-h" style={{ flexWrap: "wrap" }}><div className="stack g1"><h2 className="a-h2" id="v-camp">Campañas de oferta</h2><p className="a-cap">Lo vendido con precio de campaña, por canal. Descuento = precio regular − precio cobrado.</p></div><Link className="a-btn sm ghost" href="/admin/productos#precios">Editar campañas</Link></div>
+          <div className="a-table">
+            <div className="a-tr head" style={{ gridTemplateColumns: CAMP_COLS }}><span>Campaña</span><span>Canales</span><span>Unidades</span><span>Ingresos</span><span>Descuento</span><span>Contribución</span></div>
+            {campAgg.map((c) => {
+              const s = c.c && now ? campaignState(c.c, now) : null;
+              return (
+                <div key={c.id} className="a-tr" style={{ gridTemplateColumns: CAMP_COLS }}>
+                  <span className="stack" style={{ gap: 2 }}>
+                    <b>{c.name}</b>
+                    <span className="a-cap">{c.c ? campaignRange(c.c) : "Ya no existe en Precios"}{s && <> · <span className={`st ${CAMPAIGN_STATE[s][1]}`}>{CAMPAIGN_STATE[s][0]}</span></>}</span>
+                    <span className="c-m a-cap">{c.units} u. · {moneyShort(c.rev)} · contribución {moneyShort(c.contrib)}</span>
+                  </span>
+                  <span className="c-d a-cap">{c.byCh.length ? c.byCh.map((x) => `${x.l} ${moneyShort(x.rev)}`).join(" · ") : "Sin ventas todavía"}</span>
+                  <span className="c-d">{c.units}</span>
+                  <span className="c-d money" style={{ fontWeight: 700 }}>{moneyShort(c.rev)}</span>
+                  <span className="c-d money">{c.discount > 0 ? `− ${moneyShort(c.discount)}` : "—"}</span>
+                  <span className="money">{moneyShort(c.contrib)}</span>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
       <section className="a-card" aria-labelledby="v-fair">
         <div className="a-card-h" style={{ flexWrap: "wrap" }}><div className="stack g1"><h2 className="a-h2" id="v-fair">Ferias y eventos</h2><p className="a-cap">Para decidir si volver el próximo año.</p></div></div>
         <div className="row between wrap-row g2"><div><b>{demo.sales.fair.name}</b><p className="a-cap">{demo.sales.fair.dates}</p></div><span className={fNet > 0 ? "ok-pill" : "bad-pill"}>{fNet > 0 ? "Rentable · conviene volver" : "No cubrió costos"}</span></div>

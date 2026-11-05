@@ -9,6 +9,8 @@ import { useAdmin, useAdminCatalog } from "../AdminContext";
 import { AdminPage, BackLink, Switch } from "../AdminPage";
 import { AIPlus, AITrash } from "../AdminIcons";
 import { useManualSales, type ManualSale } from "./SalesView";
+import { useCampaigns } from "../AdminCampaigns";
+import { bestCampaign, limaToIso } from "@/lib/campaigns";
 
 const CH: [string, string, string][] = [["ig", "Instagram", "Venta por DM o WhatsApp"], ["feria", "Feria o evento", "Asociada a una feria"], ["otros", "Otros", "Colegios, referidos, empresas"]];
 const PAYS = ["Yape", "Plin", "Efectivo", "Transferencia", "Tarjeta (POS)"];
@@ -22,7 +24,25 @@ export function NewSaleView() {
   const [chan, setChan] = useState("feria");
   const [date, setDate] = useState(demo.today);
   const [client, setClient] = useState("");
+  const { campaigns } = useCampaigns();
+  /** Precio del día de la venta: el de la campaña vigente ese día (a mediodía, hora de Perú) o el regular. */
+  const priced = (productId: string, variantId: string, day = date) => {
+    const regular = catalog.products.find((p) => p.id === productId)?.variants.find((v) => v.id === variantId)?.price ?? 0;
+    const b = /^\d{4}-\d{2}-\d{2}$/.test(day) ? bestCampaign(campaigns, productId, variantId, Date.parse(limaToIso(`${day}T12:00`))) : null;
+    return b && b.price < regular
+      ? { productId, variantId, price: b.price, campaignId: b.campaign.id, campaign: b.campaign.name, listPrice: regular }
+      : { productId, variantId, price: regular, campaignId: undefined, campaign: undefined, listPrice: undefined };
+  };
   const [lines, setLines] = useState<ManualSale["lines"]>(() => (products[0] ? [{ productId: products[0].id, variantId: products[0].variants[0]?.id ?? "", qty: 1, price: products[0].variants[0]?.price ?? 0 }] : []));
+  // Las campañas llegan después del primer render: aplicar su precio a las líneas que siguen con el precio regular.
+  const [campaignsSeen, setCampaignsSeen] = useState(campaigns);
+  if (campaignsSeen !== campaigns) {
+    setCampaignsSeen(campaigns);
+    setLines((ls) => ls.map((l) => {
+      const np = priced(l.productId, l.variantId);
+      return l.campaignId || l.price !== (np.listPrice ?? np.price) ? l : { ...l, ...np };
+    }));
+  }
   const [del, setDel] = useState(false);
   const [dIn, setDIn] = useState("");
   const [dOut, setDOut] = useState("");
@@ -58,24 +78,24 @@ export function NewSaleView() {
             </div>
             {chan === "feria" && <p className="a-cap">Feria: <b>{demo.sales.fair.name}</b> · {demo.sales.fair.dates}</p>}
             <div className="a-grid2">
-              <div className="a-field"><label htmlFor="v-fecha">Fecha</label><input id="v-fecha" className="a-input" type="date" value={date} onChange={(e) => setDate(e.target.value)} /></div>
+              <div className="a-field"><label htmlFor="v-fecha">Fecha</label><input id="v-fecha" className="a-input" type="date" value={date} onChange={(e) => { const day = e.target.value; setDate(day); setLines((ls) => ls.map((l) => ({ ...l, ...priced(l.productId, l.variantId, day) }))); }} /></div>
               <div className="a-field"><label htmlFor="v-cli">Cliente <span className="a-cap">(opcional)</span></label><input id="v-cli" className="a-input" placeholder="Nombre o @usuario" value={client} onChange={(e) => setClient(e.target.value)} /></div>
             </div>
           </section>
           <section className="a-card" aria-labelledby="vn-p">
-            <div className="a-card-h"><h2 className="a-h2" id="vn-p">Productos</h2><button className="a-btn sm" type="button" onClick={() => products[0] && setLines((ls) => [...ls, { productId: products[0].id, variantId: products[0].variants[0]?.id ?? "", qty: 1, price: products[0].variants[0]?.price ?? 0 }])}><AIPlus size="sm" /> Agregar producto</button></div>
+            <div className="a-card-h"><h2 className="a-h2" id="vn-p">Productos</h2><button className="a-btn sm" type="button" onClick={() => products[0] && setLines((ls) => [...ls, { qty: 1, ...priced(products[0].id, products[0].variants[0]?.id ?? "") }])}><AIPlus size="sm" /> Agregar producto</button></div>
             {lines.map((l, i) => {
               const p = prod(l.productId);
               return (
                 <div className="ln" key={i}>
                   <span className="av" style={{ width: 44, height: 44 }}>{p && <img src={asset(bundle.tenant.slug, p.images[0])} alt="" />}</span>
                   <div>
-                    <select className="a-select" aria-label="Producto" value={l.productId} onChange={(e) => { const np = prod(e.target.value); upd(i, { productId: e.target.value, variantId: np?.variants[0]?.id ?? "", price: np?.variants[0]?.price ?? 0 }); }}>
+                    <select className="a-select" aria-label="Producto" value={l.productId} onChange={(e) => { const np = prod(e.target.value); upd(i, priced(e.target.value, np?.variants[0]?.id ?? "")); }}>
                       {products.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
                     </select>
-                    <p className="a-cap">costo {money(cost(l))} c/u</p>
+                    <p className="a-cap">costo {money(cost(l))} c/u{l.campaign ? ` · campaña «${l.campaign}» (regular ${money(l.listPrice ?? 0)})` : ""}</p>
                   </div>
-                  <select className="a-select wide" aria-label="Variante" value={l.variantId} onChange={(e) => upd(i, { variantId: e.target.value, price: p?.variants.find((v) => v.id === e.target.value)?.price ?? l.price })}>
+                  <select className="a-select wide" aria-label="Variante" value={l.variantId} onChange={(e) => upd(i, priced(l.productId, e.target.value))}>
                     {p?.variants.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
                   </select>
                   <div className="a-prefix wide"><span>S/</span><input inputMode="decimal" value={l.price} onChange={(e) => upd(i, { price: parseFloat(e.target.value) || 0 })} aria-label="Precio cobrado" /></div>
