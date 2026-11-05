@@ -11,6 +11,7 @@ import { AdminPage, DemoNote } from "../AdminPage";
 import { FieldEditor, type FieldCtx, type Json } from "../TextFields";
 import { StorePreview } from "../StorePreview";
 import { AIUndo } from "../AdminIcons";
+import { COMPLAINTS_ROUTE, CONTACT_ROUTE, LEGAL_ROUTES } from "@/lib/legal";
 
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -55,6 +56,9 @@ export function TextsView() {
       ...catalog.products.map((p) => `/p/${p.id}`),
       ...(tenant.customOrder.enabled ? ["/fiesta"] : []),
       "/carrito",
+      ...Object.values(LEGAL_ROUTES),
+      CONTACT_ROUTE,
+      COMPLAINTS_ROUTE,
       "#modelos",
       "#tips",
     ],

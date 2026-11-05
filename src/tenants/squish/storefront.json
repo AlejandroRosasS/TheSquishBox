@@ -84,12 +84,19 @@
       { "label": "Para tu fiesta", "href": "/fiesta" }
     ],
     "help": [
-      { "label": "Entregas en Lima", "href": "#" },
+      { "label": "Entregas en Lima", "href": "/entregas" },
       { "label": "Squishy tips", "href": "/#tips" },
-      { "label": "Cambios y devoluciones", "href": "#" }
-    ],
-    "legal": "RUC [N.º de RUC]",
-    "legalLinks": "Libro de reclamaciones · Términos · Privacidad"
+      { "label": "Cambios y devoluciones", "href": "/cambios-y-devoluciones" },
+      { "label": "Contáctanos", "href": "/contacto" }
+    ]
+  },
+  "business": {
+    "legalName": "Soluciones Comerciales Prep4sales E.I.R.L.",
+    "ruc": "20613418793",
+    "address": "Av. Valles del Sur 281, Santiago de Surco, Lima",
+    "email": "alejandro@prep4sales.com",
+    "phone": "+51 967 746 145",
+    "hours": "Lunes a viernes, 9 a. m. a 5 p. m."
   },
   "catalog": {
     "title": "Todas las *sorpresas*",

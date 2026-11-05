@@ -6,7 +6,7 @@
   "tagline": "Mystery squishies para coleccionar",
   "motto": "Abre • descubre • colecciona • intercambia",
   "domain": "[dominio por definir]",
-  "whatsapp": "+51 9XX XXX XXX",
+  "whatsapp": "+51 967 746 145",
   "currency": "PEN",
   "locale": "es-PE",
   "fonts": {
@@ -117,7 +117,11 @@
     "methods": [
       "tarjeta",
       "yape"
-    ]
+    ],
+    "yape": {
+      "phone": "+51 984 775 300",
+      "qr": ""
+    }
   },
   "fulfillment": {
     "delivery": "Lima Metropolitana, tarifa por distrito (configurable)",

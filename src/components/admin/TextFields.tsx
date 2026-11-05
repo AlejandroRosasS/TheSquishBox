@@ -40,19 +40,20 @@ function TextInput({ k, value, onChange }: { k: string; value: string; onChange:
   const id = useId();
   const long = isLong(k, value);
   const vars = value.match(/\{\w+\}/g);
-  const rich = isRichCandidate(k) || /\*|\[/.test(value);
+  const marks = /\*|\[[^\]]*\]\(/.test(value);
+  const rich = isRichCandidate(k) || marks;
   return (
     <div className="a-field">
       <label htmlFor={id}>{labelFor(k)}</label>
       {long ? (
-        <textarea id={id} className="a-textarea" value={value} rows={3} onChange={(e) => onChange(e.target.value)} />
+        <textarea id={id} className="a-textarea" value={value} rows={value.length > 240 ? 7 : 3} onChange={(e) => onChange(e.target.value)} />
       ) : (
         <input id={id} className="a-input" value={value} onChange={(e) => onChange(e.target.value)} list={k === "href" ? "tx-routes" : undefined} />
       )}
-      {(vars || (rich && /\*|\[/.test(value))) && (
+      {(vars || (rich && marks)) && (
         <span className="a-cap">
-          {rich && /\*|\[/.test(value) && <>Usa *así* para resaltar, **así** para negrita y [texto](/ruta) para un enlace. </>}
-          {vars && <>Deja tal cual {vars.join(", ")}: se reemplaza por el dato del cliente.</>}
+          {rich && marks && <>Usa *así* para resaltar, **así** para negrita y [texto](/ruta) para un enlace. </>}
+          {vars && <>Deja tal cual {vars.join(", ")}: se reemplaza por el dato que corresponde.</>}
         </span>
       )}
     </div>

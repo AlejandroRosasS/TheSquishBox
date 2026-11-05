@@ -5,6 +5,8 @@ import squishStorefront from "./squish/storefront.json";
 import squishSeo from "./squish/seo.json";
 import squishAdminDemo from "./squish/admin-demo.json";
 import squishMedia from "./squish/media.json";
+import sharedLegal from "./_shared/legal.json";
+import { withDefaults } from "@/lib/defaults";
 import type { MediaMap } from "@/lib/media";
 import type { AdminDemo } from "@/lib/admin/types";
 import type { Tokens } from "@/lib/publishedTheme";
@@ -20,6 +22,8 @@ export type TenantBundle = {
   source?: "db" | "files";
   /** Encuadres y datos de las fotos de la marca (por src). */
   media?: MediaMap;
+  /** Llave pública de Culqi de la marca, si el cobro con tarjeta está activo (solo con Supabase). */
+  culqiKey?: string | null;
 };
 
 /**
@@ -31,11 +35,14 @@ export const adminDemos: Record<string, AdminDemo> = {
   squish: squishAdminDemo as unknown as AdminDemo,
 };
 
+/** Textos de la marca sobre la base legal común (contacto, términos, políticas, libro de reclamaciones). */
+const storefrontOf = (own: unknown) => withDefaults(sharedLegal as unknown as Storefront, own as Storefront);
+
 export const tenants: Record<string, TenantBundle> = {
   squish: {
     tenant: squishTenant as Tenant,
     catalog: squishCatalog as Catalog,
-    storefront: squishStorefront as unknown as Storefront,
+    storefront: storefrontOf(squishStorefront),
     seo: squishSeo as Seo,
     media: squishMedia as MediaMap,
   },
