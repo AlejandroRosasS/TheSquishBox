@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { dataKey, usePersisted } from "@/lib/admin/storage";
-import { bestCampaign, limaToIso } from "@/lib/campaigns";
-import { norm, type Pricer, type SaleDraft } from "@/lib/sales/csv";
+import type { Pricer, SaleDraft } from "@/lib/sales/csv";
+import { makePricer } from "@/lib/sales/pricer";
+import { saleRow } from "@/lib/sales/rows";
 import { useAdmin, useAdminCatalog } from "./AdminContext";
 import { useCampaigns } from "./AdminCampaigns";
 import { useDb } from "./DbContext";
@@ -40,11 +41,9 @@ export type SalesState = {
 const EMPTY: ManualSale[] = [];
 /** «5 nov» */
 export const dayLabel = (day: string) => new Intl.DateTimeFormat("es-PE", { day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${day}T12:00:00Z`)).replace(".", "");
-/** Hoy en Perú (AAAA-MM-DD). Solo en el navegador. */
-export const limaToday = () => new Date(Date.now() - 5 * 3600_000).toISOString().slice(0, 10);
+export { limaToday } from "@/lib/sales/pricer";
 /** Referencia nueva para una venta registrada a mano. */
 export const newRef = () => `m${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
-const saleTotal = (s: NewSale) => s.lines.reduce((a, l) => a + l.price * l.qty, 0) + s.dIn;
 
 /** Ventas manuales: en la base con Supabase; en el navegador en modo demo. */
 export function useManualSales(): SalesState {
@@ -130,18 +129,7 @@ function useDbSales(on: boolean): SalesState {
         toast("Las ventas necesitan la migración 0009_manual_sales en Supabase");
         return null;
       }
-      const name = (pid: string, vid: string) => {
-        const p = catalog.products.find((x) => x.id === pid);
-        return { name: p?.name ?? pid, variant_label: p?.variants.find((v) => v.id === vid)?.label ?? vid };
-      };
-      const rows = next.map((s) => ({
-        tenant_id: tenantId, ref: s.ref, channel: s.channel, client: s.client || null, pay: s.pay || null, note: s.note || null,
-        delivery_in: s.dIn, delivery_out: s.dOut, total: saleTotal(s), sold_at: `${s.day}T12:00:00-05:00`, created_by: userId, source,
-        items: s.lines.map((l) => ({
-          product: l.productId, variant: l.variantId, ...name(l.productId, l.variantId), qty: l.qty, price: l.price,
-          ...(l.campaignId ? { list_price: l.listPrice ?? l.price, campaign_id: l.campaignId, campaign: l.campaign } : {}),
-        })),
-      }));
+      const rows = next.map((s) => saleRow(s, { tenantId, catalog, source, userId }));
       const { data, error } = await client.from("manual_sales").upsert(rows, { onConflict: "tenant_id,ref", ignoreDuplicates: true }).select(COLUMNS);
       if (error) {
         if (missingColumn(error)) setAvailable(false);
@@ -158,18 +146,9 @@ function useDbSales(on: boolean): SalesState {
   return { sales, add, hydrated, available };
 }
 
-/**
- * Precio de una opción en un día: el de la campaña vigente ese día (a mediodía, hora de Perú) o el regular.
- * Si piden una campaña por nombre y tiene precio para esa opción, se usa esa.
- */
+/** Precio de una opción en un día (campaña vigente o regular). Ver makePricer. */
 export function usePricer(): Pricer {
   const { catalog } = useAdminCatalog();
   const { campaigns } = useCampaigns();
-  return useMemo<Pricer>(() => (productId, variantId, day, campaignName) => {
-    const regular = catalog.products.find((p) => p.id === productId)?.variants.find((v) => v.id === variantId)?.price ?? 0;
-    const named = campaignName ? campaigns.find((c) => norm(c.name) === norm(campaignName)) : undefined;
-    const namedPrice = named?.prices[productId]?.[variantId];
-    const b = typeof namedPrice === "number" ? { campaign: named!, price: namedPrice } : /^\d{4}-\d{2}-\d{2}$/.test(day) ? bestCampaign(campaigns, productId, variantId, Date.parse(limaToIso(`${day}T12:00`))) : null;
-    return b && b.price < regular ? { price: b.price, campaignId: b.campaign.id, campaign: b.campaign.name, listPrice: regular } : { price: regular };
-  }, [catalog, campaigns]);
+  return useMemo(() => makePricer(catalog, campaigns), [catalog, campaigns]);
 }
