@@ -32,9 +32,20 @@ Un canal sin sus variables aparece como «Falta configurar» en Notificaciones. 
 
 1. En Telegram, abre **@BotFather** › `/newbot`. Ponle un nombre (por ejemplo «Alertas de pedidos») y un usuario que termine en `bot`.
 2. Copia el token que te da y guárdalo como `TELEGRAM_BOT_TOKEN`.
-3. No configures webhook: la app lee los mensajes del bot con `getUpdates`.
+3. El webhook se configura solo: la primera vez que alguien toca **Vincular chat o grupo** en producción, la app apunta el bot a `https://<dominio>/api/telegram/webhook` (con una clave que sale del token). En local y en vistas previas sigue leyendo con `getUpdates`.
+4. Para que el bot reciba CSV dentro de un **grupo**: en @BotFather › `/setprivacy` › elige el bot › **Disable**. Si no, en grupos solo ve los comandos (en un chat privado con el bot funciona siempre).
 
 Para vincular un chat, entra a Notificaciones › Telegram › **Vincular chat o grupo**, abre el link en el celular y toca **Iniciar**. Para un grupo, usa «Agregar a un grupo» y elige el grupo del equipo. El bot responde «Listo» y aparece en la lista.
+
+### Ventas manuales por Telegram
+
+Cualquier chat vinculado a una marca puede cargar ventas manuales:
+
+1. `/prompt`: el bot manda las instrucciones con el catálogo, precios y campañas de hoy, para pegarlas en Claude o ChatGPT.
+2. La IA devuelve un CSV (formato de Admin › Ventas › Importar ventas). Se le manda al bot pegado como texto o como archivo `.csv`.
+3. El bot responde con el resumen (ventas nuevas, total, campañas, filas con error, ventas ya cargadas) y los botones **Registrar** / **Cancelar**. Nada se guarda antes de tocar Registrar.
+
+Las ventas quedan en `manual_sales` con `source = 'telegram'`. Si el chat recibe avisos de más de una marca, el bot no carga ventas ahí (hay que usar un chat por marca).
 
 ### Correo con [Resend](https://resend.com) (gratis hasta 3 000 correos al mes)
 
@@ -67,6 +78,7 @@ Aplica `supabase/migrations/0004_alerts.sql` después de 0001, 0002 y 0003, y `0
 
 - `alert_outbox`: la cola de avisos. El equipo la puede leer; solo el servidor la escribe.
 - `telegram_link_codes`: códigos para vincular chats de Telegram. Solo el servidor.
+- `sales_imports` (0010): CSV de ventas recibidos por el bot, esperando Registrar/Cancelar. Solo el servidor.
 - El trigger `orders_enqueue_alerts` y la función `claim_alerts`, que solo puede llamar el servidor.
 
 La configuración vive en `site_docs` (kind `notifications`, stage `published`), que solo ve el equipo de la marca.

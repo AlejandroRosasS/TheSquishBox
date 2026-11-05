@@ -1,6 +1,18 @@
+import type { Campaign } from "../types";
 import { MANUAL_CHANNELS, PAY_METHODS, SALES_COLUMNS, type CatalogLite } from "./csv";
 
 export type PromptCampaign = { name: string; from: string; to: string; prices: { productId: string; variantId: string; price: number }[] };
+
+/** Campañas activas o programadas, en el formato del prompt (fechas en hora de Perú). */
+export function promptCampaigns(campaigns: Campaign[], now: number): PromptCampaign[] {
+  const lima = (iso: string) => new Date(Date.parse(iso) - 5 * 3600_000).toISOString().slice(0, 10);
+  return campaigns
+    .filter((c) => Date.parse(c.endsAt) > now)
+    .map((c) => ({
+      name: c.name, from: lima(c.startsAt), to: lima(c.endsAt),
+      prices: Object.entries(c.prices).flatMap(([productId, vs]) => Object.entries(vs).map(([variantId, price]) => ({ productId, variantId, price }))),
+    }));
+}
 
 const soles = (n: number) => `S/ ${n.toFixed(2)}`;
 

@@ -4,9 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { money } from "@/lib/admin/format";
-import { isActive } from "@/lib/campaigns";
 import { readSalesCsv, templateCsv, MANUAL_CHANNELS, type ReadResult } from "@/lib/sales/csv";
-import { salesPrompt } from "@/lib/sales/prompt";
+import { promptCampaigns, salesPrompt } from "@/lib/sales/prompt";
 import { useAdmin, useAdminCatalog } from "../AdminContext";
 import { useCampaigns } from "../AdminCampaigns";
 import { AdminPage, BackLink } from "../AdminPage";
@@ -32,17 +31,7 @@ export function ImportSalesView() {
   const prod = (id: string) => catalog.products.find((p) => p.id === id);
   const chanName = (k: string) => MANUAL_CHANNELS.find((c) => c[0] === k)?.[1] ?? k;
 
-  const prompt = () => {
-    const now = Date.now();
-    const lima = (iso: string) => new Date(Date.parse(iso) - 5 * 3600_000).toISOString().slice(0, 10);
-    const list = campaigns
-      .filter((c) => isActive(c, now) || Date.parse(c.startsAt) > now)
-      .map((c) => ({
-        name: c.name, from: lima(c.startsAt), to: lima(c.endsAt),
-        prices: Object.entries(c.prices).flatMap(([productId, vs]) => Object.entries(vs).map(([variantId, p]) => ({ productId, variantId, price: p }))),
-      }));
-    return salesPrompt({ brand: bundle.tenant.name, catalog: lite, campaigns: list, today: limaToday() });
-  };
+  const prompt = () => salesPrompt({ brand: bundle.tenant.name, catalog: lite, campaigns: promptCampaigns(campaigns, Date.now()), today: limaToday() });
 
   const copyPrompt = async () => {
     try {
@@ -106,7 +95,7 @@ export function ImportSalesView() {
             <button className="a-btn ghost" type="button" aria-expanded={showPrompt} onClick={() => setShowPrompt((v) => !v)}>{showPrompt ? "Ocultar prompt" : "Ver prompt"}</button>
           </div>
           {showPrompt && <textarea className="a-textarea" readOnly rows={10} value={prompt()} aria-label="Prompt para tu IA" onFocus={(e) => e.currentTarget.select()} />}
-          <p className="a-cap">Si cambias precios o campañas, vuelve a copiarlo.</p>
+          <p className="a-cap">Si cambias precios o campañas, vuelve a copiarlo. También puedes mandarle el CSV al bot de Telegram de alertas: escríbele /prompt para empezar.</p>
         </section>
         <section className="a-card" aria-labelledby="im-csv">
           <h2 className="a-h2" id="im-csv">Pega o sube el CSV</h2>
