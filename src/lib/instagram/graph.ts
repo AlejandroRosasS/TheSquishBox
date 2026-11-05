@@ -16,9 +16,21 @@ import path from "node:path";
 
 const VERSION = process.env.META_API_VERSION || "v26.0";
 const GRAPH = `https://graph.facebook.com/${VERSION}`;
-const APP_ID = () => process.env.META_APP_ID ?? "";
-const APP_SECRET = () => process.env.META_APP_SECRET ?? "";
-const CONFIG_ID = () => process.env.META_CONFIG_ID ?? "";
+/**
+ * Las variables se limpian: espacios, comillas o saltos de línea al pegar en Vercel rompen el login.
+ * Los IDs aceptan también "client_id=123…" o la URL de inicio de sesión completa de Meta.
+ */
+const clean = (v: string | undefined) => (v ?? "").trim().replace(/^["']|["']$/g, "").trim();
+function idFrom(v: string | undefined, key: "client_id" | "config_id"): string {
+  const raw = clean(v);
+  const inUrl = new RegExp(`${key}=(\\d+)`).exec(raw);
+  if (inUrl) return inUrl[1];
+  return /^[\d\s]+$/.test(raw) ? raw.replace(/\s/g, "") : raw;
+}
+const LOGIN_URL = () => clean(process.env.META_LOGIN_URL);
+const APP_ID = () => idFrom(process.env.META_APP_ID || LOGIN_URL(), "client_id");
+const APP_SECRET = () => clean(process.env.META_APP_SECRET);
+const CONFIG_ID = () => idFrom(process.env.META_CONFIG_ID || LOGIN_URL(), "config_id");
 
 export type IgChild = { id: string; media_type: string; media_url?: string; thumbnail_url?: string };
 export type IgMedia = {
@@ -73,7 +85,7 @@ export function authorizeUrl(redirectUri: string, state: string): string {
     response_type: "code",
     state,
   });
-  return `https://www.facebook.com/${VERSION}/dialog/oauth?${q}`;
+  return `https://www.facebook.com/dialog/oauth?${q}`; // formato exacto de la "URL de inicio de sesión" de Meta
 }
 
 /** Paso 2: el código de la redirección → token de la empresa de la marca. */
@@ -154,4 +166,29 @@ async function mockMedia(slug: string): Promise<IgMedia[]> {
       timestamp: new Date(Date.UTC(2026, 9, 31) - i * day).toISOString(),
     } satisfies IgMedia;
   });
+}
+
+/**
+ * Diagnóstico para el admin (sin secretos): qué IDs se están usando y si Meta reconoce la app
+ * con esa clave secreta (token de app = "<id>|<secret>").
+ */
+export async function checkSetup(redirectUri: string) {
+  const appId = APP_ID();
+  const configId = CONFIG_ID();
+  let app: { ok: boolean; name?: string; error?: string };
+  try {
+    const r = await call<{ name?: string }>(`${GRAPH}/${encodeURIComponent(appId)}?fields=name&access_token=${encodeURIComponent(`${appId}|${APP_SECRET()}`)}`);
+    app = { ok: true, name: r.name };
+  } catch (e) {
+    app = { ok: false, error: e instanceof Error ? e.message : String(e) };
+  }
+  return {
+    app_id: appId,
+    app_id_is_number: /^\d+$/.test(appId),
+    config_id: configId,
+    config_id_is_number: /^\d+$/.test(configId),
+    secret_set: APP_SECRET().length > 0,
+    redirect_uri: redirectUri,
+    meta_says: app,
+  };
 }

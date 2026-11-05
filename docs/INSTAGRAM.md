@@ -43,7 +43,7 @@ Docs: [Instagram API with Unified login](https://developers.facebook.com/documen
 |---|---|
 | `SUPABASE_SECRET_KEY` | Supabase › Project Settings › API Keys › Secret |
 | `META_APP_ID`, `META_APP_SECRET` | Paso 1.3 |
-| `META_CONFIG_ID` | Paso 1.2 |
+| `META_CONFIG_ID` | Paso 1.2 (o pon la "URL de inicio de sesión" completa en `META_LOGIN_URL` y se leen de ahí el ID de la app y el config_id) |
 | `CRON_SECRET` | Cualquier texto largo al azar |
 | `INSTAGRAM_REDIRECT_URI` | Opcional; si no, `<dominio>/api/instagram/callback` |
 
@@ -70,3 +70,7 @@ $$);
 Con `IG_MOCK=1` (más Supabase y `SUPABASE_SECRET_KEY` en `.env`), «Conectar Instagram» no sale a Meta: conecta una cuenta de prueba y trae los posts de ejemplo de `src/tenants/<slug>/admin-demo.json` con sus fotos de `public/`. Así se prueba todo el flujo: bandeja, convertir, borradores y sincronización.
 
 Pruebas del lector de captions: `npm test`.
+
+## Si falla la conexión
+
+Con tu sesión del admin abierta, entra a `/api/instagram/connect?check=1`. Muestra (sin secretos) el ID de la app y el config_id que está usando el servidor, la URL de regreso y si Meta reconoce la app con esa clave secreta. Recuerda que en Vercel los cambios de variables recién se aplican en el siguiente despliegue.
