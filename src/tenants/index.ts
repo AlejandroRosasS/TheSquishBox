@@ -9,15 +9,15 @@ import sharedLegal from "./_shared/legal.json";
 import { withDefaults } from "@/lib/defaults";
 import type { MediaMap } from "@/lib/media";
 import type { AdminDemo } from "@/lib/admin/types";
-import type { Tokens } from "@/lib/publishedTheme";
+import type { AppearanceDoc } from "@/lib/brand";
 
 export type TenantBundle = {
   tenant: Tenant;
   catalog: Catalog;
   storefront: Storefront;
   seo: Seo;
-  /** Paleta publicada desde Admin › Apariencia (null = la paleta por defecto del tenant). */
-  appearance?: { key: string | null; tokens: Tokens } | null;
+  /** Paleta, nombre y logo publicados desde Admin › Apariencia (null = los del tenant). */
+  appearance?: AppearanceDoc | null;
   /** "db" cuando viene de Supabase; "files" cuando sale de los JSON del repo. */
   source?: "db" | "files";
   /** Encuadres y datos de las fotos de la marca (por src). */

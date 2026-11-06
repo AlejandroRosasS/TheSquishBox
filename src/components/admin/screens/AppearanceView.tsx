@@ -12,8 +12,10 @@ import { STATUS_LABEL, useDoc } from "@/lib/admin/useDoc";
 import { TOKEN_KEYS, type TokenKey, type Tokens } from "@/lib/publishedTheme";
 import type { PaletteTokens } from "@/lib/types";
 import { useTextsDraft } from "./useTextsDraft";
+import { BrandCard } from "./BrandCard";
+import { brandOf, withBrand, type AppearanceDoc, type Brand } from "@/lib/brand";
 
-type Appearance = { key: string | null; tokens: Tokens };
+type Appearance = AppearanceDoc & { brand: Brand };
 
 const toTokens = (p: PaletteTokens): Tokens => Object.fromEntries(TOKEN_KEYS.map((k) => [k, p[k]])) as Tokens;
 
@@ -47,7 +49,7 @@ export function AppearanceView() {
   const { bundle, toast } = useAdmin();
   const { tenant } = bundle;
   const presets = tenant.palettes;
-  const base: Appearance = useMemo(() => ({ key: tenant.defaultPalette, tokens: toTokens(presets[tenant.defaultPalette]) }), [tenant, presets]);
+  const base: Appearance = useMemo(() => ({ key: tenant.defaultPalette, tokens: toTokens(presets[tenant.defaultPalette]), brand: brandOf(tenant) }), [tenant, presets]);
   const doc = useDoc<Appearance>("appearance", base);
   const db = useDb();
   const [mode, setMode] = useState<"m" | "d">("m");
@@ -58,11 +60,11 @@ export function AppearanceView() {
 
   const set = (k: TokenKey, hex: string) => {
     setJustPublished(false);
-    doc.edit((prev) => ({ key: null, tokens: { ...prev.tokens, [k]: hex } }));
+    doc.edit((prev) => ({ ...prev, key: null, tokens: { ...prev.tokens, [k]: hex } }));
   };
   const pick = (key: string) => {
     setJustPublished(false);
-    doc.edit({ key, tokens: toTokens(presets[key]) });
+    doc.edit((prev) => ({ ...prev, key, tokens: toTokens(presets[key]) }));
   };
 
   const checks = [
@@ -75,7 +77,15 @@ export function AppearanceView() {
     const r = contrast(c.a, c.b);
     return { ...c, ratio: `${r.toFixed(1)}:1`, ok: r >= 4.5 };
   });
-  const blocked = checks.some((c) => !c.ok);
+  const setBrand = (b: Brand) => {
+    setJustPublished(false);
+    doc.edit((prev) => ({ ...prev, brand: b }));
+  };
+  const brand = doc.value.brand;
+  const noName = !brand.name.trim();
+  const blocked = checks.some((c) => !c.ok) || noName;
+  // La vista previa muestra el nombre y logo que se están editando.
+  const previewBundle = useMemo(() => ({ ...texts.bundle, tenant: withBrand(texts.bundle.tenant, brand) }), [texts.bundle, brand]);
   const badKeys = new Set(checks.filter((c) => !c.ok).flatMap((c) => c.keys));
   const [stLabel, stCls] = STATUS_LABEL[doc.status];
   const derived = [
@@ -85,7 +95,9 @@ export function AppearanceView() {
     { label: "Borde fuerte", css: `color-mix(in oklab, ${v.border} 60%, ${v.text2})` },
   ];
 
-  const footNote = blocked
+  const footNote = noName
+    ? "No se puede publicar: falta el nombre de la marca."
+    : blocked
     ? "No se puede publicar: hay colores que no se leen bien."
     : doc.status === "live"
       ? "La tienda ya muestra esta paleta."
@@ -99,7 +111,7 @@ export function AppearanceView() {
             <h1 className="a-h1">Apariencia de la tienda</h1>
             <span className={`st ${stCls} only-d`}>{stLabel}</span>
           </div>
-          <p className="a-sub">Cambia los tonos sin ayuda técnica. El logo y este panel no cambian: siempre se ven igual.</p>
+          <p className="a-sub">Nombre, logo y colores de tu tienda, sin ayuda técnica. Los colores de este panel no cambian.</p>
         </div>
         <button className="a-btn" type="button" onClick={() => pick(tenant.defaultPalette)}>Restaurar paleta original</button>
       </div>
@@ -107,10 +119,12 @@ export function AppearanceView() {
       {justPublished && (
         <div className="a-banner ok" role="status">
           <AICheck size="sm" />
-          <span className="grow"><b>Paleta “{name}” publicada.</b> La tienda ya se ve con estos tonos. {!db && <span className="a-cap">(Demo: por ahora solo en este navegador.)</span>}</span>
+          <span className="grow"><b>Apariencia publicada.</b> La tienda ya se ve con este nombre, logo y la paleta “{name}”. {!db && <span className="a-cap">(Demo: por ahora solo en este navegador.)</span>}</span>
           <a className="a-btn sm" href="/" target="_blank" rel="noreferrer">Ver tienda actualizada</a>
         </div>
       )}
+
+      <BrandCard value={brand} onChange={setBrand} />
 
       <section className="a-card" aria-labelledby="ap-pal">
         <h2 className="a-h2" id="ap-pal">Paletas</h2>
@@ -190,7 +204,7 @@ export function AppearanceView() {
             </div>
           </div>
           <div className="prev-frame">
-            <StorePreview bundle={texts.bundle} tokens={v} mode={mode} label={`Vista previa de la tienda con la paleta ${name}`} />
+            <StorePreview bundle={previewBundle} tokens={v} mode={mode} label={`Vista previa de la tienda con la paleta ${name}`} />
           </div>
           <p className="a-cap">Es la página de inicio real de tu tienda{texts.hasDraft ? ", con tus textos en borrador" : ""}.</p>
         </section>
@@ -204,7 +218,7 @@ export function AppearanceView() {
             className="a-btn primary"
             type="button"
             disabled={blocked || doc.status === "live"}
-            onClick={async () => { if (await doc.publish()) { setJustPublished(true); toast(`Paleta “${name}” publicada`); } }}
+            onClick={async () => { if (await doc.publish()) { setJustPublished(true); toast("Apariencia publicada"); } }}
           >
             Publicar
           </button>

@@ -1,5 +1,5 @@
 import type { Campaign, Catalog, Product, Seo, Storefront, Tenant } from "@/lib/types";
-import type { Tokens } from "@/lib/publishedTheme";
+import type { AppearanceDoc } from "@/lib/brand";
 import type { MediaMap } from "@/lib/media";
 import { publicClient } from "./public";
 import { UNTRACKED_STOCK } from "@/lib/catalog";
@@ -9,7 +9,7 @@ export type DbBundle = {
   catalog: Catalog;
   storefront: Storefront;
   seo: Seo;
-  appearance: { key: string | null; tokens: Tokens } | null;
+  appearance: AppearanceDoc | null;
   media: MediaMap;
   culqiKey: string | null;
   /** Campañas de oferta vigentes (sin aplicar todavía al catálogo). */

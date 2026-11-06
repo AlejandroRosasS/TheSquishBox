@@ -22,7 +22,10 @@ export type Tenant = {
   currency: string;
   locale: string;
   fonts: { display: string; body: string; googleFontsUrl?: string };
+  /** Subtítulo debajo del nombre en el menú del panel (se edita en Admin › Apariencia). */
+  panelSubtitle?: string;
   logo: {
+    /** "image": se muestra con su forma propia (redonda, cuadrada o alargada), sin recortarla. */
     type: "css" | "image";
     lines?: { text: string; color: string }[];
     background?: string;

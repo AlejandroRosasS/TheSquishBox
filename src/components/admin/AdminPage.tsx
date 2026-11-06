@@ -3,9 +3,9 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Logo } from "@/components/Logo";
-import { useAdmin } from "./AdminContext";
 import { useDb } from "./DbContext";
 import { AIBack } from "./AdminIcons";
+import { useBrandTenant } from "./useBrand";
 
 type Props = {
   /** Título corto de la barra superior en celular. */
@@ -17,7 +17,7 @@ type Props = {
 
 /** Barra superior (celular) + contenido de una pantalla del panel. */
 export function AdminPage({ title, back, topRight, children }: Props) {
-  const { bundle } = useAdmin();
+  const { tenant, resolve } = useBrandTenant();
   return (
     <>
       <div className="a-top">
@@ -28,7 +28,7 @@ export function AdminPage({ title, back, topRight, children }: Props) {
           </Link>
         ) : (
           <div className="row g3">
-            <Logo tenant={bundle.tenant} size="sm" />
+            <Logo tenant={tenant} size="sm" resolve={resolve} />
             <b>{title}</b>
           </div>
         )}
