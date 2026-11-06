@@ -6,6 +6,8 @@ import { Suspense, type ReactNode } from "react";
 import { Logo } from "@/components/Logo";
 import { useAdmin, useAdminCatalog, useOrders, useParty } from "./AdminContext";
 import { AuthGate, SignOutButton } from "./AuthGate";
+import { useBrandTenant } from "./useBrand";
+import { PANEL_SUBTITLE } from "@/lib/brand";
 import { AIBell, AIBox, AIChart, AIGlobe, AIHome, AIInstagram, AIMore, AIOrders, AIPalette, AISettings, AIText, AIImage, AIBook } from "./AdminIcons";
 import { isSoldOut, totalStock, LOW_STOCK } from "@/lib/catalog";
 
@@ -43,8 +45,7 @@ function ShellWithPath({ children }: { children: ReactNode }) {
 }
 
 function ShellInner({ children, path }: { children: ReactNode; path: string }) {
-  const { bundle } = useAdmin();
-  const { tenant } = bundle;
+  const { tenant, resolve } = useBrandTenant();
   const c = useAdminCounts();
   const party = tenant.customOrder.enabled;
 
@@ -82,10 +83,10 @@ function ShellInner({ children, path }: { children: ReactNode; path: string }) {
       <a className="a-skip" href="#contenido">Saltar al contenido</a>
       <aside className="a-side" aria-label="Menú del panel">
         <div className="a-brand">
-          <Logo tenant={tenant} size="sm" />
-          <div>
+          <Logo tenant={tenant} size="sm" resolve={resolve} />
+          <div className="a-brand-txt">
             <b>{tenant.name}</b>
-            <p className="a-cap">Panel de la tienda</p>
+            <p className="a-cap">{tenant.panelSubtitle ?? PANEL_SUBTITLE}</p>
           </div>
         </div>
         <nav className="a-nav stack g1" aria-label="Secciones">

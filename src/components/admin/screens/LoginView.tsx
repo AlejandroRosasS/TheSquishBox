@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { Logo } from "@/components/Logo";
 import { asset } from "@/lib/assets";
+import { useBrandTenant } from "../useBrand";
 import { useAdmin } from "../AdminContext";
 import { DemoNote } from "../AdminPage";
 import { useDb } from "../DbContext";
@@ -14,6 +15,7 @@ import { useDb } from "../DbContext";
 export function LoginView() {
   const { bundle, toast } = useAdmin();
   const { tenant } = bundle;
+  const brand = useBrandTenant();
   const router = useRouter();
   const db = useDb();
   const [mail, setMail] = useState("");
@@ -51,7 +53,7 @@ export function LoginView() {
       <div className="a-login-form">
         <form className="a-card" onSubmit={submit}>
           <div className="stack g3" style={{ alignItems: "center", textAlign: "center" }}>
-            <Logo tenant={tenant} />
+            <Logo tenant={brand.tenant} resolve={brand.resolve} />
             <h1 className="a-h1">Panel de la tienda</h1>
             <p className="a-sub">Ingresa con tu correo del equipo.</p>
           </div>

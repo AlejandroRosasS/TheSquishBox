@@ -4,6 +4,7 @@ import { dbConfigured } from "@/lib/db/env";
 import { loadBundleFromDb } from "@/lib/db/bundle";
 import { withDefaults } from "@/lib/defaults";
 import { applyCampaigns } from "@/lib/campaigns";
+import { withBrand } from "@/lib/brand";
 
 /** Marca activa del despliegue (variable TENANT, por defecto "squish"). */
 export function tenantSlug(): string {
@@ -40,7 +41,8 @@ export async function getTenantBundle(): Promise<TenantBundle> {
   return {
     ...rest,
     catalog: applyCampaigns(fromDb.catalog, campaigns, now),
-    tenant: files ? withDefaults(files.tenant, fromDb.tenant) : fromDb.tenant,
+    // Nombre y logo publicados en Apariencia mandan sobre los datos de la marca.
+    tenant: withBrand(files ? withDefaults(files.tenant, fromDb.tenant) : fromDb.tenant, fromDb.appearance?.brand),
     storefront: files ? withDefaults(files.storefront, fromDb.storefront) : fromDb.storefront,
     seo: files ? withDefaults(files.seo, fromDb.seo) : fromDb.seo,
     source: "db",
