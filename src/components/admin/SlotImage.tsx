@@ -10,7 +10,7 @@ import { AICrop, AIRefresh, AIUndo } from "./AdminIcons";
 
 type Value = { image: string; imageMobile?: string };
 
-function Preview({ src, format, label }: { src: string; format: FormatId; label: string }) {
+function Preview({ src, format, label, max = 260 }: { src: string; format: FormatId; label: string; max?: number }) {
   const { media } = useAdminMedia();
   useMeasure(src);
   const f = FORMATS[format];
@@ -18,7 +18,7 @@ function Preview({ src, format, label }: { src: string; format: FormatId; label:
   return (
     <div className="stack g2">
       <div className="row between"><b style={{ fontSize: 13 }}>{label}</b><span className="a-cap">{f.label}</span></div>
-      <div className="slot-img" style={{ aspectRatio: `${f.w} / ${f.h}`, maxHeight: 260 }}>
+      <div className="slot-img" style={{ aspectRatio: `${f.w} / ${f.h}`, maxHeight: max }}>
         <MediaProvider mode="d"><Photo src={src} alt="" slot={format} /></MediaProvider>
         <OriginTag item={media[src]} />
       </div>
@@ -31,7 +31,9 @@ function Preview({ src, format, label }: { src: string; format: FormatId; label:
  * Foto de una sección de la tienda (portada, accesos…). Si la sección usa formatos distintos en
  * escritorio y en celular, deja elegir una foto por formato; si no, la de celular es la misma con su encuadre.
  */
-export function SlotImage({ slotKey, value, onChange }: { slotKey: string; value: Value; onChange: (v: Value) => void }) {
+/** `compact`: miniaturas más chicas (fotos dentro de una lista). */
+export function SlotImage({ slotKey, value, onChange, compact }: { slotKey: string; value: Value; onChange: (v: Value) => void; compact?: boolean }) {
+  const max = compact ? 150 : 260;
   const slot = slotFor(slotKey);
   const two = hasTwoFormats(slot);
   const id = useId();
@@ -48,14 +50,14 @@ export function SlotImage({ slotKey, value, onChange }: { slotKey: string; value
   return (
     <div className="a-field" role="group" aria-labelledby={id}>
       <span id={id} style={{ fontSize: 13, fontWeight: 600 }}>{two ? "Fotos (escritorio y celular)" : "Foto"}</span>
-      <div className={two ? "slot-pair" : "stack"} style={two ? undefined : { maxWidth: 260 }}>
+      <div className={two ? "slot-pair" : "stack"} style={two ? (compact ? { maxWidth: 320 } : undefined) : { maxWidth: compact ? 150 : 260 }}>
         <div className="stack g2">
-          <Preview src={value.image} format={slot.d} label={two ? "Escritorio" : "En la tienda"} />
+          <Preview src={value.image} format={slot.d} label={two ? "Escritorio" : "En la tienda"} max={max} />
           <button className="a-btn sm" type="button" onClick={() => setPick("d")}><AIRefresh size="sm" /> Cambiar foto</button>
         </div>
         {two && (
           <div className="stack g2">
-            <Preview src={mSrc} format={slot.m} label={value.imageMobile ? "Celular · foto propia" : "Celular · misma foto"} />
+            <Preview src={mSrc} format={slot.m} label={value.imageMobile ? "Celular · foto propia" : "Celular · misma foto"} max={max} />
             <div className="row g2 wrap-row">
               <button className="a-btn sm" type="button" onClick={() => setPick("m")}><AIRefresh size="sm" /> {value.imageMobile ? "Cambiar foto" : "Usar otra foto"}</button>
               {value.imageMobile && <button className="a-btn sm ghost" type="button" onClick={() => onChange({ ...value, imageMobile: undefined })}><AIUndo size="sm" /> Usar la de escritorio</button>}
@@ -65,7 +67,7 @@ export function SlotImage({ slotKey, value, onChange }: { slotKey: string; value
       </div>
       <div className="row g2 wrap-row">
         <button className="a-btn sm" type="button" aria-expanded={framing} onClick={() => setFraming(!framing)}><AICrop size="sm" /> Encuadrar</button>
-        {two && <span className="a-cap">Los formatos cambian mucho entre celular y escritorio: si puedes, usa una foto horizontal y otra vertical.</span>}
+        {two && !compact && <span className="a-cap">Los formatos cambian mucho entre celular y escritorio: si puedes, usa una foto horizontal y otra vertical.</span>}
       </div>
       {framing && (
         <div className="a-card" style={{ background: "var(--a-bg)" }}>
