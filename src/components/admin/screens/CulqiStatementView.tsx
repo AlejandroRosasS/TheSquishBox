@@ -14,6 +14,8 @@ const ORIGIN: Record<CulqiOrigin, [string, string]> = {
   otro: ["Otro canal", "cancelado"],
 };
 
+const PAY_STATUS: Record<string, string> = { paid: "pagado", pending: "pago pendiente", failed: "pago fallido", refunded: "devuelto" };
+
 const COLS = "120px minmax(0, 1.3fr) 120px 100px 100px 100px";
 
 /** Mes actual en hora de Lima: "2026-11". */
@@ -107,7 +109,7 @@ export function CulqiStatementView() {
           <div className="kpis5">
             <div className="kpi"><span className="l">Cobrado en la web</span><span className="v money">{money(tot(web, "amount"))}</span><span className="a-cap">{web.length} cobros</span></div>
             <div className="kpi"><span className="l">Comisión Culqi (web)</span><span className="v money">{fees.length ? `− ${money(feeSum)}` : "—"}</span><span className="a-cap">{fees.length === web.length ? "Según Culqi" : `${web.length - fees.length} sin dato · ver EECC`}</span></div>
-            <div className="kpi"><span className="l">Neto web</span><span className="v money">{netKnown && web.length ? money(netSum) : "—"}</span><span className="a-cap">{netKnown ? "Lo que deposita Culqi" : "Completa con el EECC"}</span></div>
+            <div className="kpi"><span className="l">Neto web</span><span className="v money">{netKnown && web.length ? money(netSum) : "—"}</span><span className="a-cap">{netKnown ? "Cobrado − comisión − devoluciones" : "Completa con el EECC"}</span></div>
             <div className="kpi"><span className="l">Devoluciones web</span><span className="v money">{money(tot(web, "refunded"))}</span><span className="a-cap">{web.filter((r) => r.refunded > 0).length} cobros</span></div>
             <div className="kpi"><span className="l">Otros canales</span><span className="v money">{money(tot(other, "amount"))}</span><span className="a-cap">{other.length} cobros fuera de la web</span></div>
           </div>
@@ -117,7 +119,7 @@ export function CulqiStatementView() {
               <h2 className="a-h2" id="c-rev">Para revisar</h2>
               <ul className="stack g2" style={{ margin: 0, paddingLeft: 18 }}>
                 {review.map((r) => (
-                  <li key={r.id}>Cobro <b>{r.id}</b> de {money(r.amount)} viene de la web{r.order ? <> (pedido <Link href={`/admin/pedidos/${r.order}`}>{r.order}</Link>)</> : ""}, pero el pedido no figura pagado con ese cobro{r.orderPayment ? ` (estado: ${r.orderPayment})` : ""}.</li>
+                  <li key={r.id}>Cobro <b>{r.id}</b> de {money(r.amount)} viene de la web{r.order ? <> (pedido <Link href={`/admin/pedidos/${r.order}`}>{r.order}</Link>)</> : ""}, pero el pedido no figura pagado con ese cobro{r.orderPayment ? ` (figura como ${PAY_STATUS[r.orderPayment] ?? r.orderPayment})` : ""}.</li>
                 ))}
                 {data.missing.map((m) => (
                   <li key={m.orderId}>El pedido <Link href={`/admin/pedidos/${m.order}`}>{m.order}</Link> figura pagado con tarjeta ({money(m.total)}) pero su cobro <b>{m.ref}</b> no aparece en Culqi este mes.</li>

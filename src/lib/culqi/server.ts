@@ -167,8 +167,10 @@ export function chargeFees(c: CulqiCharge): { fee: number | null; net: number | 
   const fd = c.fee_details;
   const fromDetails = fd ? (fd.fixed_fee?.total ?? fd.fixed_fee?.amount ?? 0) + (fd.variable_fee?.total ?? fd.variable_fee?.amount ?? 0) : null;
   const base = typeof c.total_fee === "number" ? c.total_fee + (c.total_fee_taxes ?? 0) : fromDetails || null;
-  const net = typeof c.transfer_amount === "number" ? c.transfer_amount : base !== null ? c.amount - base - (c.amount_refunded ?? 0) : null;
-  const fee = base ?? (typeof c.transfer_amount === "number" ? c.amount - (c.amount_refunded ?? 0) - c.transfer_amount : null);
+  // transfer_amount llega en 0 mientras Culqi no deposita el cobro: en ese caso el neto se calcula.
+  const transfer = typeof c.transfer_amount === "number" && c.transfer_amount > 0 ? c.transfer_amount : null;
+  const net = base !== null ? c.amount - base - (c.amount_refunded ?? 0) : transfer;
+  const fee = base ?? (transfer !== null ? c.amount - (c.amount_refunded ?? 0) - transfer : null);
   return { fee, net };
 }
 
