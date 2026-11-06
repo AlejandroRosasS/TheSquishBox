@@ -22,6 +22,15 @@ export type CulqiCharge = {
   response_code?: string;
   state?: string;
   metadata?: Record<string, string>;
+  description?: string;
+  /** Fecha del cobro (Unix; Culqi la manda en milisegundos). */
+  creation_date?: number;
+  /** Comisión de Culqi en céntimos, si la cuenta la expone en el cobro. */
+  total_fee?: number;
+  total_fee_taxes?: number;
+  fee_details?: { fixed_fee?: { total?: number; amount?: number }; variable_fee?: { total?: number; amount?: number } };
+  /** Lo que Culqi deposita a la marca por este cobro (céntimos), si viene. */
+  transfer_amount?: number;
   source?: { card_number?: string; last_four?: string; iin?: { card_brand?: string } };
 };
 
@@ -120,6 +129,47 @@ export async function getCharge(acct: CulqiAccount, id: string): Promise<CulqiCh
   if (!/^chr_(test|live)_[A-Za-z0-9]+$/.test(id)) return null;
   const r = await call<CulqiCharge>(acct.secretKey, `/charges/${id}`);
   return r.ok && r.json.object === "charge" ? r.json : null;
+}
+
+/**
+ * Cobros de la cuenta Culqi de la marca entre dos fechas (ms). Recorre las páginas (máx. `maxPages` × 100)
+ * y vuelve a filtrar por fecha aquí, por si la API ignora el filtro. Devuelve null si Culqi no respondió.
+ */
+export async function listCharges(acct: CulqiAccount, fromMs: number, toMs: number, maxPages = 10): Promise<{ charges: CulqiCharge[]; truncated: boolean } | null> {
+  const out: CulqiCharge[] = [];
+  let after = "";
+  for (let page = 0; page < maxPages; page++) {
+    const q = new URLSearchParams({ limit: "100", creation_date_from: String(Math.floor(fromMs / 1000)), creation_date_to: String(Math.ceil(toMs / 1000)) });
+    if (after) q.set("after", after);
+    const r = await call<{ data?: CulqiCharge[]; paging?: { cursors?: { after?: string } } }>(acct.secretKey, `/charges?${q}`);
+    if (!r.ok || !Array.isArray(r.json.data)) return page ? { charges: out, truncated: true } : null;
+    out.push(...r.json.data.filter((c) => c?.object === "charge" || String(c?.id ?? "").startsWith("chr_")));
+    after = r.json.paging?.cursors?.after ?? "";
+    if (!after || r.json.data.length < 100) {
+      return { charges: out.filter((c) => { const t = chargeTime(c); return t === null || (t >= fromMs && t <= toMs); }), truncated: false };
+    }
+  }
+  return { charges: out, truncated: true };
+}
+
+/** Fecha del cobro en ms (acepta segundos o milisegundos). */
+export function chargeTime(c: CulqiCharge): number | null {
+  const t = Number(c.creation_date);
+  if (!Number.isFinite(t) || t <= 0) return null;
+  return t < 1e12 ? t * 1000 : t;
+}
+
+/**
+ * Comisión y neto de un cobro, en céntimos. Usa lo que Culqi reporte (total_fee + IGV, transfer_amount);
+ * si no viene, queda null y la pantalla lo marca como "por conciliar con el EECC".
+ */
+export function chargeFees(c: CulqiCharge): { fee: number | null; net: number | null } {
+  const fd = c.fee_details;
+  const fromDetails = fd ? (fd.fixed_fee?.total ?? fd.fixed_fee?.amount ?? 0) + (fd.variable_fee?.total ?? fd.variable_fee?.amount ?? 0) : null;
+  const base = typeof c.total_fee === "number" ? c.total_fee + (c.total_fee_taxes ?? 0) : fromDetails || null;
+  const net = typeof c.transfer_amount === "number" ? c.transfer_amount : base !== null ? c.amount - base - (c.amount_refunded ?? 0) : null;
+  const fee = base ?? (typeof c.transfer_amount === "number" ? c.amount - (c.amount_refunded ?? 0) - c.transfer_amount : null);
+  return { fee, net };
 }
 
 export const toCents = (soles: number) => Math.round(Number(soles) * 100);
