@@ -133,7 +133,7 @@ export function SalesView() {
     <AdminPage title="Ventas" topRight={<Link className="a-btn primary sm" href="/admin/ventas/nueva">+ Venta</Link>}>
       <div className="a-head">
         <div className="stack g1"><h1 className="a-h1">Ventas y márgenes</h1><p className="a-sub">Todos los canales en un solo lugar. Montos aproximados según los costos cargados.</p></div>
-        <div className="row g2 wrap-row"><Link className="a-btn" href="/admin/ventas/importar">Importar ventas</Link><button className="a-btn" type="button" onClick={exportCsv}>Exportar CSV</button><Link className="a-btn primary only-d" href="/admin/ventas/nueva">+ Registrar venta</Link></div>
+        <div className="row g2 wrap-row"><Link className="a-btn" href="/admin/ventas/culqi">Cobros Culqi</Link><Link className="a-btn" href="/admin/ventas/importar">Importar ventas</Link><button className="a-btn" type="button" onClick={exportCsv}>Exportar CSV</button><Link className="a-btn primary only-d" href="/admin/ventas/nueva">+ Registrar venta</Link></div>
       </div>
       <div className="row g3 wrap-row">
         <div className="a-seg" role="group" aria-label="Período">

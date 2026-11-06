@@ -39,3 +39,11 @@ Sin base de datos (modo demo), el pago con tarjeta sigue simulado.
 
 - Pedidos con tarjeta abandonados (el cliente cierra Culqi y no vuelve) quedan *Pago por confirmar* con el stock reservado; el equipo los cancela desde Pedidos. Más adelante: vencerlos solos.
 - Yape en línea vía Culqi, cuando Culqi lo confirme para la cuenta.
+
+## Conciliación de cobros (Admin › Ventas › Cobros Culqi)
+
+- Cada cobro de la tienda web va a Culqi con descripción `Tienda web · Pedido 0002` y metadata `canal=web`, `tenant`, `order_id`, `order_number`. Así se distingue de lo que la marca cobre con la misma cuenta en otros sitios.
+- `/admin/ventas/culqi` lista los cobros aprobados del mes (consulta `GET /v2/charges` con la llave secreta de la marca, en el servidor) y los separa en: **Tienda web** (cobro = `orders.payment_ref`), **Web · revisar** (marcado como web pero el pedido no figura pagado con ese cobro) y **Otro canal**.
+- Comisión y neto se leen del cobro si Culqi los reporta (`total_fee`, `fee_details`, `transfer_amount`); si no, salen con «—» y se completan con el EECC de CulqiPanel. El CSV exportado se cruza con el reporte de Culqi por el id `chr_…`.
+- Si Culqi no deja listar la cuenta, la pantalla consulta solo los cobros de los pedidos de la web.
+- No usa tablas nuevas: no hay migración.

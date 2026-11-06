@@ -40,8 +40,9 @@ export async function POST(req: NextRequest) {
     token,
     amountCents: toCents(o.total),
     email: c.email ?? "",
-    description: `Pedido ${orderCode(o.number)}`,
-    metadata: { tenant: slug, order_id: o.id, order_number: String(o.number) },
+    description: `Tienda web · Pedido ${orderCode(o.number)}`,
+    // canal: "web" separa estos cobros de los que la marca haga con la misma cuenta en otros sitios.
+    metadata: { canal: "web", tenant: slug, order_id: o.id, order_number: String(o.number) },
     customer: { name: c.name ?? "", phone: c.phone ?? "", address: [d.address, d.district].filter(Boolean).join(", ") },
     deviceId: typeof body?.deviceId === "string" && /^[0-9a-f-]{8,64}$/i.test(body.deviceId) ? body.deviceId : null,
     authentication3DS: body?.authentication3DS && typeof body.authentication3DS === "object" ? body.authentication3DS : undefined,
