@@ -16,7 +16,8 @@ export type FieldCtx = {
   routesId: string;
 };
 
-type Props = { k: string; value: Json; onChange: (v: Json) => void; ctx: FieldCtx; depth?: number };
+/** `path`: ruta del campo dentro de storefront (ej. "tiles.1.title"); la vista previa la usa para resaltarlo. */
+type Props = { k: string; value: Json; onChange: (v: Json) => void; ctx: FieldCtx; depth?: number; path?: string; inList?: boolean };
 
 /** Copia "vacía" de un elemento, para agregar uno nuevo a una lista. */
 function blank(v: Json): Json {
@@ -104,27 +105,28 @@ function ProductChecks({ k, value, onChange, ctx }: { k: string; value: string[]
 }
 
 /** Editor genérico de un valor de storefront.json (texto, número, color, foto, lista u objeto). */
-export function FieldEditor({ k, value, onChange, ctx, depth = 0 }: Props) {
+export function FieldEditor({ k, value, onChange, ctx, depth = 0, path = k, inList }: Props) {
   const id = useId();
   if (HIDDEN_KEYS.has(k)) return null;
+  const at = (sub: string | number) => `${path}.${sub}`;
 
   if (PRODUCT_LIST_KEYS.has(k) && Array.isArray(value)) {
-    return <ProductChecks k={k} value={value as string[]} onChange={onChange} ctx={ctx} />;
+    return <div data-path={path}><ProductChecks k={k} value={value as string[]} onChange={onChange} ctx={ctx} /></div>;
   }
   if (typeof value === "string") {
-    if (isImageKey(k)) return <ImagePicker value={value} onChange={onChange} ctx={ctx} />;
+    if (isImageKey(k)) return <div data-path={path}><ImagePicker value={value} onChange={onChange} ctx={ctx} /></div>;
     if (k === "hex")
       return (
-        <div className="a-field">
+        <div className="a-field" data-path={path}>
           <label htmlFor={id}>{labelFor(k)}</label>
           <div className="color-in"><input id={id} type="color" value={/^#[0-9a-f]{6}$/i.test(value) ? value : "#000000"} onChange={(e) => onChange(e.target.value.toUpperCase())} /><span className="a-cap">{value}</span></div>
         </div>
       );
-    return <TextInput k={k} value={value} onChange={onChange} />;
+    return <div data-path={path}><TextInput k={k} value={value} onChange={onChange} /></div>;
   }
   if (typeof value === "number") {
     return (
-      <div className="a-field">
+      <div className="a-field" data-path={path}>
         <label htmlFor={id}>{labelFor(k)}</label>
         <input id={id} className="a-input" type="number" inputMode="decimal" value={value} onChange={(e) => onChange(Number(e.target.value) || 0)} />
       </div>
@@ -136,19 +138,19 @@ export function FieldEditor({ k, value, onChange, ctx, depth = 0 }: Props) {
     const items = value;
     const simple = items.every((x) => typeof x === "string");
     return (
-      <fieldset className="tx-group" aria-labelledby={id}>
+      <fieldset className="tx-group" aria-labelledby={id} data-path={path}>
         <div className="tx-group-h">
           <span id={id} className="a-h3">{labelFor(k)}</span>
           <span className="a-cap">{items.length}</span>
         </div>
         {items.map((item, i) => (
-          <div key={i} className={simple ? "row g2" : "stack g3"} style={simple ? { alignItems: "flex-end" } : { borderTop: i ? "1px solid var(--a-border)" : 0, paddingTop: i ? 12 : 0 }}>
+          <div key={i} data-path={at(i)} className={simple ? "row g2" : "stack g3"} style={simple ? { alignItems: "flex-end" } : { borderTop: i ? "1px solid var(--a-border)" : 0, paddingTop: i ? 12 : 0 }}>
             {!simple && <p className="a-label">{itemLabelFor(k)} {i + 1}</p>}
             <div className="grow stack g3">
               {simple ? (
-                <TextInput k={`${k}`} value={item as string} onChange={(v) => onChange(items.map((x, j) => (j === i ? v : x)))} />
+                <TextInput k={k} value={item as string} onChange={(v) => onChange(items.map((x, j) => (j === i ? v : x)))} />
               ) : (
-                <ObjectFields k={k} obj={item as Record<string, Json>} ctx={ctx} depth={depth + 1} onChange={(v) => onChange(items.map((x, j) => (j === i ? v : x)))} />
+                <ObjectFields k={k} path={at(i)} inList obj={item as Record<string, Json>} ctx={ctx} depth={depth + 1} onChange={(v) => onChange(items.map((x, j) => (j === i ? v : x)))} />
               )}
             </div>
             <div className="mv" style={simple ? undefined : { alignSelf: "flex-end" }}>
@@ -167,10 +169,10 @@ export function FieldEditor({ k, value, onChange, ctx, depth = 0 }: Props) {
     );
   }
 
-  const inner = <ObjectFields k={k} obj={value} ctx={ctx} depth={depth + 1} onChange={onChange} />;
-  if (depth === 0) return <div className="stack g4">{inner}</div>;
+  const inner = <ObjectFields k={k} path={path} inList={inList} obj={value} ctx={ctx} depth={depth + 1} onChange={onChange} />;
+  if (depth === 0) return <div className="stack g4" data-path={path}>{inner}</div>;
   return (
-    <fieldset className="tx-group" aria-labelledby={id}>
+    <fieldset className="tx-group" aria-labelledby={id} data-path={path}>
       <span id={id} className="a-h3">{labelFor(k)}</span>
       {inner}
     </fieldset>
@@ -183,24 +185,27 @@ export type { Json };
  * Campos de un objeto. Si tiene foto (`image`), se edita con su formato de la tienda:
  * en secciones con formatos distintos (portada, accesos) se puede elegir otra foto para celular.
  */
-function ObjectFields({ k, obj, onChange, ctx, depth }: { k: string; obj: Record<string, Json>; onChange: (v: Json) => void; ctx: FieldCtx; depth: number }) {
+function ObjectFields({ k, path, inList, obj, onChange, ctx, depth }: { k: string; path: string; inList?: boolean; obj: Record<string, Json>; onChange: (v: Json) => void; ctx: FieldCtx; depth: number }) {
   const hasSlot = typeof obj.image === "string";
   const entries = Object.entries(obj).filter(([ck]) => !HIDDEN_KEYS.has(ck) && !(hasSlot && (ck === "image" || ck === "imageMobile")));
   return (
     <>
       {hasSlot && (
-        <SlotImage
-          slotKey={k}
-          value={{ image: obj.image as string, imageMobile: (obj.imageMobile as string) || undefined }}
-          onChange={(v) => {
-            const next: Record<string, Json> = { ...obj, image: v.image };
-            if (v.imageMobile) next.imageMobile = v.imageMobile;
-            else delete next.imageMobile;
-            onChange(next);
-          }}
-        />
-      )}
-      {entries.map(([ck, cv]) => <FieldEditor key={ck} k={ck} value={cv} ctx={ctx} depth={depth} onChange={(v) => onChange({ ...obj, [ck]: v })} />)}
+        <div className="tx-photo" data-path={`${path}.image`}>
+          <SlotImage
+            slotKey={k}
+            compact={inList}
+            value={{ image: obj.image as string, imageMobile: (obj.imageMobile as string) || undefined }}
+            onChange={(v) => {
+              const next: Record<string, Json> = { ...obj, image: v.image };
+              if (v.imageMobile) next.imageMobile = v.imageMobile;
+              else delete next.imageMobile;
+              onChange(next);
+            }}
+          />
+        </div>
+        )}
+      {entries.map(([ck, cv]) => <FieldEditor key={ck} k={ck} path={`${path}.${ck}`} value={cv} ctx={ctx} depth={depth} onChange={(v) => onChange({ ...obj, [ck]: v })} />)}
     </>
   );
 }

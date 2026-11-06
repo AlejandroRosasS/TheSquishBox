@@ -370,6 +370,12 @@ html:has(.adm), body:has(.adm) { background: #F5F5F2; }
 .prev-scale > .prev-inner { transform-origin: 0 0; position: absolute; left: 0; top: 0; }
 .prev-scale .store { min-height: 100%; }
 .prev-scale .store .header { position: static; }
+/* Resaltado del campo que se edita en Admin › Textos. */
+.prev-hl { position: absolute; z-index: 5; pointer-events: none; border: 3px solid #2F6FEB; border-radius: 8px; box-shadow: 0 0 0 9999px rgba(20, 22, 18, .18); transition: top .2s, left .2s, width .2s, height .2s; }
+.prev-hl span { position: absolute; left: -3px; bottom: 100%; margin-bottom: 4px; background: #2F6FEB; color: #fff; font: 600 11px/1.2 system-ui, sans-serif; padding: 4px 8px; border-radius: 6px; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+.prev-hl.below span { bottom: auto; top: 100%; margin: 4px 0 0; }
+.prev-hl.right span { left: auto; right: -3px; }
+@media (prefers-reduced-motion: reduce) { .prev-hl { transition: none; } }
 .der-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .der-row div { display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: #5C5F58; font-weight: 600; }
 .der-row i { height: 28px; border-radius: 6px; border: 1px solid #E2E3DD; display: block; }
@@ -455,8 +461,10 @@ html:has(.adm), body:has(.adm) { background: #F5F5F2; }
 .warn-txt { color: var(--a-amber); background: var(--a-amber-bg); border-radius: 8px; padding: 6px 10px; }
 .photo-src { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 10px 12px; border-radius: 10px; background: var(--a-sunken); }
 .slot-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.slot-pair .slot-img { position: relative; border-radius: 10px; overflow: hidden; background: var(--a-sunken); }
-.slot-pair .slot-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.slot-img { position: relative; border-radius: 10px; overflow: hidden; background: var(--a-sunken); }
+.slot-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* Foto de una sección de Textos: recuadro propio, separado de los campos de texto. */
+.tx-photo { border: 1px solid var(--a-border); border-radius: 12px; padding: 12px; background: var(--a-bg); display: flex; flex-direction: column; gap: 10px; }
 .lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
 .lib-grid .lib-it { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 .lib-grid .lib-ph { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: var(--a-sunken); }

@@ -8,6 +8,8 @@ export type TextSection = {
   /** La sección aparece en la vista previa de Inicio. */
   onHome: boolean;
   keys: (keyof Storefront)[];
+  /** Aclaración que se muestra arriba de los campos. */
+  note?: string;
   /** Solo si la marca tiene pedido especial (fiesta / a medida). */
   needsCustomOrder?: boolean;
 };
@@ -15,11 +17,11 @@ export type TextSection = {
 export const TEXT_SECTIONS: TextSection[] = [
   { id: "top", title: "Anuncio y menú", where: "Todas las páginas", onHome: true, keys: ["announce", "nav"] },
   { id: "hero", title: "Portada", where: "Inicio", onHome: true, keys: ["hero"] },
-  { id: "highlights", title: "Destacados y accesos", where: "Inicio", onHome: true, keys: ["highlights", "tiles"] },
+  { id: "highlights", title: "Destacados y accesos", where: "Inicio, debajo de la portada", onHome: true, keys: ["highlights", "tiles"], note: "Destacados: los círculos tipo historias de Instagram. Accesos: las fotos grandes que llevan a cada línea de productos." },
   { id: "featured", title: "Productos destacados", where: "Inicio", onHome: true, keys: ["featured"] },
   { id: "partyBand", title: "Banda del pedido especial", where: "Inicio", onHome: true, keys: ["partyBand"], needsCustomOrder: true },
   { id: "inside", title: "¿Qué hay dentro?", where: "Inicio", onHome: true, keys: ["inside"] },
-  { id: "models", title: "Modelos", where: "Inicio", onHome: true, keys: ["models"] },
+  { id: "models", title: "Modelos", where: "Inicio", onHome: true, keys: ["models"], note: "Las fotos del recuadro se cambian aquí abajo, en «Fotos del recuadro». Puedes agregar, quitar y ordenar fotos." },
   { id: "tips", title: "Tips", where: "Inicio", onHome: true, keys: ["tips"] },
   { id: "footer", title: "Pie de página", where: "Todas las páginas", onHome: true, keys: ["footer"] },
   { id: "business", title: "Empresa y contacto", where: "Pie de página, Contacto (/contacto), páginas legales y Libro de reclamaciones", onHome: true, keys: ["business", "contact"] },
@@ -67,6 +69,7 @@ const LABELS: Record<string, string> = {
   inside: "¿Qué hay dentro?",
   models: "Modelos que te pueden tocar",
   footnote: "Nota al pie",
+  photos: "Fotos del recuadro",
   tips: "Tips",
   items: "Tips",
   text: "Texto",
@@ -140,7 +143,7 @@ const LABELS: Record<string, string> = {
 };
 
 /** Nombre de cada elemento de una lista (si no está, se usa el de la lista). */
-const ITEM_LABELS: Record<string, string> = { boxes: "Caja", sizes: "Opción", sections: "Sección" };
+const ITEM_LABELS: Record<string, string> = { boxes: "Caja", sizes: "Opción", sections: "Sección", photos: "Foto", highlights: "Círculo", tiles: "Acceso", items: "Tip", steps: "Paso" };
 export const itemLabelFor = (key: string) => ITEM_LABELS[key] ?? labelFor(key);
 
 export function labelFor(key: string): string {

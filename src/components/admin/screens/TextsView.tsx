@@ -4,16 +4,41 @@ import { useMemo, useState } from "react";
 import type { Storefront } from "@/lib/types";
 import { useStoredDoc } from "@/lib/admin/useStoredDoc";
 import { STATUS_LABEL, useDoc } from "@/lib/admin/useDoc";
-import { TEXT_SECTIONS } from "@/lib/admin/textSchema";
+import { TEXT_SECTIONS, itemLabelFor, labelFor } from "@/lib/admin/textSchema";
 import { TOKEN_KEYS, type Tokens } from "@/lib/publishedTheme";
 import { useAdmin } from "../AdminContext";
 import { AdminPage, DemoNote } from "../AdminPage";
 import { FieldEditor, type FieldCtx, type Json } from "../TextFields";
 import { StorePreview } from "../StorePreview";
+import { previewPage } from "../PreviewPage";
+import type { PreviewFocus } from "../previewFocus";
 import { AIUndo } from "../AdminIcons";
 import { COMPLAINTS_ROUTE, CONTACT_ROUTE, LEGAL_ROUTES } from "@/lib/legal";
 
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+
+const getIn = (obj: unknown, path: string[]): unknown =>
+  path.reduce<unknown>((v, k) => (v && typeof v === "object" ? (v as Record<string, unknown>)[k] : undefined), obj);
+
+/** Para un elemento de lista (un círculo, un acceso…), el texto que mejor lo ubica en la tienda. */
+function representative(v: unknown): { key: string; value: string } | null {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return null;
+  const o = v as Record<string, unknown>;
+  for (const k of ["title", "label", "name", "text", "eyebrow", "image"]) if (typeof o[k] === "string" && o[k]) return { key: k, value: o[k] as string };
+  return null;
+}
+
+/** «Círculo 3 › Texto» a partir de "highlights.2.label". */
+function pathLabel(parts: string[]): string {
+  if (parts.length === 1) return labelFor(parts[0]);
+  const out: string[] = [];
+  parts.forEach((p, i) => {
+    if (i === 0) return;
+    if (/^\d+$/.test(p)) out.push(`${itemLabelFor(parts[i - 1])} ${Number(p) + 1}`);
+    else if (!/^\d+$/.test(parts[i + 1] ?? "")) out.push(labelFor(p));
+  });
+  return out.join(" › ");
+}
 
 /** Recolecta las fotos que ya usa la marca (tienda + catálogo + Instagram) para elegir. */
 function collectImages(...sources: unknown[]): string[] {
@@ -33,7 +58,10 @@ export function TextsView() {
   const doc = useDoc<Storefront>("texts", bundle.storefront);
   const [appearance] = useStoredDoc<{ tokens: Tokens }>("appearance");
   const sections = TEXT_SECTIONS.filter((s) => !s.needsCustomOrder || tenant.customOrder.enabled);
-  const [secId, setSecId] = useState(sections[1]?.id ?? sections[0].id);
+  const [secId, setSecIdRaw] = useState(sections[1]?.id ?? sections[0].id);
+  /** Campo con foco en el editor (ej. "tiles.1.title"): la vista previa lo resalta. */
+  const [fieldPath, setFieldPath] = useState<string | null>(null);
+  const setSecId = (id: string) => { setSecIdRaw(id); setFieldPath(null); };
   const [mode, setMode] = useState<"m" | "d">("m");
   const sec = sections.find((s) => s.id === secId) ?? sections[0];
   const sf = doc.value;
@@ -73,6 +101,19 @@ export function TextsView() {
   const ap = appearance.draft ?? appearance.published;
   const tokens = ap?.tokens && TOKEN_KEYS.every((k) => ap.tokens[k]) ? ap.tokens : undefined;
   const previewBundle = useMemo(() => ({ ...bundle, storefront: sf }), [bundle, sf]);
+  const page = previewPage(sec.id, fieldPath, previewBundle);
+  const focus: PreviewFocus = (() => {
+    const parts = fieldPath?.split(".") ?? [];
+    const raw = parts.length ? getIn(sf, parts) : undefined;
+    const rep = typeof raw === "string" ? { key: parts[parts.length - 1], value: raw } : representative(raw);
+    return {
+      id: `${sec.id}|${fieldPath ?? ""}`,
+      scope: page.scope,
+      key: rep?.key,
+      value: rep?.value,
+      label: parts.length ? `Editando: ${pathLabel(parts)}` : sec.title,
+    };
+  })();
 
   return (
     <AdminPage title="Textos" back={{ href: "/admin/ajustes", label: "Ajustes" }} topRight={<span className={`st ${stCls}`}>{stLabel}</span>}>
@@ -103,10 +144,18 @@ export function TextsView() {
           ))}
         </nav>
 
-        <section className="a-card" aria-labelledby="tx-sec">
+        <section
+          className="a-card"
+          aria-labelledby="tx-sec"
+          onFocusCapture={(e) => {
+            const el = (e.target as HTMLElement).closest<HTMLElement>("[data-path]");
+            if (el?.dataset.path) setFieldPath(el.dataset.path);
+          }}
+        >
           <div className="stack g1">
             <h2 className="a-h2" id="tx-sec">{sec.title}</h2>
             <p className="a-cap">Se ve en: {sec.where}</p>
+            {sec.note && <p className="tx-hint">{sec.note}</p>}
           </div>
           {sec.keys.map((k) => (
             <FieldEditor key={k} k={k} value={sf[k] as unknown as Json} ctx={ctx} depth={sec.keys.length > 1 ? 1 : 0} onChange={(v) => setKey(k, v)} />
@@ -121,9 +170,13 @@ export function TextsView() {
               <button className={mode === "d" ? "on" : ""} type="button" aria-pressed={mode === "d"} onClick={() => setMode("d")}>Desktop</button>
             </div>
           </div>
-          {!sec.onHome && <p className="a-banner info" style={{ fontSize: 13 }}>Esta sección no está en Inicio: se ve en «{sec.where}». La vista previa muestra Inicio.</p>}
+          <p className="a-cap" aria-live="polite">
+            Mostrando: <b>{page.where}</b>. {fieldPath ? "El recuadro azul marca lo que estás editando." : "Toca un campo y te mostramos dónde aparece."}
+          </p>
           <div className="prev-frame" style={{ padding: 12 }}>
-            <StorePreview bundle={previewBundle} tokens={tokens} mode={mode} maxHeight={620} />
+            <StorePreview bundle={previewBundle} tokens={tokens} mode={mode} maxHeight={620} chrome={page.chrome} cart={page.cart} focus={focus} label={`Vista previa: ${page.where}`}>
+              {page.node ?? undefined}
+            </StorePreview>
           </div>
         </section>
       </div>

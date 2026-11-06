@@ -14,15 +14,17 @@ import { IconChat, IconCheck, IconInfo, IconList, IconTruck } from "@/components
 
 const PAY_NAMES: Record<string, string> = { yape: "Yape", tarjeta: "tarjeta" };
 
-export function OrderView({ id }: { id: string }) {
+/** `demo`: pedido de ejemplo (vista previa del admin) en vez del guardado en el navegador. */
+export function OrderView({ id, demo }: { id: string; demo?: Order }) {
   const { tenant, storefront: sf } = useStore();
-  const [order, setOrder] = useState<Order | null | undefined>(undefined);
+  const [stored, setOrder] = useState<Order | null | undefined>(undefined);
+  const order = demo ?? stored;
   const cur = tenant.currency;
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- el pedido de la demo vive en localStorage
-    setOrder(findOrder(tenant.slug, id));
-  }, [tenant.slug, id]);
+    if (!demo) setOrder(findOrder(tenant.slug, id));
+  }, [tenant.slug, id, demo]);
 
   const header = (
     <header className="header">

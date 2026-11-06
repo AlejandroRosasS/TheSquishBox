@@ -25,26 +25,28 @@ type CartState = {
 
 const Ctx = createContext<CartState | null>(null);
 
-export function CartProvider({ children }: { children: ReactNode }) {
+/** `demo`: carrito fijo de ejemplo (vistas previas del admin): no lee ni guarda el carrito del navegador. */
+export function CartProvider({ children, demo }: { children: ReactNode; demo?: CartItem[] }) {
   const { tenant, catalog } = useStore();
   const key = `cart:${tenant.slug}`;
-  const [items, setItems] = useState<CartItem[]>([]);
-  const [ready, setReady] = useState(false);
+  const [items, setItems] = useState<CartItem[]>(demo ?? []);
+  const [ready, setReady] = useState(!!demo);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [lastKey, setLastKey] = useState<string | null>(null);
 
   useEffect(() => {
+    if (demo) return;
     try {
       const raw = localStorage.getItem(key);
       // eslint-disable-next-line react-hooks/set-state-in-effect -- leer el carrito guardado al montar
       if (raw) setItems(JSON.parse(raw));
     } catch {}
     setReady(true);
-  }, [key]);
+  }, [key, demo]);
 
   useEffect(() => {
-    if (ready) localStorage.setItem(key, JSON.stringify(items));
-  }, [items, key, ready]);
+    if (ready && !demo) localStorage.setItem(key, JSON.stringify(items));
+  }, [items, key, ready, demo]);
 
   useEffect(() => {
     document.body.classList.toggle("no-scroll", drawerOpen);
