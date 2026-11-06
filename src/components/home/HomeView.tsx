@@ -15,11 +15,13 @@ export function HomeView({ bundle }: { bundle: TenantBundle }) {
     .filter((p) => p && p.status !== "draft") as typeof catalog.products;
   const soldOutSuffix = tenant.customOrder.enabled ? `pídela ${tenant.customOrder.label.toLowerCase()}` : undefined;
   const ig = `https://www.instagram.com/${tenant.instagram}/`;
-  const models = catalog.collectibleModels?.items.slice(0, sf.models.max) ?? [];
+  const models = sf.models.photos
+    ? sf.models.photos.map((m) => ({ name: m.alt, image: m.image }))
+    : (catalog.collectibleModels?.items.slice(0, sf.models.max) ?? []);
 
   return (
     <>
-      <section className="hero">
+      <section className="hero" data-edit="hero">
         <Photo src={sf.hero.image} srcMobile={sf.hero.imageMobile} alt={sf.hero.alt} slot={SLOTS.hero} fetchPriority="high" />
         <div className="wrap hero-in stack g4">
           <p className="eyebrow">{sf.hero.eyebrow}</p>
@@ -36,7 +38,7 @@ export function HomeView({ bundle }: { bundle: TenantBundle }) {
         </div>
       </section>
 
-      <section className="section tight">
+      <section className="section tight" data-edit="highlights">
         <div className="wrap stack g7">
           <nav className="hls" aria-label="Accesos rápidos">
             {sf.highlights.map((h, i) => (
@@ -60,7 +62,7 @@ export function HomeView({ bundle }: { bundle: TenantBundle }) {
         </div>
       </section>
 
-      <section className="section" style={{ paddingTop: 32 }}>
+      <section className="section" style={{ paddingTop: 32 }} data-edit="featured">
         <div className="wrap stack g6">
           <div className="row between" style={{ alignItems: "flex-end", gap: 16 }}>
             <div className="stack g2">
@@ -81,7 +83,7 @@ export function HomeView({ bundle }: { bundle: TenantBundle }) {
       </section>
 
       {tenant.customOrder.enabled && (
-        <section className="section primary-band">
+        <section className="section primary-band" data-edit="partyBand">
           <div className="wrap split">
             <div className="ph r45" style={{ borderRadius: 24 }}>
               <Photo src={sf.partyBand.image} srcMobile={sf.partyBand.imageMobile} alt={sf.partyBand.alt} slot={SLOTS.partyBand} loading="lazy" />
@@ -104,7 +106,7 @@ export function HomeView({ bundle }: { bundle: TenantBundle }) {
         </section>
       )}
 
-      <section className="section">
+      <section className="section" data-edit="inside">
         <div className="wrap split">
           <div className="stack g5">
             <p className="eyebrow">{sf.inside.eyebrow}</p>
@@ -120,7 +122,7 @@ export function HomeView({ bundle }: { bundle: TenantBundle }) {
       </section>
 
       {models.length > 0 && (
-        <section className="section surface" id="modelos">
+        <section className="section surface" id="modelos" data-edit="models">
           <div className="wrap stack g6">
             <div className="row between wrap-row" style={{ alignItems: "flex-end", gap: 16 }}>
               <div className="stack g2">
@@ -143,7 +145,7 @@ export function HomeView({ bundle }: { bundle: TenantBundle }) {
         </section>
       )}
 
-      <section className="section" id="tips">
+      <section className="section" id="tips" data-edit="tips">
         <div className="wrap stack g6">
           <div className="stack g2">
             <p className="eyebrow">{sf.tips.eyebrow}</p>

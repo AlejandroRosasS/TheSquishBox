@@ -64,7 +64,33 @@
     "eyebrow": "Modelos que te pueden tocar",
     "title": "Demasiado *squishy* para tener solo uno",
     "footnote": "Comparte tu unboxing y etiquétanos en Instagram para aparecer aquí.",
-    "max": 6
+    "max": 6,
+    "photos": [
+      {
+        "image": "img/ajolote.jpg",
+        "alt": "Ajolote glitter"
+      },
+      {
+        "image": "img/patitas.jpg",
+        "alt": "Patitas"
+      },
+      {
+        "image": "img/jelly-cubes.jpg",
+        "alt": "Jelly Cubes"
+      },
+      {
+        "image": "img/mini-butter.jpg",
+        "alt": "Mini Butter"
+      },
+      {
+        "image": "img/butter-barra.jpg",
+        "alt": "Butter"
+      },
+      {
+        "image": "img/gatitos.jpg",
+        "alt": "Gatitos"
+      }
+    ]
   },
   "tips": {
     "eyebrow": "Squishy tips",

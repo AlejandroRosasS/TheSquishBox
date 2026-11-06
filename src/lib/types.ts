@@ -135,7 +135,8 @@ export type Storefront = {
   featured: { eyebrow: string; title: string; productIds: string[]; viewAll: string; viewAllMobile: string };
   partyBand: Img & { eyebrow: string; title: string; lead: string; steps: string[]; cta: string };
   inside: Img & { eyebrow: string; title: string; lead: string; body: string };
-  models: { eyebrow: string; title: string; footnote: string; max: number };
+  /** `photos`: fotos del recuadro de modelos. Si no hay, se usan los modelos del catálogo (`max` como tope). */
+  models: { eyebrow: string; title: string; footnote: string; max: number; photos?: { image: string; alt: string }[] };
   tips: { eyebrow: string; title: string; items: { title: string; text: string }[] };
   /** `legal` y `legalLinks` son de la versión anterior (antes de las páginas legales): ya no se muestran. */
   footer: { about: string; shop: Link[]; help: Link[]; legal?: string; legalLinks?: string };

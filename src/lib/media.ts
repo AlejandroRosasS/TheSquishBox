@@ -51,7 +51,9 @@ export const SLOTS = {
 } satisfies Record<string, Slot>;
 export type SlotId = keyof typeof SLOTS;
 
-export const slotFor = (key: string): Slot => (SLOTS as Record<string, Slot>)[key] ?? SLOTS.product;
+/** Listas de fotos cuyo nombre no coincide con el formato (models.photos → Modelo). */
+const SLOT_ALIAS: Record<string, SlotId> = { photos: "models" };
+export const slotFor = (key: string): Slot => (SLOTS as Record<string, Slot>)[SLOT_ALIAS[key] ?? key] ?? SLOTS.product;
 export const hasTwoFormats = (s: Slot) => s.d !== s.m;
 
 const clamp = (n: number, a: number, b: number) => Math.min(b, Math.max(a, n));
