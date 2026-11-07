@@ -14,6 +14,7 @@ function Svg({ size = "", className = "", children, ...rest }: P) {
 export const AIHome = (p: P) => <Svg {...p}><path d="M4 11 12 4l8 7v9H4z" /><path d="M10 20v-6h4v6" /></Svg>;
 export const AIOrders = (p: P) => <Svg {...p}><path d="M4 4h16v16H4z" /><path d="M4 14h5l1 2h4l1-2h5" /></Svg>;
 export const AIGift = (p: P) => <Svg {...p}><path d="M4 11h16v9H4zM3 7h18v4H3zM12 7v13" /><path d="M12 7C10 3 6.5 4 7.5 7M12 7c2-4 5.5-3 4.5 0" /></Svg>;
+export const AILayers = (p: P) => <Svg {...p}><path d="m12 3 9 5-9 5-9-5z" /><path d="m3 13 9 5 9-5" /></Svg>;
 export const AIBox = (p: P) => <Svg {...p}><path d="M3 7l9-4 9 4v10l-9 4-9-4z" /><path d="M3 7l9 4 9-4M12 11v10" /></Svg>;
 export const AIInstagram = (p: P) => <Svg {...p}><rect x="3.5" y="3.5" width="17" height="17" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17" cy="7" r=".8" /></Svg>;
 export const AIChart = (p: P) => <Svg {...p}><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></Svg>;

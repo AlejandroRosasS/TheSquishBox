@@ -7,6 +7,8 @@ import { useAdmin } from "../AdminContext";
 import { AdminPage, DemoNote, Switch } from "../AdminPage";
 import { AIChevron, AIInstagram } from "../AdminIcons";
 import { CulqiSettings } from "../CulqiSettings";
+import { useInventory } from "../AdminInventory";
+import { useToday } from "@/lib/useToday";
 import { useTextsDraft } from "./useTextsDraft";
 import { businessOf, isPlaceholder } from "@/lib/legal";
 
@@ -17,6 +19,7 @@ const TABS = [
   { id: "empresa", label: "Datos de empresa" },
   { id: "conexiones", label: "Conexiones" },
   { id: "delivery", label: "Tarifas de delivery" },
+  { id: "modulos", label: "Módulos" },
 ] as const;
 type TabId = (typeof TABS)[number]["id"];
 const isTab = (v: string): v is TabId => TABS.some((t) => t.id === v);
@@ -38,7 +41,7 @@ export function SettingsView() {
   const [newD, setNewD] = useState<string | null>(null);
   // Tab activo: se refleja en el hash (#delivery) para poder enlazarlo y volver con «Atrás».
   const [tab, setTab] = useState<TabId>("empresa");
-  const tabRefs = useRef<Record<TabId, HTMLButtonElement | null>>({ empresa: null, conexiones: null, delivery: null });
+  const tabRefs = useRef<Record<TabId, HTMLButtonElement | null>>({ empresa: null, conexiones: null, delivery: null, modulos: null });
   useEffect(() => {
     const sync = () => { const h = window.location.hash.slice(1); if (isTab(h)) setTab(h); };
     sync();
@@ -59,7 +62,11 @@ export function SettingsView() {
   };
   const setRate = (i: number, patch: Partial<Rate>) => setS((x) => ({ ...x, rates: x.rates.map((r, j) => (j === i ? { ...r, ...patch } : r)) }));
 
+  const inv = useInventory();
+  // El estado del inventario se conoce recién en el navegador: el interruptor se activa después de hidratar.
+  const mounted = !!useToday();
   const more = [
+    ...(mounted && inv.data.enabled ? [{ href: "/admin/inventario", label: "Inventario" }] : []),
     { href: "/admin/apariencia", label: "Apariencia de la tienda" },
     { href: "/admin/textos", label: "Textos de la tienda" },
     { href: "/admin/seo", label: "SEO y redes" },
@@ -70,7 +77,7 @@ export function SettingsView() {
 
   return (
     <AdminPage title="Ajustes">
-      <div className="a-head"><div className="stack g1"><h1 className="a-h1">Ajustes</h1><p className="a-sub">Datos de la empresa, conexiones y tarifas de delivery.</p></div></div>
+      <div className="a-head"><div className="stack g1"><h1 className="a-h1">Ajustes</h1><p className="a-sub">Datos de la empresa, conexiones, tarifas de delivery y módulos.</p></div></div>
       <nav className="only-m stack g2" aria-label="Más secciones">
         {more.map((m) => <Link key={m.href} className="a-btn block" href={m.href} style={{ justifyContent: "space-between" }}>{m.label}<AIChevron size="sm" /></Link>)}
       </nav>
@@ -131,6 +138,20 @@ export function SettingsView() {
               <div className="a-field"><label htmlFor="t-hor">Horario de recojo</label><input id="t-hor" className="a-input" placeholder="Ej.: lun a sáb, 10 a. m. – 6 p. m." value={s.pickup.hours} onChange={(e) => setS((x) => ({ ...x, pickup: { ...x.pickup, hours: e.target.value } }))} /></div>
             </div>
           </div>
+        </section>
+      </div>
+      <div role="tabpanel" id="aj-panel-modulos" aria-labelledby="aj-tab-modulos" hidden={tab !== "modulos"}>
+        <section className="a-card" aria-labelledby="aj-mod">
+          <h2 className="a-h2" id="aj-mod">Módulos</h2>
+          <div className="row between g3">
+            <div className="grow">
+              <b>Inventario de insumos</b>
+              <p className="a-cap">Insumos con fotos, compras por proveedor, último costo y costo promedio. Agrega «Inventario» al menú. No cambia el stock que ve el cliente en la tienda.</p>
+              {mounted && !inv.available && <p className="a-cap">Falta la migración 0011_inventory en Supabase.</p>}
+            </div>
+            <Switch on={mounted && inv.data.enabled} disabled={!mounted || !inv.hydrated || !inv.available} onChange={(v) => void inv.setEnabled(v)} label="Inventario de insumos" />
+          </div>
+          {mounted && inv.data.enabled && <Link className="a-btn" href="/admin/inventario" style={{ alignSelf: "flex-start" }}>Ir a Inventario</Link>}
         </section>
       </div>
       <DemoNote>Demo: los ajustes se guardan en este navegador. En la Fase 3 las tarifas pasan a la tienda en vivo.</DemoNote>

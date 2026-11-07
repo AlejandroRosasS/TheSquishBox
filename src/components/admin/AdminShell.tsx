@@ -6,9 +6,11 @@ import { Suspense, type ReactNode } from "react";
 import { Logo } from "@/components/Logo";
 import { useAdmin, useAdminCatalog, useOrders, useParty } from "./AdminContext";
 import { AuthGate, SignOutButton } from "./AuthGate";
+import { InventoryProvider, useInventory } from "./AdminInventory";
 import { useBrandTenant } from "./useBrand";
 import { PANEL_SUBTITLE } from "@/lib/brand";
-import { AIBell, AIBox, AIChart, AIGlobe, AIHome, AIInstagram, AIMore, AIOrders, AIPalette, AISettings, AIText, AIImage, AIBook } from "./AdminIcons";
+import { useToday } from "@/lib/useToday";
+import { AIBell, AIBox, AILayers, AIChart, AIGlobe, AIHome, AIInstagram, AIMore, AIOrders, AIPalette, AISettings, AIText, AIImage, AIBook } from "./AdminIcons";
 import { isSoldOut, totalStock, LOW_STOCK } from "@/lib/catalog";
 
 type Item = { href: string; label: string; icon: ReactNode; count?: number; exact?: boolean };
@@ -33,9 +35,11 @@ export function useAdminCounts() {
 export function AdminShell({ children }: { children: ReactNode }) {
   return (
     <AuthGate>
-      <Suspense fallback={<ShellInner path="">{children}</ShellInner>}>
-        <ShellWithPath>{children}</ShellWithPath>
-      </Suspense>
+      <InventoryProvider>
+        <Suspense fallback={<ShellInner path="">{children}</ShellInner>}>
+          <ShellWithPath>{children}</ShellWithPath>
+        </Suspense>
+      </InventoryProvider>
     </AuthGate>
   );
 }
@@ -48,11 +52,16 @@ function ShellInner({ children, path }: { children: ReactNode; path: string }) {
   const { tenant, resolve } = useBrandTenant();
   const c = useAdminCounts();
   const party = tenant.customOrder.enabled;
+  // Se sabe recién en el navegador (demo: localStorage; base: se carga al entrar), así no cambia el HTML al hidratar.
+  const mounted = !!useToday();
+  const inventoryOn = useInventory().data.enabled;
+  const inventory = mounted && inventoryOn;
 
   const main: Item[] = [
     { href: "/admin", label: "Inicio", icon: <AIHome />, exact: true },
     { href: "/admin/pedidos", label: "Pedidos", icon: <AIOrders />, count: c.newOrders + (party ? c.newParty : 0) },
     { href: "/admin/productos", label: "Productos", icon: <AIBox /> },
+    ...(inventory ? [{ href: "/admin/inventario", label: "Inventario", icon: <AILayers /> }] : []),
     { href: "/admin/instagram", label: "Instagram", icon: <AIInstagram />, count: c.newPosts },
     { href: "/admin/ventas", label: "Ventas y márgenes", icon: <AIChart /> },
   ];
