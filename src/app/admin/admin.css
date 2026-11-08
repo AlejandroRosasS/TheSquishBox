@@ -360,7 +360,12 @@ html:has(.adm), body:has(.adm) { background: #F5F5F2; }
 .fair { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
 .fair > div { background: #F5F5F2; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 2px; }
 .fair b { font-size: 18px; }
-@container page (max-width: 760px) { .chbar { grid-template-columns: 96px minmax(0, 1fr) 84px; } .fair { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.fair-item + .fair-item { padding-top: 14px; border-top: 1px solid #E2E3DD; }
+.fair-form { background: #F5F5F2; border-radius: 12px; padding: 14px; }
+.fair-cost { display: grid; grid-template-columns: minmax(0, 1fr) 140px 44px; gap: 8px; align-items: center; }
+.fair-amt { display: flex; align-items: center; gap: 6px; }
+.fair-amt span { color: var(--a-text-2); font-weight: 600; }
+@container page (max-width: 760px) { .chbar { grid-template-columns: 96px minmax(0, 1fr) 84px; } .fair { grid-template-columns: repeat(2, minmax(0, 1fr)); } .fair-cost { grid-template-columns: minmax(0, 1fr) 110px 44px; } .fair-form .a-grid2 { grid-template-columns: minmax(0, 1fr); } }
 
 /* ---------- Apariencia ---------- */
 .ap-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 20px; align-items: start; }
