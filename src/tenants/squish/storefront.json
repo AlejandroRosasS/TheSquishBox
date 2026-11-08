@@ -220,5 +220,20 @@
     "alt": "Manos apretando un squishy de mandarina",
     "title": "Esta página se nos *escapó del sobre*",
     "lead": "La página que buscas se movió o ya no existe. Pero hay muchas sorpresas esperándote."
+  },
+  "comingSoon": {
+    "metaDescription": "Nuestra tienda online está en construcción. Muy pronto podrás comprar tus mystery squishies aquí.",
+    "tape": "🚧 Tienda en construcción 🚧",
+    "title": "¡Estamos armando *la caja!*",
+    "lead": "Muy pronto vas a poder comprar tus mystery squishies aquí. Mientras tanto, mira las novedades y escríbenos por Instagram.",
+    "colors": { "ink": "#141018", "pink": "#E5177B", "teal": "#36B8B5", "lime": "#C6F432", "purple": "#7B3FE4", "yellow": "#FFD23F" },
+    "photos": [
+      "img/fresa-gigante.jpg",
+      "img/ajolote.jpg",
+      "img/jelly-cubes.jpg",
+      "img/mandarina.jpg",
+      "img/gatitos.jpg",
+      "img/patitas.jpg"
+    ]
   }
 }
