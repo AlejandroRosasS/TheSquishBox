@@ -1,6 +1,7 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { asset } from "@/lib/assets";
@@ -12,6 +13,8 @@ import { newRef, useManualSales, type ManualSale } from "../AdminSales";
 import { useCampaigns } from "../AdminCampaigns";
 import { bestCampaign, limaToIso } from "@/lib/campaigns";
 import { PAY_METHODS } from "@/lib/sales/csv";
+import { fairOn, fairRange } from "@/lib/fairs";
+import { useFairs } from "../AdminFairs";
 
 const CH: [string, string, string][] = [["ig", "Instagram", "Venta por DM o WhatsApp"], ["feria", "Feria o evento", "Asociada a una feria"], ["otros", "Otros", "Colegios, referidos, empresas"]];
 const PAYS = PAY_METHODS;
@@ -27,6 +30,8 @@ export function NewSaleView() {
   const [date, setDate] = useState(demo.today);
   const [client, setClient] = useState("");
   const { campaigns } = useCampaigns();
+  const { fairs } = useFairs();
+  const fair = fairOn(fairs, date);
   /** Precio del día de la venta: el de la campaña vigente ese día (a mediodía, hora de Perú) o el regular. */
   const priced = (productId: string, variantId: string, day = date) => {
     const regular = catalog.products.find((p) => p.id === productId)?.variants.find((v) => v.id === variantId)?.price ?? 0;
@@ -81,7 +86,9 @@ export function NewSaleView() {
             <div className="chg" role="radiogroup" aria-labelledby="vn-ch">
               {CH.map(([k, l, desc]) => <button key={k} className={`chb ${chan === k ? "on" : ""}`} type="button" role="radio" aria-checked={chan === k} onClick={() => { setChan(k); if (k === "ig") setDel(true); }}><b>{l}</b><span className="a-cap">{desc}</span></button>)}
             </div>
-            {chan === "feria" && <p className="a-cap">Feria: <b>{demo.sales.fair.name}</b> · {demo.sales.fair.dates}</p>}
+            {chan === "feria" && (fair
+              ? <p className="a-cap">Se carga en la feria <b>{fair.name}{fair.place ? ` · ${fair.place}` : ""}</b> · {fairRange(fair)}</p>
+              : <p className="a-cap">No hay ninguna feria en esa fecha. <Link href="/admin/ventas#v-fair">Crea la feria</Link> y esta venta se cargará sola.</p>)}
             <div className="a-grid2">
               <div className="a-field"><label htmlFor="v-fecha">Fecha</label><input id="v-fecha" className="a-input" type="date" value={date} onChange={(e) => { const day = e.target.value; setDate(day); setLines((ls) => ls.map((l) => ({ ...l, ...priced(l.productId, l.variantId, day) }))); }} /></div>
               <div className="a-field"><label htmlFor="v-cli">Cliente <span className="a-cap">(opcional)</span></label><input id="v-cli" className="a-input" placeholder="Nombre o @usuario" value={client} onChange={(e) => setClient(e.target.value)} /></div>

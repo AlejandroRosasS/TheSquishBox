@@ -192,8 +192,9 @@ export async function onVtaButton(db: SupabaseClient, q: TgCallback) {
       throw new Error(error.message);
     }
     const items = d.lines.map((l) => `• ${lineName(ctx.catalog, l)} x${l.qty}`).join("\n");
+    const fair = d.channel === "feria" ? await fairLine(db, row.tenant_id, d.day) : "";
     await edit(
-      [`✅ Venta registrada${who}`, `${dayShort(d.day)} · ${label(WIZARD_CHANNELS, d.channel)} · ${label(WIZARD_PAYS, d.pay)}`, items, `Total: ${formatPrice(total)}`, "", "Ya está en Ventas y márgenes. Otra venta: /vta"].join("\n"),
+      [`✅ Venta registrada${who}`, `${dayShort(d.day)} · ${label(WIZARD_CHANNELS, d.channel)} · ${label(WIZARD_PAYS, d.pay)}`, ...(fair ? [fair] : []), items, `Total: ${formatPrice(total)}`, "", "Ya está en Ventas y márgenes. Otra venta: /vta"].join("\n"),
     );
     return void (await answer("Listo"));
   }
@@ -302,4 +303,13 @@ export async function onVtaText(db: SupabaseClient, tenant: Tenant, m: TgMessage
   await store(db, row.id, d);
   await show(db, row, d, "new");
   return true;
+}
+
+/** Feria en la que se cargó la venta (la base la asigna sola por fecha; misma regla que fair_on). */
+async function fairLine(db: SupabaseClient, tenantId: string, day: string): Promise<string> {
+  const { data, error } = await db.from("fairs").select("name, place").eq("tenant_id", tenantId).lte("starts_on", day).gte("ends_on", day)
+    .order("starts_on", { ascending: false }).order("created_at", { ascending: false }).limit(1);
+  if (error) return ""; // sin la migración 0013 no hay ferias
+  const f = data?.[0] as { name: string; place: string | null } | undefined;
+  return f ? `🎪 Feria: ${f.name}${f.place ? ` · ${f.place}` : ""}` : "🎪 Ninguna feria en esa fecha: créala en Ventas y márgenes y la venta se carga sola.";
 }

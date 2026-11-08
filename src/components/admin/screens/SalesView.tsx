@@ -14,6 +14,9 @@ import { limaToday, useManualSales, type ManualSale } from "../AdminSales";
 import { salesToCsv, type ExportSale } from "@/lib/sales/csv";
 import { deductions, feesConfigured, payMethodKey } from "@/lib/sales/fees";
 import { usePaymentFees } from "../AdminFees";
+import { fairOn } from "@/lib/fairs";
+import { useFairs } from "../AdminFairs";
+import { FairsSection } from "./FairsSection";
 
 export const CHANNELS: [string, string][] = [["web", "Web"], ["ig", "Instagram"], ["feria", "Ferias"], ["otros", "Otros"]];
 
@@ -45,6 +48,7 @@ export function SalesView() {
   const [rank, setRank] = useState<"c" | "u">("c");
   const [campF, setCampF] = useState("all");
   const { campaigns } = useCampaigns();
+  const { fairs } = useFairs();
   const fromDb = useOrdersFromDb();
   const { orders: dbOrders } = useOrders();
   const { fees } = usePaymentFees();
@@ -60,7 +64,7 @@ export function SalesView() {
   const base = demo.sales.lines.map(([pid, vid, ch, u, dIn, dOut, o]) => {
     const units = Math.max(1, Math.round(u * scale));
     const rev = price(pid, vid) * units;
-    return { pid, ch, line: prod(pid)?.line ?? "", units, rev, listRev: rev, cost: cost(pid, vid) * units, dIn: dIn * scale, dOut: dOut * scale, orders: Math.max(1, Math.round(o * scale)), camp: "", campName: "", igv: 0, fee: 0, dCut: 0, card: false };
+    return { pid, ch, line: prod(pid)?.line ?? "", units, rev, listRev: rev, cost: cost(pid, vid) * units, dIn: dIn * scale, dOut: dOut * scale, orders: Math.max(1, Math.round(o * scale)), camp: "", campName: "", igv: 0, fee: 0, dCut: 0, card: false, fair: "" as string | null };
   });
   type Row = (typeof base)[number];
   // IGV y comisión según el medio de pago (Ajustes › Comisiones e IGV). Lo del delivery cobrado se descuenta del resultado del delivery;
@@ -74,10 +78,12 @@ export function SalesView() {
     return {
       pid: l.productId, ch, line: prod(l.productId)?.line ?? "", units: l.qty, rev, listRev: (l.listPrice ?? l.price) * l.qty,
       cost: cost(l.productId, l.variantId) * l.qty, dIn: first ? dIn : 0, dOut: first ? dOut : 0, orders: first ? 1 : 0, camp: l.campaignId ?? "", campName: l.campaign ?? "",
-      igv: d.igv, fee: d.fee, dCut: dd.igv + dd.fee, card: key === "card_web" || key === "card_pos",
+      igv: d.igv, fee: d.fee, dCut: dd.igv + dd.fee, card: key === "card_web" || key === "card_pos", fair: null,
     };
   };
-  const extra = manual.flatMap((s) => s.lines.map((l, i) => saleLine(l, s.channel, !i, s.dIn, s.dOut, s.pay)));
+  // Ventas de feria: se cargan en la feria vigente ese día (misma regla que la base). "" = ninguna.
+  const fairOf = (s: ManualSale) => (s.channel === "feria" ? fairOn(fairs, s.day)?.id ?? "" : null);
+  const extra = manual.flatMap((s) => s.lines.map((l, i) => ({ ...saleLine(l, s.channel, !i, s.dIn, s.dOut, s.pay), fair: fairOf(s) })));
   // Pedidos reales de la web (con la base): los cancelados, fallidos o devueltos no cuentan.
   const web = fromDb
     ? dbOrders
@@ -119,10 +125,9 @@ export function SalesView() {
   prodAgg.sort((a, b) => (rank === "c" ? b.contrib - a.contrib : b.units - a.units));
   const top = prodAgg.slice(0, 5);
   const maxK = Math.max(1, ...top.map((x) => (rank === "c" ? x.contrib : x.units)));
-  const fr = byLine.filter((r) => r.ch === "feria");
-  const fRev = sum(fr, "rev"), fCon = contrib(fr);
-  const fixed = demo.sales.fair.fixedCosts.reduce((a, c) => a + c.amount, 0);
-  const fNet = fCon - fixed;
+  // Solo ventas registradas (las de ejemplo no tienen fecha ni feria). «cost» incluye IGV y comisiones, como la contribución del resto.
+  const fairRows = byLine.filter((r) => r.ch === "feria" && r.fair !== null && r.fair !== "").map((r) => ({ fair: r.fair as string, rev: r.rev, cost: r.rev - contrib([r]), units: r.units }));
+  const fairLoose = manual.filter((s) => fairOf(s) === "").length;
   const chanName = (k: string) => CHANNELS.find((c) => c[0] === k)?.[1] ?? k;
   const recent = [
     ...manual.slice().reverse().map((s) => {
@@ -248,16 +253,7 @@ export function SalesView() {
           </div>
         </section>
       )}
-      <section className="a-card" aria-labelledby="v-fair">
-        <div className="a-card-h" style={{ flexWrap: "wrap" }}><div className="stack g1"><h2 className="a-h2" id="v-fair">Ferias y eventos</h2><p className="a-cap">Para decidir si volver el próximo año.</p></div></div>
-        <div className="row between wrap-row g2"><div><b>{demo.sales.fair.name}</b><p className="a-cap">{demo.sales.fair.dates}</p></div><span className={fNet > 0 ? "ok-pill" : "bad-pill"}>{fNet > 0 ? "Rentable · conviene volver" : "No cubrió costos"}</span></div>
-        <div className="fair">
-          <div><span className="a-cap">Ventas</span><b className="money">{moneyShort(fRev)}</b><span className="a-cap">{sum(fr, "units")} unidades</span></div>
-          <div><span className="a-cap">Contribución de productos</span><b className="money">{moneyShort(fCon)}</b><span className="a-cap">Margen {fRev ? Math.round((fCon / fRev) * 100) : 0}%</span></div>
-          <div><span className="a-cap">Costos fijos</span><b className="money">− {moneyShort(fixed)}</b><span className="a-cap">{demo.sales.fair.fixedCosts.map((c) => `${c.label} ${moneyShort(c.amount)}`).join(" · ")}</span></div>
-          <div style={{ background: "#E4F2E7" }}><span className="a-cap">Contribución neta</span><b className="money">{fNet < 0 ? "− " : ""}{moneyShort(Math.abs(fNet))}</b><span className="a-cap">{moneyShort(fNet / demo.sales.fair.days)} por día</span></div>
-        </div>
-      </section>
+      <FairsSection rows={fairRows} unassigned={fairLoose} />
       <section className="a-card flush" aria-labelledby="v-rec">
         <div className="a-card-h"><h2 className="a-h2" id="v-rec">Últimas ventas registradas</h2><Link className="a-btn sm ghost" href="/admin/ventas/nueva">+ Registrar</Link></div>
         <div className="a-table">
