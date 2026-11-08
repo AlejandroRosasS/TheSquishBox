@@ -25,7 +25,7 @@ export type Supply = {
   archived: boolean;
 };
 
-export type MovementKind = "purchase" | "waste" | "adjust" | "use";
+export type MovementKind = "purchase" | "waste" | "adjust" | "use" | "sale";
 export type Movement = {
   id: string;
   supplyId: string;
@@ -40,6 +40,8 @@ export type Movement = {
   /** Solo compras: unidades de uso que llegaron malas. */
   badQty?: number;
   receipt?: string;
+  /** Solo salidas por cotización (kind "sale"): la cotización que se descontó. */
+  quoteId?: string;
   note: string;
   /** AAAA-MM-DD (hora de Perú). */
   day: string;
@@ -58,7 +60,7 @@ export type InventoryData = {
 export const EMPTY_INVENTORY: InventoryData = { enabled: false, suppliers: [], supplies: [], movements: [], // Mismo valor que DEFAULT_RULES en pricing.ts (aquí literal para no importar código en las pruebas).
   pricing: { mode: "margin", margin: 50, multiplier: 3, rounding: "sol", igv: false }, recipes: [], quotes: [] };
 
-export const KIND_LABEL: Record<MovementKind, string> = { purchase: "Compra", waste: "Merma", adjust: "Ajuste por conteo", use: "Uso interno" };
+export const KIND_LABEL: Record<MovementKind, string> = { purchase: "Compra", waste: "Merma", adjust: "Ajuste por conteo", use: "Uso interno", sale: "Salida por cotización" };
 
 export type PurchaseInfo = { day: string; supplierId?: string; unitCost: number; qty: number; amount: number };
 export type SupplierPrice = { supplierId: string; last: PurchaseInfo; avgUnitCost: number; purchases: number; units: number };

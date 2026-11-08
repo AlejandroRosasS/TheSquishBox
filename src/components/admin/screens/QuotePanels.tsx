@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { formatPrice } from "@/lib/format";
 import { newId, qtyLabel, shiftDay, unitsLabel, type Supply, type SupplyState } from "@/lib/inventory";
 import {
-  QUOTE_STATUS, ROUNDING_LABEL, costOf, realMargin, recipeKey, suggestedPrice,
+  QUOTE_STATUS, ROUNDING_LABEL, costOf, quoteSupplies, realMargin, recipeKey, suggestedPrice,
   type CostBreakdown, type PricingRules, type Quote, type QuoteLine, type QuoteStatus, type Recipe, type RecipeLine, type Rounding,
 } from "@/lib/pricing";
 import { useAdmin, useAdminCatalog } from "../AdminContext";
@@ -13,7 +13,7 @@ import { usePaymentFees } from "../AdminFees";
 import Link from "next/link";
 import { dayLabel } from "../AdminSales";
 import { Thumb } from "../PhotoPicker";
-import { AIBox, AIClose, AIPlus, AISearch, AITrash, AIWhatsApp } from "../AdminIcons";
+import { AIBox, AIClose, AIPlus, AISearch, AITrash, AIUndo, AIWhatsApp } from "../AdminIcons";
 
 const money = (n: number) => formatPrice(Math.round(n * 100) / 100);
 const parse = (s: string): number | null => {
@@ -229,23 +229,10 @@ function RulesCard() {
 
 type Draft = { id?: string; title: string; client: string; days: string; lines: (QuoteLine & { qtyText: string })[]; extra: string; price: string; note: string; status: QuoteStatus; createdAt?: string };
 
-/** Expande las líneas de una cotización a insumos (las recetas por su cantidad) y suma sus extras. */
+/** Costo de una cotización con los costos promedio de hoy. */
 function quoteCost(lines: QuoteLine[], recipe: (p: string, v: string) => Recipe | undefined, supplies: Map<string, Supply>, avg: (id: string) => number, extra: number) {
-  const flat: { supply: string; qty: number }[] = [];
-  let ex = extra;
-  for (const l of lines) {
-    if (l.kind === "supply") flat.push({ supply: l.supply, qty: l.qty });
-    else {
-      const r = recipe(l.product, l.variant);
-      if (!r) continue;
-      ex += r.extraCost * l.qty;
-      for (const x of r.lines) if (!x.optional || l.optionals.includes(x.optional)) flat.push({ supply: x.supply, qty: x.qty * l.qty });
-    }
-  }
-  // Junta el mismo insumo en una sola fila.
-  const merged = new Map<string, number>();
-  for (const f of flat) merged.set(f.supply, (merged.get(f.supply) ?? 0) + f.qty);
-  return costOf([...merged].map(([supply, qty]) => ({ supply, qty })), supplies, avg, { extra: ex });
+  const q = quoteSupplies(lines, recipe);
+  return costOf(q.supplies, supplies, avg, { extra: extra + q.extra });
 }
 
 function quoteText(q: { title: string; client: string; lines: QuoteLine[]; price: number; validUntil: string | null }, brand: string) {
@@ -259,6 +246,8 @@ export function QuotesPanel({ states, today }: { states: Map<string, SupplyState
   const { toast, bundle } = useAdmin();
   const { recipe, supplies, avg, rules } = useCosting(states);
   const [draft, setDraft] = useState<Draft | null>(null);
+  const [stockFor, setStockFor] = useState<Quote | null>(null);
+  const discounted = (q: Quote) => inv.data.movements.some((m) => m.quoteId === q.id);
 
   const startNew = () => setDraft({ title: "", client: "", days: "3", lines: [], extra: "", price: "", note: "", status: "open" });
   const edit = (q: Quote) => setDraft({
@@ -270,12 +259,21 @@ export function QuotesPanel({ states, today }: { states: Map<string, SupplyState
     const text = quoteText(q, bundle.tenant.name);
     try { await navigator.clipboard.writeText(text); toast("Cotización copiada: pégala en WhatsApp"); } catch { toast("No se pudo copiar"); }
   };
-  const setStatus = async (q: Quote, status: QuoteStatus) => { if (await inv.saveQuote({ ...q, status })) toast(`Cotización: ${QUOTE_STATUS[status].toLowerCase()}`); };
+  const setStatus = async (q: Quote, status: QuoteStatus) => {
+    if (!(await inv.saveQuote({ ...q, status }))) return;
+    toast(`Cotización: ${QUOTE_STATUS[status].toLowerCase()}`);
+    // Al aceptarla, ofrece descontar sus insumos (si todavía no se descontaron).
+    if (status === "accepted" && !discounted(q)) setStockFor({ ...q, status });
+  };
+  const giveBack = async (q: Quote) => {
+    if (window.confirm(`¿Devolver al stock los insumos de «${q.title}»? Se borran sus salidas y el stock vuelve a como estaba.`) && (await inv.returnQuoteStock(q.id))) toast("Insumos devueltos al stock");
+  };
   const remove = async (q: Quote) => { if (window.confirm(`¿Borrar la cotización «${q.title}»?`) && (await inv.deleteQuote(q.id))) toast("Cotización borrada"); };
 
   if (!inv.quotesAvailable) return <section className="a-card"><p>Falta preparar la base de datos: hay que correr la migración <b>0012_recipes_quotes</b> en Supabase.</p></section>;
 
   if (draft) return <QuoteBuilder draft={draft} setDraft={setDraft} today={today} states={states} />;
+  if (stockFor) return <StockOutCard quote={stockFor} states={states} today={today} onDone={() => setStockFor(null)} />;
 
   const quotes = [...inv.data.quotes].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   return (
@@ -287,11 +285,12 @@ export function QuotesPanel({ states, today }: { states: Map<string, SupplyState
           {quotes.map((q) => {
             const now = quoteCost(q.lines, recipe, supplies, avg, q.extraCost);
             const expired = q.status === "open" && q.validUntil !== null && q.validUntil < today;
+            const out = discounted(q);
             return (
               <div key={q.id} className="a-tr" style={{ gridTemplateColumns: "minmax(0, 1.4fr) 110px 90px 170px auto" }}>
                 <button type="button" className="q-open" onClick={() => edit(q)}>
                   <b>{q.title}</b>
-                  <span className="a-cap">{[q.client, dayLabel(q.createdAt.slice(0, 10)), expired ? "vencida" : q.validUntil ? `vale hasta ${dayLabel(q.validUntil)}` : null].filter(Boolean).join(" · ")}</span>
+                  <span className="a-cap">{[q.client, dayLabel(q.createdAt.slice(0, 10)), expired ? "vencida" : q.validUntil ? `vale hasta ${dayLabel(q.validUntil)}` : null, out ? "stock descontado" : null].filter(Boolean).join(" · ")}</span>
                   <span className="c-m a-cap">{money(q.price)} · costo hoy {money(now.total)}</span>
                 </button>
                 <span className="c-d money">{money(q.price)}<span className="a-cap" style={{ display: "block" }}>costo hoy {money(now.total)}</span></span>
@@ -300,6 +299,9 @@ export function QuotesPanel({ states, today }: { states: Map<string, SupplyState
                   {(Object.keys(QUOTE_STATUS) as QuoteStatus[]).map((s) => <option key={s} value={s}>{QUOTE_STATUS[s]}</option>)}
                 </select>
                 <span className="row g1">
+                  {out
+                    ? <button className="a-btn ghost sm" type="button" aria-label={`Devolver al stock los insumos de ${q.title}`} title="Devolver al stock" onClick={() => void giveBack(q)}><AIUndo size="sm" /></button>
+                    : q.status !== "lost" && <button className="a-btn ghost sm" type="button" aria-label={`Descontar del stock los insumos de ${q.title}`} title="Descontar del stock" onClick={() => setStockFor(q)}><AIBox size="sm" /></button>}
                   <button className="a-btn ghost sm" type="button" aria-label={`Copiar ${q.title} para WhatsApp`} onClick={() => void copy(q)}><AIWhatsApp size="sm" /></button>
                   <button className="a-btn ghost sm" type="button" aria-label={`Borrar ${q.title}`} onClick={() => void remove(q)}><AITrash size="sm" /></button>
                 </span>
@@ -310,6 +312,71 @@ export function QuotesPanel({ states, today }: { states: Map<string, SupplyState
         </div>
       </section>
     </>
+  );
+}
+
+/** Descuenta del stock los insumos de una cotización. Las cantidades salen de las recetas, pero se pueden cambiar (sustituciones). */
+function StockOutCard({ quote, states, today, onDone }: { quote: Quote; states: Map<string, SupplyState>; today: string; onDone: () => void }) {
+  const inv = useInventory();
+  const { toast } = useAdmin();
+  const { recipe, supplies } = useCosting(states);
+  const needs = useMemo(() => quoteSupplies(quote.lines, recipe).supplies.filter((n) => supplies.has(n.supply)), [quote.lines, recipe, supplies]);
+  const [qty, setQty] = useState<Record<string, string>>(() => Object.fromEntries(needs.map((n) => [n.supply, String(n.qty)])));
+  const [day, setDay] = useState(today);
+  const [busy, setBusy] = useState(false);
+  const rows = needs.map((n) => {
+    const s = supplies.get(n.supply)!;
+    const v = parse(qty[n.supply] ?? "");
+    const stock = states.get(s.id)?.stock ?? 0;
+    return { s, v, stock, after: stock - (v !== null && !Number.isNaN(v) ? v : 0) };
+  });
+  const bad = rows.some((r) => r.v === null || Number.isNaN(r.v) || r.v < 0);
+  const short = rows.filter((r) => r.after < 0);
+
+  const save = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (bad) return toast("Revisa las cantidades: deben ser 0 o más");
+    const now = new Date().toISOString();
+    const list = rows.filter((r) => (r.v ?? 0) > 0).map((r) => ({ id: newId(), createdAt: now, supplyId: r.s.id, kind: "sale" as const, qty: -(r.v ?? 0), quoteId: quote.id, note: `Cotización: ${quote.title}`, day }));
+    if (!list.length) return toast("No hay nada que descontar");
+    setBusy(true);
+    const ok = await inv.addMovements(list);
+    if (ok && quote.status === "open") await inv.saveQuote({ ...quote, status: "accepted" });
+    setBusy(false);
+    if (ok) {
+      toast(`Stock descontado: ${list.length === 1 ? "1 insumo" : `${list.length} insumos`}`);
+      onDone();
+    }
+  };
+
+  return (
+    <form className="a-card" onSubmit={save} aria-labelledby="so-h">
+      <div className="a-card-h">
+        <div className="stack g1"><h3 className="a-h2" id="so-h">Descontar del stock: {quote.title}</h3><p className="a-cap">Salen los insumos de la cotización. Si cambiaste algo al armarla (otra flor, una caja de más), corrige la cantidad.</p></div>
+        <button className="a-btn ghost sm" type="button" onClick={onDone} aria-label="Cerrar"><AIClose size="sm" /></button>
+      </div>
+      {!rows.length ? <p className="a-cap">Esta cotización no tiene insumos con receta para descontar.</p> : (
+        <div className="a-table so-table" aria-label="Insumos a descontar">
+          {rows.map((r) => (
+            <div key={r.s.id} className="a-tr so-tr" style={{ gridTemplateColumns: "minmax(0, 1.4fr) 160px 120px 120px" }}>
+              <b>{r.s.name}</b>
+              <div className="a-prefix"><input inputMode="decimal" aria-label={`Cantidad de ${r.s.name} que sale`} value={qty[r.s.id] ?? ""} onChange={(e) => setQty({ ...qty, [r.s.id]: e.target.value })} /><span style={{ borderRight: 0, borderLeft: "1px solid var(--a-border-2)" }}>{r.s.unit}</span></div>
+              <span className="a-cap">Hay {unitsLabel(r.stock, r.s.unit)}</span>
+              <span>{r.after < 0 ? <span className="st error">Queda {unitsLabel(r.after, r.s.unit)}</span> : <span className="a-cap">Queda {unitsLabel(r.after, r.s.unit)}</span>}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {short.length > 0 && <p className="a-cap" role="status">No alcanza el stock de {short.map((r) => r.s.name).join(", ")}. Igual puedes descontar: quizá falta registrar una compra o hacer un conteo.</p>}
+      <div className="a-grid3">
+        <div className="a-field"><label htmlFor="so-d">Fecha</label><input id="so-d" className="a-input" type="date" max={today} value={day} onChange={(e) => setDay(e.target.value || today)} /></div>
+      </div>
+      {quote.status === "open" && <p className="a-cap">La cotización pasará a «Aceptada».</p>}
+      <div className="row g2">
+        <button className="a-btn primary" type="submit" disabled={busy || !rows.length}>Descontar del stock</button>
+        <button className="a-btn ghost" type="button" onClick={onDone}>Ahora no</button>
+      </div>
+    </form>
   );
 }
 

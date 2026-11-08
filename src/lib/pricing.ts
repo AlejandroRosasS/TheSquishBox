@@ -39,6 +39,27 @@ export type Quote = {
 export const QUOTE_STATUS: Record<QuoteStatus, string> = { open: "Abierta", accepted: "Aceptada", lost: "No se concretó" };
 
 const r2 = (n: number) => Math.round(n * 100) / 100;
+const r3 = (n: number) => Math.round(n * 1000) / 1000;
+
+/**
+ * Insumos que usa una cotización: las recetas por su cantidad (con los opcionales elegidos) más los insumos sueltos,
+ * juntando el mismo insumo en una sola fila. `extra`: extras de las recetas por su cantidad.
+ */
+export function quoteSupplies(lines: QuoteLine[], recipe: (product: string, variant: string) => Recipe | undefined): { supplies: { supply: string; qty: number }[]; extra: number } {
+  const merged = new Map<string, number>();
+  const add = (supply: string, qty: number) => merged.set(supply, (merged.get(supply) ?? 0) + qty);
+  let extra = 0;
+  for (const l of lines) {
+    if (l.kind === "supply") add(l.supply, l.qty);
+    else {
+      const r = recipe(l.product, l.variant);
+      if (!r) continue;
+      extra += r.extraCost * l.qty;
+      for (const x of r.lines) if (!x.optional || l.optionals.includes(x.optional)) add(x.supply, x.qty * l.qty);
+    }
+  }
+  return { supplies: [...merged].map(([supply, qty]) => ({ supply, qty: r3(qty) })).filter((x) => x.qty > 0), extra: r2(extra) };
+}
 
 export type CostRow = { supplyId: string; name: string; unit: string; qty: number; unitCost: number; cost: number; waste: number; optional?: string };
 export type CostBreakdown = { rows: CostRow[]; supplies: number; waste: number; extra: number; total: number; missing: string[] };
