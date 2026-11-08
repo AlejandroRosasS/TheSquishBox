@@ -75,6 +75,8 @@ export function SettingsView() {
     { href: "/admin/notificaciones", label: "Notificaciones" },
     { href: "/admin/reclamaciones", label: "Libro de reclamaciones" },
     { href: "/admin/ventas", label: "Ventas y márgenes" },
+    { href: "/admin/usuarios", label: "Usuarios y accesos" },
+    { href: "/admin/perfil", label: "Mi perfil" },
   ];
 
   return (

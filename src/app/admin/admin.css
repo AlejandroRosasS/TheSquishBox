@@ -546,3 +546,38 @@ button.a-tr.inv-row:focus-visible { outline: 3px solid var(--a-focus); outline-o
 .a-seg.inv-tabs { grid-auto-columns: max-content; display: grid; overflow-x: auto; max-width: 100%; justify-self: start; }
 .q-adds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 @container page (max-width: 760px) { .q-adds { grid-template-columns: minmax(0, 1fr); } }
+
+/* Usuarios y Mi perfil */
+.a-me { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 10px; border-radius: 10px; text-decoration: none; color: var(--a-text); }
+.a-me:hover { background: var(--a-sunken); }
+.a-me.on { background: var(--a-sunken); box-shadow: inset 0 0 0 1px var(--a-border-2); }
+.a-me-txt { display: flex; flex-direction: column; min-width: 0; }
+.a-me-txt b { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.a-me-av { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: var(--a-ink); color: var(--a-on-ink); font-size: 13px; font-weight: 800; letter-spacing: .02em; }
+.a-me-av.lg { width: 56px; height: 56px; font-size: 18px; }
+.usr-row { grid-template-columns: minmax(0, 1.5fr) 170px minmax(0, 1.2fr) 360px; }
+.usr-name { display: flex; align-items: center; gap: 8px; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.usr-mail { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.usr-me { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: var(--a-blue-bg); color: var(--a-blue); }
+.usr-badge { display: inline-flex; height: 28px; align-items: center; padding: 0 10px; border-radius: 14px; background: var(--a-sunken); font-size: 13px; font-weight: 700; }
+.usr-status { gap: 4px; align-items: flex-start; }
+.usr-actions { justify-content: flex-end; flex-wrap: wrap; }
+@container page (max-width: 980px) { .usr-row { grid-template-columns: minmax(0, 1fr) 160px; } .usr-status { grid-column: 1; } .usr-actions { grid-column: 1 / -1; justify-content: flex-start; } }
+@container page (max-width: 760px) { .usr-row { grid-template-columns: minmax(0, 1fr) !important; gap: 10px; } .usr-actions, .usr-status { grid-column: 1; } .usr-role { max-width: 220px; } }
+.usr-roles { border: 0; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.a-field-legend { font-size: 13px; font-weight: 600; padding: 0; margin-bottom: 6px; }
+.usr-role-opt { display: flex; gap: 10px; align-items: flex-start; padding: 12px; border: 1px solid var(--a-border-2); border-radius: 12px; cursor: pointer; min-height: 44px; }
+.usr-role-opt input { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--a-ink); flex: none; }
+.usr-role-opt.on { border-color: var(--a-ink); box-shadow: inset 0 0 0 1px var(--a-ink); }
+.usr-role-opt:has(input:focus-visible) { outline: 3px solid var(--a-focus); }
+@container page (max-width: 760px) { .usr-roles { grid-template-columns: minmax(0, 1fr); } .a-grid2.usr-grid { grid-template-columns: minmax(0, 1fr); } }
+.usr-result { align-items: flex-start; }
+.usr-roles-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@container page (max-width: 760px) { .usr-roles-grid { grid-template-columns: minmax(0, 1fr); } }
+.usr-role-card { display: flex; flex-direction: column; gap: 6px; padding: 14px; border-radius: 12px; background: var(--a-sunken); }
+.usr-role-card ul { margin: 4px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.usr-role-card li { padding-left: 20px; position: relative; }
+.usr-role-card li::before { position: absolute; left: 0; font-weight: 800; }
+.usr-role-card li.ok::before { content: "✓"; color: var(--a-green); }
+.usr-role-card li.no::before { content: "✕"; color: var(--a-red); }
+.usr-role-card li.no { color: var(--a-text-2); }

@@ -6,6 +6,7 @@ import { dbConfigured } from "@/lib/db/env";
 import { browserClient } from "@/lib/db/browser";
 import type { Doc } from "@/lib/admin/storage";
 import { refreshStore } from "@/app/admin/actions";
+import { isRole, type Role } from "@/lib/team/roles";
 
 /** Documentos editables del admin y su tipo en la base (`site_docs.kind`). */
 export const DOC_KINDS = { appearance: "appearance", texts: "storefront", seo: "seo" } as const;
@@ -18,7 +19,7 @@ type State =
   | { phase: "signed-out" }
   | { phase: "no-access"; user: User }
   | { phase: "error"; message: string }
-  | { phase: "ready"; user: User; tenantId: string; docs: Partial<Record<DocName, Doc<unknown>>> };
+  | { phase: "ready"; user: User; tenantId: string; role: Role; docs: Partial<Record<DocName, Doc<unknown>>> };
 
 type Ctx = {
   client: SupabaseClient;
@@ -68,15 +69,16 @@ function DbProviderInner({ slug, children }: { slug: string; children: ReactNode
       const { data: t, error } = await client.from("tenants").select("id").eq("slug", slug).maybeSingle();
       if (error) return setState({ phase: "error", message: error.message });
       if (!t) return setState({ phase: "error", message: `La marca «${slug}» no está cargada en la base de datos.` });
-      const { data: member } = await client.rpc("is_member", { t: t.id });
+      const { data: member } = await client.from("tenant_members").select("role").eq("tenant_id", t.id).eq("user_id", user.id).maybeSingle();
       if (!member) return setState({ phase: "no-access", user });
+      const role: Role = isRole(member.role) ? member.role : "staff";
       const { data: rows, error: e2 } = await client
         .from("site_docs")
         .select("kind, stage, body, updated_at")
         .eq("tenant_id", t.id)
         .in("kind", Object.values(DOC_KINDS));
       if (e2) return setState({ phase: "error", message: e2.message });
-      setState({ phase: "ready", user, tenantId: t.id, docs: toDocs((rows ?? []) as Row[]) });
+      setState({ phase: "ready", user, tenantId: t.id, role, docs: toDocs((rows ?? []) as Row[]) });
     },
     [client, slug],
   );
@@ -85,7 +87,11 @@ function DbProviderInner({ slug, children }: { slug: string; children: ReactNode
     let current: string | null | undefined;
     const { data } = client.auth.onAuthStateChange((_event, session) => {
       const id = session?.user.id ?? null;
-      if (id === current) return;
+      if (id === current) {
+        // Mismo usuario (por ejemplo, cambió su nombre): se actualizan sus datos sin recargar el panel.
+        if (session && _event === "USER_UPDATED") setState((s) => (s.phase === "ready" ? { ...s, user: session.user } : s));
+        return;
+      }
       current = id;
       // Fuera del callback: Supabase recomienda no llamar a la base dentro de él.
       setTimeout(() => void load(session?.user ?? null), 0);

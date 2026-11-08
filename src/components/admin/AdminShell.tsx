@@ -10,7 +10,10 @@ import { InventoryProvider, useInventory } from "./AdminInventory";
 import { useBrandTenant } from "./useBrand";
 import { PANEL_SUBTITLE } from "@/lib/brand";
 import { useToday } from "@/lib/useToday";
-import { AIBell, AIBox, AILayers, AIChart, AIGlobe, AIHome, AIInstagram, AIMore, AIOrders, AIPalette, AISettings, AIText, AIImage, AIBook } from "./AdminIcons";
+import { useRole } from "./useRole";
+import { useDb } from "./DbContext";
+import { canSee, isManager } from "@/lib/team/roles";
+import { AIUsers, AIBell, AIBox, AILayers, AIChart, AIGlobe, AIHome, AIInstagram, AIMore, AIOrders, AIPalette, AISettings, AIText, AIImage, AIBook } from "./AdminIcons";
 import { isSoldOut, totalStock, LOW_STOCK } from "@/lib/catalog";
 
 type Item = { href: string; label: string; icon: ReactNode; count?: number; exact?: boolean };
@@ -56,6 +59,10 @@ function ShellInner({ children, path }: { children: ReactNode; path: string }) {
   const mounted = !!useToday();
   const inventoryOn = useInventory().data.enabled;
   const inventory = mounted && inventoryOn;
+  const role = useRole();
+  const db = useDb();
+  const meUser = db?.state.phase === "ready" ? db.state.user : null;
+  const meName = String(meUser?.user_metadata?.full_name ?? "").trim() || meUser?.email || "Tu cuenta";
 
   const main: Item[] = [
     { href: "/admin", label: "Inicio", icon: <AIHome />, exact: true },
@@ -74,10 +81,16 @@ function ShellInner({ children, path }: { children: ReactNode; path: string }) {
   const config: Item[] = [
     { href: "/admin/notificaciones", label: "Notificaciones", icon: <AIBell /> },
     { href: "/admin/reclamaciones", label: "Reclamaciones", icon: <AIBook /> },
+    { href: "/admin/usuarios", label: "Usuarios", icon: <AIUsers /> },
     { href: "/admin/ajustes", label: "Ajustes", icon: <AISettings /> },
   ];
+  const allowed = (i: Item) => canSee(role, i.href);
   const tabs: Item[] = [main[0], main[1], main.find((i) => i.href === "/admin/productos")!, main.find((i) => i.href === "/admin/instagram")!];
   const moreOn = !tabs.some((t) => isOn(path, t));
+  // El perfil Ventas no entra a Ajustes: su «Más» lleva a Mi perfil, que lista sus secciones.
+  const moreHref = isManager(role) ? "/admin/ajustes" : "/admin/perfil";
+  const storeItems = store.filter(allowed);
+  const configItems = config.filter(allowed);
 
   const link = (i: Item) => (
     <Link key={i.href} href={i.href} className={isOn(path, i) ? "on" : ""} aria-current={isOn(path, i) ? "page" : undefined}>
@@ -99,18 +112,25 @@ function ShellInner({ children, path }: { children: ReactNode; path: string }) {
           </div>
         </div>
         <nav className="a-nav stack g1" aria-label="Secciones">
-          {main.map(link)}
-          <p className="a-navlabel">Tu tienda</p>
-          {store.map(link)}
-          <p className="a-navlabel">Configuración</p>
-          {config.map(link)}
+          {main.filter(allowed).map(link)}
+          {storeItems.length > 0 && <p className="a-navlabel">Tu tienda</p>}
+          {storeItems.map(link)}
+          {configItems.length > 0 && <p className="a-navlabel">Configuración</p>}
+          {configItems.map(link)}
         </nav>
         <div className="stack g2" style={{ marginTop: "auto", paddingTop: 20 }}>
+          <Link className={`a-me ${isOn(path, { href: "/admin/perfil" }) ? "on" : ""}`} href="/admin/perfil" aria-current={isOn(path, { href: "/admin/perfil" }) ? "page" : undefined}>
+            <span className="a-me-av" aria-hidden="true">{initials(meName)}</span>
+            <span className="a-me-txt">
+              <b>{meName}</b>
+              <span className="a-cap">Mi perfil</span>
+            </span>
+          </Link>
           <a className="a-btn sm" href="/" target="_blank" rel="noreferrer">Ver tienda</a>
           <SignOutButton />
         </div>
       </aside>
-      {children}
+      {canSee(role, path || "/admin") ? children : <NoPermission />}
       <nav className="a-tabbar" aria-label="Secciones">
         {tabs.map((i) => (
           <Link key={i.href} href={i.href} className={isOn(path, i) ? "on" : ""} aria-current={isOn(path, i) ? "page" : undefined}>
@@ -119,11 +139,32 @@ function ShellInner({ children, path }: { children: ReactNode; path: string }) {
             {!!i.count && <span className="cnt">{i.count}</span>}
           </Link>
         ))}
-        <Link href="/admin/ajustes" className={moreOn ? "on" : ""} aria-current={moreOn ? "page" : undefined}>
+        <Link href={moreHref} className={moreOn ? "on" : ""} aria-current={moreOn ? "page" : undefined}>
           <AIMore />
           Más
         </Link>
       </nav>
     </div>
+  );
+}
+
+export function initials(name: string): string {
+  const base = name.includes("@") ? name.split("@")[0].replace(/[._-]+/g, " ") : name;
+  const parts = base.replace(/[^\p{L}\p{N}\s]/gu, " ").trim().split(/\s+/).filter(Boolean);
+  return ((parts[0]?.[0] ?? "?") + (parts[1]?.[0] ?? "")).toUpperCase();
+}
+
+function NoPermission() {
+  return (
+    <main className="a-main" id="contenido">
+      <div className="a-card stack g3" style={{ maxWidth: 520 }}>
+        <h1 className="a-h1">Esta sección no es para tu perfil</h1>
+        <p className="a-sub">Tu perfil es Ventas: ves pedidos, productos, inventario, ventas, Instagram y reclamaciones. Si necesitas entrar aquí, pídele a un Dueño de la marca que cambie tu perfil en Usuarios.</p>
+        <div className="row g2">
+          <Link className="a-btn primary" href="/admin">Ir al inicio</Link>
+          <Link className="a-btn" href="/admin/perfil">Mi perfil</Link>
+        </div>
+      </div>
+    </main>
   );
 }
