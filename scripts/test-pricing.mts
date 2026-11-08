@@ -38,3 +38,17 @@ test("redondeo hacia arriba", () => {
   assert.equal(roundPrice(117.42, "10"), 120);
   assert.equal(roundPrice(120, "10"), 120);
 });
+
+test("insumos de una cotización: recetas por cantidad, opcionales elegidos e insumos sueltos", async () => {
+  const { quoteSupplies } = await import("../src/lib/pricing.ts");
+  const recipes = [{ product: "ramo", variant: "u", extraCost: 2, lines: [{ supply: "rosa", qty: 6 }, { supply: "papel", qty: 2 }, { supply: "florero", qty: 1, optional: "Con florero" }] }];
+  const r = (p: string, v: string) => recipes.find((x) => x.product === p && x.variant === v);
+  const q = quoteSupplies([
+    { kind: "recipe", product: "ramo", variant: "u", name: "Ramo", qty: 3, optionals: [] },
+    { kind: "recipe", product: "ramo", variant: "u", name: "Ramo", qty: 2, optionals: ["Con florero"] },
+    { kind: "supply", supply: "rosa", name: "Rosa", qty: 4 },
+    { kind: "recipe", product: "borrado", variant: "u", name: "Sin receta", qty: 5, optionals: [] },
+  ], r);
+  assert.deepEqual(q.supplies, [{ supply: "rosa", qty: 34 }, { supply: "papel", qty: 10 }, { supply: "florero", qty: 2 }]);
+  assert.equal(q.extra, 10);
+});
