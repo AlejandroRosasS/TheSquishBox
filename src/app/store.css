@@ -427,6 +427,66 @@ body.no-scroll { overflow: hidden; }
 .seg-sizes { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: var(--s3); }
 @container page (max-width: 760px) { .seg-sizes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
+/* ---------- "En construcción", variante editorial (comingSoon.layout = "editorial") ---------- */
+/* Sobria y sin animaciones: panel de marca (--primary) + columna de texto sobre --bg. Todo sale de la paleta. */
+.soon-ed { --gold: var(--accent); --line: color-mix(in oklab, var(--accent) 45%, transparent);
+  min-height: 100svh; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  background: var(--bg); color: var(--text); font-family: var(--sans); }
+.soon-ed-brand { position: relative; background: var(--primary); color: var(--on-primary);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 36px; padding: 64px 40px; }
+.soon-ed-brand::before { content: ""; position: absolute; inset: 22px; border: 1px solid color-mix(in oklab, var(--on-primary) 22%, transparent); pointer-events: none; }
+.soon-ed-mark { position: relative; width: clamp(160px, 15vw, 200px); aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center;
+  outline: 1px solid var(--line); outline-offset: 14px; }
+.soon-ed-mark img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
+.soon-ed-tagline { margin: 0; font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 22px; line-height: 1.3; text-align: center;
+  color: color-mix(in oklab, var(--on-primary) 86%, var(--primary)); max-width: 280px; }
+.soon-ed-body { position: relative; display: flex; flex-direction: column; justify-content: center; padding: 72px clamp(28px, 7vw, 112px) 40px; }
+.soon-ed-body::before { content: ""; position: absolute; inset: 22px 22px 22px 0; border: 1px solid var(--border); border-left: 0; pointer-events: none; }
+.soon-ed-inner { position: relative; max-width: 520px; display: flex; flex-direction: column; align-items: flex-start; gap: 26px; margin-block: auto; }
+.soon-ed-eyebrow { margin: 0; display: flex; align-items: center; gap: 14px; font-size: 12px; font-weight: 600; letter-spacing: .28em;
+  text-transform: uppercase; color: var(--gold); }
+.soon-ed-eyebrow::before { content: ""; width: 36px; height: 1px; background: currentColor; }
+.soon-ed h1 { margin: 0; font-family: var(--serif); font-weight: 400; font-size: clamp(46px, 6.4vw, 84px); line-height: 1.02;
+  letter-spacing: -0.01em; color: var(--primary); }
+.soon-ed h1 em { display: block; font-style: italic; font-weight: 400; color: var(--gold); }
+.soon-ed-rule { display: flex; align-items: center; gap: 10px; width: 120px; color: var(--gold); }
+.soon-ed-rule::before, .soon-ed-rule::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.soon-ed-rule i { width: 6px; height: 6px; background: currentColor; transform: rotate(45deg); }
+.soon-ed-lead { margin: 0; font-size: 17px; line-height: 1.75; color: var(--text-2); max-width: 440px; }
+.soon-ed-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 28px; margin-top: 6px; }
+.soon-ed .soon-ed-btn { display: inline-flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 28px; background: var(--primary); color: var(--on-primary);
+  text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; border: 1px solid var(--primary); }
+.soon-ed .soon-ed-btn:hover { background: color-mix(in oklab, var(--primary) 86%, black); }
+.soon-ed .soon-ed-link { display: inline-flex; align-items: center; min-height: 44px; color: var(--primary); font-size: 13px; font-weight: 600;
+  letter-spacing: .16em; text-transform: uppercase; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 8px; }
+.soon-ed-link:hover { text-decoration-color: currentColor; }
+.soon-ed-btn:focus-visible, .soon-ed-link:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+.soon-ed-motto { margin: 18px 0 0; font-family: var(--serif); font-style: italic; font-size: 20px; color: var(--text-2); }
+.soon-ed-foot { position: relative; margin-top: 48px; font-size: 11px; font-weight: 600; letter-spacing: .26em; text-transform: uppercase;
+  color: color-mix(in oklab, var(--text-2) 80%, var(--bg)); }
+/* El selector de paletas del modo demo no va en la portada sobria. */
+.store:has(.soon-ed) .palette-demo { display: none; }
+@media (max-width: 980px) {
+  .soon-ed { grid-template-columns: minmax(0, 1fr); }
+  .soon-ed-brand { padding: 56px 24px 48px; gap: 26px; }
+  .soon-ed-brand::before { inset: 14px 14px 0; border-bottom: 0; }
+  .soon-ed-mark { width: 150px; outline-offset: 10px; }
+  .soon-ed-tagline { font-size: 19px; }
+  .soon-ed-body { padding: 52px 32px 40px; }
+  .soon-ed-body::before { inset: 0 14px 14px; border-top: 0; border-left: 1px solid var(--border); }
+  .soon-ed-inner { max-width: 600px; margin-inline: auto; }
+}
+@media (max-width: 760px) {
+  .soon-ed-inner { align-items: center; text-align: center; gap: 22px; }
+  .soon-ed-eyebrow::after { content: ""; width: 36px; height: 1px; background: currentColor; }
+  .soon-ed-eyebrow { font-size: 11px; letter-spacing: .22em; white-space: nowrap; gap: 12px; }
+  .soon-ed-eyebrow::before, .soon-ed-eyebrow::after { width: 24px; }
+  .soon-ed-lead { font-size: 16px; }
+  .soon-ed-actions { flex-direction: column; width: 100%; }
+  .soon-ed-btn { width: 100%; justify-content: center; }
+  .soon-ed-foot { text-align: center; margin-top: 40px; }
+}
+
 /* ---------- Página "en construcción" (dominio principal mientras tanto) ---------- */
 /* Colores: por defecto salen de la paleta de la marca; storefront.comingSoon.colors los puede fijar. */
 .soon { --ink: color-mix(in oklab, var(--text) 92%, black); --pink: var(--primary); --teal: var(--accent);
