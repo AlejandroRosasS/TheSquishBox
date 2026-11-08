@@ -6,7 +6,9 @@ import { DELIVERY_STATUS, money, ORDER_STATUS, PARTY_STATUS } from "@/lib/admin/
 import type { DemoOrder, PartyRequest } from "@/lib/admin/types";
 import { useAdmin, useAdminCatalog, useOrders, useParty } from "../AdminContext";
 import { AdminPage } from "../AdminPage";
-import { AIBell, AISearch } from "../AdminIcons";
+import { AIBell, AIPlus, AISearch } from "../AdminIcons";
+import { useInventory } from "../AdminInventory";
+import { useToday } from "@/lib/useToday";
 
 export const orderTotal = (o: DemoOrder) => o.lines.reduce((s, l) => s + l.price * l.qty, 0) + o.deliveryFee;
 
@@ -50,6 +52,9 @@ export function OrdersView() {
   const nParty = parties.filter((r) => r.status === "nueva").length;
   const nDiff = orders.filter((o) => deliveryState(o)[1] === "pend" || deliveryState(o)[0].startsWith("Devolver")).length;
   const cols = { gridTemplateColumns: "90px minmax(0, 1.4fr) minmax(0, 1fr) 110px 150px 130px" };
+  // Con el inventario prendido, el cotizador queda a un toque (se conoce recién en el navegador).
+  const mounted = !!useToday();
+  const quotesOn = useInventory().data.enabled && mounted;
 
   return (
     <AdminPage title="Pedidos" topRight={<Link className="a-btn ghost sm" href="/admin/notificaciones" aria-label="Notificaciones"><AIBell /></Link>}>
@@ -60,7 +65,10 @@ export function OrdersView() {
             {nNew} nuevos{parties.length ? ` · ${nParty} de ${partyLabel.toLowerCase()} por cotizar` : ""} · {nDiff} diferencias de delivery por resolver
           </p>
         </div>
-        <div className="a-search"><AISearch size="sm" /><input placeholder="Buscar por N.º, cliente o celular" aria-label="Buscar pedidos" value={q} onChange={(e) => setQ(e.target.value)} /></div>
+        <div className="row g2" style={{ flexWrap: "wrap" }}>
+          {quotesOn && <Link className="a-btn" href="/admin/inventario#cotizador"><AIPlus size="sm" />Nueva cotización</Link>}
+          <div className="a-search"><AISearch size="sm" /><input placeholder="Buscar por N.º, cliente o celular" aria-label="Buscar pedidos" value={q} onChange={(e) => setQ(e.target.value)} /></div>
+        </div>
       </div>
       <div className="a-scroll-x" role="group" aria-label="Filtrar pedidos">
         {defs.map(([k, label]) => (

@@ -12,6 +12,8 @@ import { CAMPAIGN_STATE, campaignRange, campaignState } from "@/lib/campaigns";
 import { AdminPage, DemoNote } from "../AdminPage";
 import { limaToday, useManualSales, type ManualSale } from "../AdminSales";
 import { salesToCsv, type ExportSale } from "@/lib/sales/csv";
+import { deductions, feesConfigured, payMethodKey } from "@/lib/sales/fees";
+import { usePaymentFees } from "../AdminFees";
 import { fairOn } from "@/lib/fairs";
 import { useFairs } from "../AdminFairs";
 import { FairsSection } from "./FairsSection";
@@ -49,35 +51,48 @@ export function SalesView() {
   const { fairs } = useFairs();
   const fromDb = useOrdersFromDb();
   const { orders: dbOrders } = useOrders();
+  const { fees } = usePaymentFees();
   const [now, setNow] = useState<number | null>(null);
   // eslint-disable-next-line react-hooks/set-state-in-effect -- la hora es solo del navegador
   useEffect(() => setNow(Date.now()), []);
   const scale = period === "mes" ? 1 : period === "tri" ? 2.6 : 7.4;
   const prod = (id: string) => catalog.products.find((p) => p.id === id);
-  const sum = <K extends "rev" | "listRev" | "cost" | "units" | "orders" | "dIn" | "dOut">(arr: { [k in K]: number }[], k: K) => arr.reduce((a, r) => a + r[k], 0);
+  const sum = <K extends "rev" | "listRev" | "cost" | "units" | "orders" | "dIn" | "dOut" | "igv" | "fee" | "dCut">(arr: { [k in K]: number }[], k: K) => arr.reduce((a, r) => a + r[k], 0);
   const price = (pid: string, vid: string) => prod(pid)?.variants.find((v) => v.id === vid)?.price ?? 0;
   const cost = (pid: string, vid: string) => catalog.costs[pid]?.[vid] ?? 0;
 
   const base = demo.sales.lines.map(([pid, vid, ch, u, dIn, dOut, o]) => {
     const units = Math.max(1, Math.round(u * scale));
     const rev = price(pid, vid) * units;
-    return { pid, ch, line: prod(pid)?.line ?? "", units, rev, listRev: rev, cost: cost(pid, vid) * units, dIn: dIn * scale, dOut: dOut * scale, orders: Math.max(1, Math.round(o * scale)), camp: "", campName: "", fair: "" as string | null };
+    return { pid, ch, line: prod(pid)?.line ?? "", units, rev, listRev: rev, cost: cost(pid, vid) * units, dIn: dIn * scale, dOut: dOut * scale, orders: Math.max(1, Math.round(o * scale)), camp: "", campName: "", igv: 0, fee: 0, dCut: 0, card: false, fair: "" as string | null };
   });
   type Row = (typeof base)[number];
-  const saleLine = (l: ManualSale["lines"][number], ch: string, first: boolean, dIn: number, dOut: number): Row => ({
-    pid: l.productId, ch, line: prod(l.productId)?.line ?? "", units: l.qty, rev: l.price * l.qty, listRev: (l.listPrice ?? l.price) * l.qty,
-    cost: cost(l.productId, l.variantId) * l.qty, dIn: first ? dIn : 0, dOut: first ? dOut : 0, orders: first ? 1 : 0, camp: l.campaignId ?? "", campName: l.campaign ?? "", fair: null,
-  });
+  // IGV y comisión según el medio de pago (Ajustes › Comisiones e IGV). Lo del delivery cobrado se descuenta del resultado del delivery;
+  // el fijo por operación, de los productos (una vez por venta).
+  const saleLine = (l: ManualSale["lines"][number], ch: string, first: boolean, dIn: number, dOut: number, pay: string | undefined): Row => {
+    const key = payMethodKey(pay, ch);
+    const rule = key ? fees.rules[key] : null;
+    const rev = l.price * l.qty;
+    const d = deductions(rev, rule, fees.igvRate, first);
+    const dd = first ? deductions(dIn, rule, fees.igvRate, false) : { igv: 0, fee: 0 };
+    return {
+      pid: l.productId, ch, line: prod(l.productId)?.line ?? "", units: l.qty, rev, listRev: (l.listPrice ?? l.price) * l.qty,
+      cost: cost(l.productId, l.variantId) * l.qty, dIn: first ? dIn : 0, dOut: first ? dOut : 0, orders: first ? 1 : 0, camp: l.campaignId ?? "", campName: l.campaign ?? "",
+      igv: d.igv, fee: d.fee, dCut: dd.igv + dd.fee, card: key === "card_web" || key === "card_pos", fair: null,
+    };
+  };
   // Ventas de feria: se cargan en la feria vigente ese día (misma regla que la base). "" = ninguna.
   const fairOf = (s: ManualSale) => (s.channel === "feria" ? fairOn(fairs, s.day)?.id ?? "" : null);
-  const extra = manual.flatMap((s) => s.lines.map((l, i) => ({ ...saleLine(l, s.channel, !i, s.dIn, s.dOut), fair: fairOf(s) })));
+  const extra = manual.flatMap((s) => s.lines.map((l, i) => ({ ...saleLine(l, s.channel, !i, s.dIn, s.dOut, s.pay), fair: fairOf(s) })));
   // Pedidos reales de la web (con la base): los cancelados, fallidos o devueltos no cuentan.
   const web = fromDb
     ? dbOrders
         .filter((o) => o.status !== "cancelado" && !["failed", "refunded"].includes(o.paymentStatus ?? ""))
-        .flatMap((o) => o.lines.map((l, i) => saleLine(l, "web", !i, o.deliveryFee, o.deliveryReal ?? o.deliveryFee)))
+        .flatMap((o) => o.lines.map((l, i) => saleLine(l, "web", !i, o.deliveryFee, o.deliveryReal ?? o.deliveryFee, o.payMethod)))
     : [];
   const rows = [...base, ...extra, ...web];
+  /** Contribución = ingresos − costo de productos − IGV − comisiones. */
+  const contrib = (a: Row[]) => sum(a, "rev") - sum(a, "cost") - sum(a, "igv") - sum(a, "fee");
   const campName = (id: string, fallback = "") => campaigns.find((c) => c.id === id)?.name || fallback || "Campaña borrada";
   const campOk = (r: Row) => campF === "all" || (campF === "none" ? !r.camp : r.camp === campF);
   const byLine = rows.filter((r) => (line === "all" || r.line === line) && campOk(r));
@@ -89,34 +104,39 @@ export function SalesView() {
   const campAgg = campIds.map((id) => {
     const a = lineRows.filter((r) => r.camp === id);
     const fallback = a.find((r) => r.campName)?.campName ?? "";
-    return { id, name: campName(id, fallback), c: campOf(id), rev: sum(a, "rev"), contrib: sum(a, "rev") - sum(a, "cost"), units: sum(a, "units"), discount: sum(a, "listRev") - sum(a, "rev"), byCh: CHANNELS.map(([k, l]) => ({ k, l, rev: sum(a.filter((r) => r.ch === k), "rev") })).filter((x) => x.rev > 0) };
+    return { id, name: campName(id, fallback), c: campOf(id), rev: sum(a, "rev"), contrib: contrib(a), units: sum(a, "units"), discount: sum(a, "listRev") - sum(a, "rev"), byCh: CHANNELS.map(([k, l]) => ({ k, l, rev: sum(a.filter((r) => r.ch === k), "rev") })).filter((x) => x.rev > 0) };
   });
-  const rev = sum(f, "rev"), cst = sum(f, "cost"), units = sum(f, "units"), orders = sum(f, "orders"), del = sum(f, "dIn") - sum(f, "dOut");
+  const rev = sum(f, "rev"), cst = sum(f, "cost"), units = sum(f, "units"), orders = sum(f, "orders"), del = sum(f, "dIn") - sum(f, "dOut") - sum(f, "dCut");
+  const igv = sum(f, "igv"), fee = sum(f, "fee"), cut = igv + fee, net = rev - cst - cut;
+  // Ventas con tarjeta sin comisión cargada: se avisa para que la marca la configure.
+  const cardNoFee = (["card_web", "card_pos"] as const).filter((k) => !feesConfigured(fees, k) && f.some((r) => r.card && (k === "card_web") === (r.ch === "web")));
 
   const chanAgg = CHANNELS.map(([k, label]) => {
     const a = byLine.filter((r) => r.ch === k);
     // Subcategorías del canal: lo vendido con precio de cada campaña.
     const subs = [...new Set(a.filter((r) => r.camp).map((r) => r.camp))].map((id) => {
       const b = a.filter((r) => r.camp === id);
-      return { id, label: campName(id, b.find((r) => r.campName)?.campName), rev: sum(b, "rev"), contrib: sum(b, "rev") - sum(b, "cost"), units: sum(b, "units") };
+      return { id, label: campName(id, b.find((r) => r.campName)?.campName), rev: sum(b, "rev"), contrib: contrib(b), units: sum(b, "units") };
     });
-    return { k, label, rev: sum(a, "rev"), contrib: sum(a, "rev") - sum(a, "cost"), units: sum(a, "units"), subs };
+    return { k, label, rev: sum(a, "rev"), contrib: contrib(a), units: sum(a, "units"), subs };
   });
   const maxRev = Math.max(1, ...chanAgg.map((c) => c.rev));
-  const prodAgg = catalog.products.map((p) => { const a = f.filter((r) => r.pid === p.id); return { p, units: sum(a, "units"), contrib: sum(a, "rev") - sum(a, "cost") }; }).filter((x) => x.units > 0);
+  const prodAgg = catalog.products.map((p) => { const a = f.filter((r) => r.pid === p.id); return { p, units: sum(a, "units"), contrib: contrib(a) }; }).filter((x) => x.units > 0);
   prodAgg.sort((a, b) => (rank === "c" ? b.contrib - a.contrib : b.units - a.units));
   const top = prodAgg.slice(0, 5);
   const maxK = Math.max(1, ...top.map((x) => (rank === "c" ? x.contrib : x.units)));
-  // Solo ventas registradas (las de ejemplo no tienen fecha ni feria).
-  const fairRows = byLine.filter((r) => r.ch === "feria" && r.fair !== null && r.fair !== "").map((r) => ({ fair: r.fair as string, rev: r.rev, cost: r.cost, units: r.units }));
+  // Solo ventas registradas (las de ejemplo no tienen fecha ni feria). «cost» incluye IGV y comisiones, como la contribución del resto.
+  const fairRows = byLine.filter((r) => r.ch === "feria" && r.fair !== null && r.fair !== "").map((r) => ({ fair: r.fair as string, rev: r.rev, cost: r.rev - contrib([r]), units: r.units }));
   const fairLoose = manual.filter((s) => fairOf(s) === "").length;
   const chanName = (k: string) => CHANNELS.find((c) => c[0] === k)?.[1] ?? k;
   const recent = [
     ...manual.slice().reverse().map((s) => {
       const r = s.lines.reduce((a, l) => a + l.price * l.qty, 0);
       const c = s.lines.reduce((a, l) => a + cost(l.productId, l.variantId) * l.qty, 0);
+      const ls = s.lines.map((l, i) => saleLine(l, s.channel, !i, s.dIn, s.dOut, s.pay));
+      const cutS = sum(ls, "igv") + sum(ls, "fee") + sum(ls, "dCut");
       const camps = [...new Set(s.lines.filter((l) => l.campaignId).map((l) => campName(l.campaignId!, l.campaign)))];
-      return { date: s.date, detail: s.lines.map((l) => `${prod(l.productId)?.name ?? l.productId} x${l.qty}`).join(" + "), note: camps.length ? `${saleCaption(s, money)} · campaña ${camps.join(", ")}` : saleCaption(s, money), channel: s.channel, revenue: r + s.dIn, contribution: r - c + s.dIn - s.dOut };
+      return { date: s.date, detail: s.lines.map((l) => `${prod(l.productId)?.name ?? l.productId} x${l.qty}`).join(" + "), note: camps.length ? `${saleCaption(s, money)} · campaña ${camps.join(", ")}` : saleCaption(s, money), channel: s.channel, revenue: r + s.dIn, contribution: r - c + s.dIn - s.dOut - cutS };
     }),
     ...demo.sales.recent,
   ];
@@ -137,7 +157,7 @@ export function SalesView() {
   return (
     <AdminPage title="Ventas" topRight={<Link className="a-btn primary sm" href="/admin/ventas/nueva">+ Venta</Link>}>
       <div className="a-head">
-        <div className="stack g1"><h1 className="a-h1">Ventas y márgenes</h1><p className="a-sub">Todos los canales en un solo lugar. Montos aproximados según los costos cargados.</p></div>
+        <div className="stack g1"><h1 className="a-h1">Ventas y márgenes</h1><p className="a-sub">Todos los canales en un solo lugar. Montos aproximados según los costos cargados. La contribución ya descuenta el IGV y las comisiones de cada medio de pago (<Link href="/admin/ajustes#pagos">configurar</Link>).</p></div>
         <div className="row g2 wrap-row"><Link className="a-btn" href="/admin/ventas/culqi">Cobros Culqi</Link><Link className="a-btn" href="/admin/ventas/importar">Importar ventas</Link><button className="a-btn" type="button" onClick={exportCsv}>Exportar CSV</button><Link className="a-btn primary only-d" href="/admin/ventas/nueva">+ Registrar venta</Link></div>
       </div>
       <div className="row g3 wrap-row">
@@ -159,12 +179,18 @@ export function SalesView() {
       <div className="a-scroll-x" role="group" aria-label="Canal">
         {[["all", "Todos los canales"], ...CHANNELS].map(([k, l]) => <button key={k} className={`a-chip ${chan === k ? "on" : ""}`} type="button" aria-pressed={chan === k} onClick={() => setChan(k)}>{l}</button>)}
       </div>
+      {cardNoFee.length > 0 && (
+        <div className="a-card row between g3 wrap-row" role="status">
+          <p className="a-cap" style={{ margin: 0 }}>Hay ventas con {cardNoFee.map((k) => (k === "card_web" ? "tarjeta en la web" : "tarjeta con POS")).join(" y ")} y aún no pusiste la comisión: por ahora solo se descuenta el IGV.</p>
+          <Link className="a-btn sm" href="/admin/ajustes#pagos">Poner comisión</Link>
+        </div>
+      )}
       <div className="kpis5">
         <div className="kpi"><span className="l">Ingresos</span><span className="v money">{moneyShort(rev)}</span><span className="a-cap">{orders} ventas</span></div>
         <div className="kpi"><span className="l">Costo de productos</span><span className="v money">{moneyShort(cst)}</span><span className="a-cap">Según costo por variante</span></div>
-        <div className="kpi"><span className="l">Contribución</span><span className="v money">{moneyShort(rev - cst)}</span><span className="a-cap">Margen {rev ? Math.round(((rev - cst) / rev) * 100) : 0}%</span></div>
+        <div className="kpi"><span className="l">Contribución</span><span className="v money">{moneyShort(net)}</span><span className="a-cap">Margen {rev ? Math.round((net / rev) * 100) : 0}%{cut > 0 ? ` · tras IGV ${moneyShort(igv)} y comisiones ${moneyShort(fee)}` : ""}</span></div>
         <div className="kpi"><span className="l">Unidades</span><span className="v">{units}</span><span className="a-cap">Ticket prom. {orders ? moneyShort(rev / orders) : "—"}</span></div>
-        <div className="kpi"><span className="l">Resultado delivery</span><span className="v money" style={{ color: del >= 0 ? "#1F6B35" : "#B42318" }}>{del >= 0 ? "+ " : "− "}{moneyShort(Math.abs(del))}</span><span className="a-cap">Cobrado {moneyShort(sum(f, "dIn"))} · costó {moneyShort(sum(f, "dOut"))}</span></div>
+        <div className="kpi"><span className="l">Resultado delivery</span><span className="v money" style={{ color: del >= 0 ? "#1F6B35" : "#B42318" }}>{del >= 0 ? "+ " : "− "}{moneyShort(Math.abs(del))}</span><span className="a-cap">Cobrado {moneyShort(sum(f, "dIn"))} · costó {moneyShort(sum(f, "dOut"))}{sum(f, "dCut") > 0 ? ` · IGV y comisión ${moneyShort(sum(f, "dCut"))}` : ""}</span></div>
       </div>
       <div className="a-cols even">
         <section className="a-card" aria-labelledby="v-ch">

@@ -7,6 +7,7 @@ import { useAdmin } from "../AdminContext";
 import { AdminPage, DemoNote, Switch } from "../AdminPage";
 import { AIChevron, AIInstagram } from "../AdminIcons";
 import { CulqiSettings } from "../CulqiSettings";
+import { PaymentFeesPanel } from "./PaymentFeesPanel";
 import { useInventory } from "../AdminInventory";
 import { useToday } from "@/lib/useToday";
 import { useTextsDraft } from "./useTextsDraft";
@@ -19,6 +20,7 @@ const TABS = [
   { id: "empresa", label: "Datos de empresa" },
   { id: "conexiones", label: "Conexiones" },
   { id: "delivery", label: "Tarifas de delivery" },
+  { id: "pagos", label: "Comisiones e IGV" },
   { id: "modulos", label: "Módulos" },
 ] as const;
 type TabId = (typeof TABS)[number]["id"];
@@ -41,7 +43,7 @@ export function SettingsView() {
   const [newD, setNewD] = useState<string | null>(null);
   // Tab activo: se refleja en el hash (#delivery) para poder enlazarlo y volver con «Atrás».
   const [tab, setTab] = useState<TabId>("empresa");
-  const tabRefs = useRef<Record<TabId, HTMLButtonElement | null>>({ empresa: null, conexiones: null, delivery: null, modulos: null });
+  const tabRefs = useRef<Record<TabId, HTMLButtonElement | null>>({ empresa: null, conexiones: null, delivery: null, pagos: null, modulos: null });
   useEffect(() => {
     const sync = () => { const h = window.location.hash.slice(1); if (isTab(h)) setTab(h); };
     sync();
@@ -77,7 +79,7 @@ export function SettingsView() {
 
   return (
     <AdminPage title="Ajustes">
-      <div className="a-head"><div className="stack g1"><h1 className="a-h1">Ajustes</h1><p className="a-sub">Datos de la empresa, conexiones, tarifas de delivery y módulos.</p></div></div>
+      <div className="a-head"><div className="stack g1"><h1 className="a-h1">Ajustes</h1><p className="a-sub">Datos de la empresa, conexiones, tarifas de delivery, comisiones e IGV, y módulos.</p></div></div>
       <nav className="only-m stack g2" aria-label="Más secciones">
         {more.map((m) => <Link key={m.href} className="a-btn block" href={m.href} style={{ justifyContent: "space-between" }}>{m.label}<AIChevron size="sm" /></Link>)}
       </nav>
@@ -139,6 +141,9 @@ export function SettingsView() {
             </div>
           </div>
         </section>
+      </div>
+      <div role="tabpanel" id="aj-panel-pagos" aria-labelledby="aj-tab-pagos" hidden={tab !== "pagos"}>
+        <PaymentFeesPanel />
       </div>
       <div role="tabpanel" id="aj-panel-modulos" aria-labelledby="aj-tab-modulos" hidden={tab !== "modulos"}>
         <section className="a-card" aria-labelledby="aj-mod">

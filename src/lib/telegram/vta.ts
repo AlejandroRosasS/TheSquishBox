@@ -309,7 +309,7 @@ export async function onVtaText(db: SupabaseClient, tenant: Tenant, m: TgMessage
 async function fairLine(db: SupabaseClient, tenantId: string, day: string): Promise<string> {
   const { data, error } = await db.from("fairs").select("name, place").eq("tenant_id", tenantId).lte("starts_on", day).gte("ends_on", day)
     .order("starts_on", { ascending: false }).order("created_at", { ascending: false }).limit(1);
-  if (error) return ""; // sin la migración 0012 no hay ferias
+  if (error) return ""; // sin la migración 0013 no hay ferias
   const f = data?.[0] as { name: string; place: string | null } | undefined;
   return f ? `🎪 Feria: ${f.name}${f.place ? ` · ${f.place}` : ""}` : "🎪 Ninguna feria en esa fecha: créala en Ventas y márgenes y la venta se carga sola.";
 }

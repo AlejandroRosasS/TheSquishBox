@@ -12,7 +12,7 @@ export type FairsState = {
   save: (fair: Fair) => Promise<boolean>;
   remove: (id: string) => Promise<boolean>;
   hydrated: boolean;
-  /** false si la base aún no tiene la tabla de ferias (falta la migración 0012). */
+  /** false si la base aún no tiene la tabla de ferias (falta la migración 0013). */
   available: boolean;
 };
 
@@ -91,7 +91,7 @@ function useDbFairs(on: boolean): FairsState {
       return false;
     }
     if (!available) {
-      toast("Las ferias necesitan la migración 0012_fairs en Supabase");
+      toast("Las ferias necesitan la migración 0013_fairs en Supabase");
       return false;
     }
     return true;

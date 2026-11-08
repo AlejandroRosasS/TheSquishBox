@@ -20,7 +20,7 @@ export const fairDays = (f: Pick<Fair, "startsOn" | "endsOn">) => Math.max(1, Ma
 export const fairFixed = (f: Pick<Fair, "costs">) => f.costs.reduce((a, c) => a + (Number(c.amount) || 0), 0);
 
 /**
- * Feria vigente en un día. Misma regla que la base (fair_on en 0012_fairs.sql):
+ * Feria vigente en un día. Misma regla que la base (fair_on en 0013_fairs.sql):
  * si dos se cruzan, gana la que empezó más tarde.
  */
 export function fairOn<T extends Pick<Fair, "startsOn" | "endsOn" | "createdAt">>(fairs: T[], day: string | undefined): T | null {

@@ -72,7 +72,7 @@ export function FairsSection({ rows, unassigned }: { rows: FairRow[]; /** Ventas
         </div>
         {!draft && <button className="a-btn sm" type="button" onClick={() => setDraft(blank())} disabled={!available}><AIPlus size="sm" /> Nueva feria</button>}
       </div>
-      {!available && <p className="bad-pill" style={{ alignSelf: "flex-start" }}>Falta aplicar la migración de ferias (0012) en la base</p>}
+      {!available && <p className="bad-pill" style={{ alignSelf: "flex-start" }}>Falta aplicar la migración de ferias (0013) en la base</p>}
 
       {draft && (
         <form className="stack g3 fair-form" onSubmit={(e) => { e.preventDefault(); void submit(); }} aria-label={draft.isNew ? "Nueva feria" : `Editar ${draft.name}`}>
