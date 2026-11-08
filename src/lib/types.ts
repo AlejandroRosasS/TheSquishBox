@@ -211,6 +211,19 @@ export type Storefront = {
     sentLead: string;
   };
   notFound: Img & { title: string; lead: string };
+  /**
+   * Página "en construcción" del dominio principal mientras la tienda vive en demo.<dominio>.
+   * `title`: el texto entre *asteriscos* va resaltado. `photos`: hasta 6 fotos decorativas.
+   * `colors`: fija los colores de la página (fondo `ink`, botón `pink`, etc.); si faltan, salen de la paleta.
+   */
+  comingSoon?: {
+    metaDescription: string;
+    tape: string;
+    title: string;
+    lead: string;
+    photos: string[];
+    colors?: Partial<Record<"ink" | "pink" | "teal" | "lime" | "purple" | "yellow", string>>;
+  };
 };
 
 export type SeoPage = { title: string; description: string };

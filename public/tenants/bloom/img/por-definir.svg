@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <rect width="800" height="800" fill="#F3ECE6"/>
+  <g fill="none" stroke="#C9B4A6" stroke-width="10" stroke-linecap="round" transform="translate(400 360)">
+    <circle r="34"/>
+    <ellipse cx="0" cy="-78" rx="38" ry="52"/>
+    <ellipse cx="0" cy="78" rx="38" ry="52"/>
+    <ellipse cx="-78" cy="0" rx="52" ry="38"/>
+    <ellipse cx="78" cy="0" rx="52" ry="38"/>
+  </g>
+  <text x="400" y="560" text-anchor="middle" font-family="system-ui, sans-serif" font-size="34" fill="#8C766A">Foto por definir</text>
+</svg>

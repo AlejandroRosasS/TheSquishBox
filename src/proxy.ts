@@ -1,19 +1,22 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * Mientras la tienda está en construcción:
- * - thesquishbox.com y www.thesquishbox.com muestran la página "en construcción".
- * - demo.thesquishbox.com (y los *.vercel.app) muestran la tienda completa, sin indexar.
- * Para lanzar la tienda en el dominio principal, borra este archivo.
+ * Mientras la tienda de una marca está en construcción:
+ * - su dominio principal (marca.com y www.marca.com) muestra la página "en construcción" (/pronto).
+ * - demo.<dominio>, los *.vercel.app y localhost muestran la tienda completa, sin indexar.
+ * Sirve para cualquier marca: cada una se despliega en su propio proyecto de Vercel.
+ * Para lanzar la tienda en el dominio principal, pon STORE_LIVE=1 en las variables del proyecto.
  */
-const COMING_SOON_HOSTS = /^(www\.)?thesquishbox\.com$/i;
+const PREVIEW_HOSTS = /^(demo\.|localhost$|127\.0\.0\.1$)|\.vercel\.app$/i;
 
 export function proxy(request: NextRequest) {
   const host = (request.headers.get("host") ?? "").split(":")[0];
   const { pathname } = request.nextUrl;
 
-  if (COMING_SOON_HOSTS.test(host)) {
-    // /pronto y las rutas del servidor (cron de Instagram) siguen funcionando.
+  if (process.env.STORE_LIVE === "1") return NextResponse.next();
+
+  if (host && !PREVIEW_HOSTS.test(host)) {
+    // /pronto y las rutas del servidor (cron de Instagram, webhooks) siguen funcionando.
     if (pathname === "/pronto" || pathname.startsWith("/api/")) return NextResponse.next();
     return NextResponse.rewrite(new URL("/pronto", request.url));
   }

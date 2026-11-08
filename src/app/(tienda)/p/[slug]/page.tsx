@@ -8,7 +8,9 @@ import { ProductPageView } from "@/components/product/ProductPageView";
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateStaticParams() {
-  return visibleProducts((await getTenantBundle()).catalog).map((p) => ({ slug: p.id }));
+  const slugs = visibleProducts((await getTenantBundle()).catalog).map((p) => ({ slug: p.id }));
+  // Una marca nueva puede no tener productos aún: Next exige al menos un parámetro (este responde 404).
+  return slugs.length ? slugs : [{ slug: "_" }];
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
