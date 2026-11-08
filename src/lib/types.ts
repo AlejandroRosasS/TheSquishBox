@@ -217,11 +217,15 @@ export type Storefront = {
    * `colors`: fija los colores de la página (fondo `ink`, botón `pink`, etc.); si faltan, salen de la paleta.
    */
   comingSoon?: {
+    /** "playful" (por defecto: fondo oscuro, manchas de color, fotos flotando) o "editorial" (sobrio, sin animaciones). */
+    layout?: "playful" | "editorial";
     metaDescription: string;
     tape: string;
     title: string;
     lead: string;
     photos: string[];
+    /** Solo "editorial": texto del enlace a WhatsApp (se oculta si el número es un placeholder). */
+    whatsappLabel?: string;
     colors?: Partial<Record<"ink" | "pink" | "teal" | "lime" | "purple" | "yellow", string>>;
   };
 };

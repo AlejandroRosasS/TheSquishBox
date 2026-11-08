@@ -449,11 +449,13 @@
     "lead": "La página que buscas se movió o ya no existe. Pero hay muchos arreglos esperándote."
   },
   "comingSoon": {
+    "layout": "editorial",
     "metaDescription": "Nuestra tienda online está en construcción. Muy pronto podrás comprar aquí.",
-    "tape": "🚧 Tienda en construcción 🚧",
+    "tape": "Tienda en construcción",
     "title": "Muy pronto *florecemos*",
     "lead": "Estamos preparando nuestra tienda online de arreglos florales permanentes. Mientras tanto, mira las novedades y escríbenos por Instagram.",
     "photos": [],
+    "whatsappLabel": "Escríbenos por WhatsApp",
     "colors": {
       "ink": "#344034",
       "pink": "#A8874F",
