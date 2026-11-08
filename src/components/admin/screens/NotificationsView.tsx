@@ -32,10 +32,12 @@ function NotificationsDemo() {
     ["Pago de diferencia de delivery", "Cuando el cliente paga el link"],
     ["Stock bajo", "Cuando una variante llega al mínimo"],
   ];
+  // Una marca nueva no tiene pedidos de ejemplo: la vista previa usa textos genéricos.
   const o = demo.orders[0];
+  const o2 = demo.orders[2] ?? o;
   const previews = [
-    `Nuevo pedido #${o.id}\n${o.client} · ${o.district} · ${o.date}`,
-    `Diferencia pagada · pedido #${demo.orders[2]?.id}\n${demo.orders[2]?.client} pagó la diferencia de delivery`,
+    o ? `Nuevo pedido #${o.id}\n${o.client} · ${o.district} · ${o.date}` : "Nuevo pedido #1001\nCliente · Distrito · Fecha",
+    o2 ? `Diferencia pagada · pedido #${o2.id}\n${o2.client} pagó la diferencia de delivery` : "Diferencia pagada · pedido #1001\nEl cliente pagó la diferencia de delivery",
     "Stock bajo\nRevisa Productos: hay variantes en el mínimo",
   ];
 
