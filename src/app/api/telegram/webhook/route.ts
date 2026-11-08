@@ -8,12 +8,14 @@ import { promptCampaigns, salesPrompt } from "@/lib/sales/prompt";
 import { saleRow } from "@/lib/sales/rows";
 import { existingRefs, salesContext } from "@/lib/sales/server";
 import { downloadFile, linkChat, tenantsOfChat, webhookSecret, type TgChat } from "@/lib/telegram/bot";
+import { onVtaButton, onVtaText, startVta } from "@/lib/telegram/vta";
 
 /**
  * Webhook del bot de la plataforma (@PedidosAlertasBot). Recibe:
  * - /start <código>: vincula el chat a las alertas de una marca.
  * - Un CSV de ventas (archivo o texto pegado): responde con un resumen y botones Registrar/Cancelar.
  * - /prompt: el prompt para armar el CSV con Claude o ChatGPT.
+ * - /vta: registrar una venta paso a paso con botones (src/lib/telegram/vta.ts).
  * Telegram firma cada llamada con `X-Telegram-Bot-Api-Secret-Token` (ver webhookSecret).
  */
 
@@ -22,6 +24,7 @@ type Message = {
   chat: TgChat;
   from?: { first_name?: string };
   text?: string;
+  reply_to_message?: { message_id: number };
   caption?: string;
   document?: { file_id: string; file_name?: string; mime_type?: string; file_size?: number };
 };
@@ -37,7 +40,9 @@ const HELP = (brand?: string) =>
   [
     `Hola${brand ? `, equipo de ${brand}` : ""}. Además de avisarte los pedidos, cargo ventas manuales (Instagram, ferias, colegios).`,
     "",
-    "Cómo:",
+    "Una venta a la vez: escribe /vta y elige con los botones el canal, el pago, los productos y el monto.",
+    "",
+    "Varias ventas juntas (CSV):",
     "1. Escribe /prompt y copia lo que te mando.",
     "2. Pégalo en un chat nuevo de Claude o ChatGPT y cuéntale tus ventas.",
     "3. Mándame aquí el CSV que te devuelva: pegado como texto o como archivo.",
@@ -90,6 +95,13 @@ async function onMessage(m: Message) {
     return;
   }
   const tenant = tenants[0];
+
+  if (cmd?.[1]?.toLowerCase() === "vta") {
+    await startVta(db, tenant, m.chat.id);
+    return;
+  }
+  // Cantidad u otro monto que pidió /vta.
+  if (!cmd && !m.document && (await onVtaText(db, tenant, m))) return;
 
   if (cmd?.[1] === "prompt") {
     const ctx = await salesContext(db, tenant.id);
@@ -177,6 +189,7 @@ async function review(db: ReturnType<typeof serviceClient>, tenant: { id: string
 
 async function onButton(q: NonNullable<Update["callback_query"]>) {
   const db = serviceClient();
+  if (q.data?.startsWith("v:")) return onVtaButton(db, q);
   const [action, id] = (q.data ?? "").split(":");
   const msg = q.message;
   const answer = (text: string) => telegram("answerCallbackQuery", { callback_query_id: q.id, text });
@@ -185,6 +198,8 @@ async function onButton(q: NonNullable<Update["callback_query"]>) {
 
   const { data: imp } = await db.from("sales_imports").select("id, tenant_id, chat_id, sales, status, created_at").eq("id", id).maybeSingle();
   if (!imp || imp.chat_id !== String(msg.chat.id)) return void (await answer("No encuentro esa importación"));
+  // Las ventas de /vta tienen sus propios botones.
+  if ((imp.sales as { wizard?: unknown }[]).some((s) => s.wizard)) return void (await answer(""));
   if (imp.status !== "pending") return void (await answer(imp.status === "saved" ? "Ya estaba registrada" : "Ya estaba cancelada"));
   // El chat tiene que seguir vinculado a la marca.
   if (!(await tenantsOfChat(db, msg.chat.id)).some((t) => t.id === imp.tenant_id)) return void (await answer("Este chat ya no está vinculado a la tienda"));

@@ -34,7 +34,7 @@ export async function linkChat(db: SupabaseClient, code: string, chat: TgChat, o
   const brand = (t?.name as string) ?? "la tienda";
   await telegram("sendMessage", {
     chat_id: chat.id,
-    text: `Listo. Aquí llegarán los pedidos nuevos de ${brand}.\n\nTambién puedes mandarme ventas manuales en CSV (archivo o texto). Escribe /ayuda para ver cómo.`,
+    text: `Listo. Aquí llegarán los pedidos nuevos de ${brand}.\n\nTambién puedo registrar ventas manuales: /vta para una venta con botones, o un CSV con varias. Escribe /ayuda para ver cómo.`,
   });
   return { tenantId, label, brand };
 }
