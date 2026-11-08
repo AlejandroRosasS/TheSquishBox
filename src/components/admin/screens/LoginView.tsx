@@ -8,6 +8,7 @@ import { useBrandTenant } from "../useBrand";
 import { useAdmin } from "../AdminContext";
 import { DemoNote } from "../AdminPage";
 import { useDb } from "../DbContext";
+import { requestPasswordReset } from "@/app/admin/team-actions";
 
 /* eslint-disable @next/next/no-img-element */
 
@@ -48,6 +49,22 @@ export function LoginView() {
     toast(`Te enviamos un enlace a ${mail.trim()}`);
   };
 
+  const forgot = async () => {
+    if (!db) return toast("En la demo no se envían correos. Entra con «Ingresar».");
+    const email = mail.trim();
+    if (!email) return setError("Escribe tu correo arriba y vuelve a tocar «¿Olvidaste tu contraseña?».");
+    setBusy(true);
+    setError(null);
+    const r = await requestPasswordReset(email);
+    if (r.ok && r.fallback) {
+      // El servidor no tiene correo propio: lo pide el navegador a Supabase (el enlace vuelve a este navegador).
+      await db.client.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/admin/clave` });
+    }
+    setBusy(false);
+    if (!r.ok) return setError(r.message);
+    toast(`Si ${email} es del equipo, te llegará un enlace para crear una contraseña nueva.`);
+  };
+
   return (
     <main className="a-login" id="contenido">
       <div className="a-login-form">
@@ -64,6 +81,9 @@ export function LoginView() {
           <div className="a-field">
             <label htmlFor="l-pass">Contraseña</label>
             <input id="l-pass" className="a-input" type="password" autoComplete="current-password" value={pass} onChange={(e) => setPass(e.target.value)} required={!!db} />
+          </div>
+          <div className="row" style={{ justifyContent: "flex-end", marginTop: -6 }}>
+            <button className="a-btn sm ghost" type="button" onClick={() => void forgot()} disabled={busy}>¿Olvidaste tu contraseña?</button>
           </div>
           {error && <p className="a-err" role="alert">{error}</p>}
           <button className="a-btn primary block" type="submit" style={{ minHeight: 48 }} disabled={busy}>{busy ? "Ingresando…" : "Ingresar"}</button>
