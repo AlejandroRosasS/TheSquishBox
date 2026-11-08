@@ -159,6 +159,7 @@ export function toAdminOrder(r: OrderRow, events: EventRow[], catalog: { product
     createdAt: whenLong(r.created_at),
     createdIso: r.created_at,
     payment: paymentLabel(r),
+    payMethod: r.payment_method ?? "",
     paymentStatus: r.payment_status,
     lines: r.items.map((it) => {
       const p = catalog.products.find((x) => x.id === it.product);

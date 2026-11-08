@@ -14,6 +14,8 @@ export type DemoOrder = {
   email: string;
   createdAt: string;
   payment: string;
+  /** Medio de pago tal como lo guarda la base (`tarjeta`, `yape`…), para IGV y comisiones. */
+  payMethod?: string;
   lines: DemoOrderLine[];
   district: string;
   address: string;
