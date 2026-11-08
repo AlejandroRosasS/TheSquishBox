@@ -5,6 +5,12 @@ import squishStorefront from "./squish/storefront.json";
 import squishSeo from "./squish/seo.json";
 import squishAdminDemo from "./squish/admin-demo.json";
 import squishMedia from "./squish/media.json";
+import bloomTenant from "./bloom/tenant.json";
+import bloomCatalog from "./bloom/catalog.json";
+import bloomStorefront from "./bloom/storefront.json";
+import bloomSeo from "./bloom/seo.json";
+import bloomAdminDemo from "./bloom/admin-demo.json";
+import bloomMedia from "./bloom/media.json";
 import sharedLegal from "./_shared/legal.json";
 import { withDefaults } from "@/lib/defaults";
 import type { MediaMap } from "@/lib/media";
@@ -33,6 +39,7 @@ export type TenantBundle = {
 /** Datos de ejemplo del admin (Fase 2). En Fase 3 salen de la base de datos. */
 export const adminDemos: Record<string, AdminDemo> = {
   squish: squishAdminDemo as unknown as AdminDemo,
+  bloom: bloomAdminDemo as unknown as AdminDemo,
 };
 
 /** Textos de la marca sobre la base legal común (contacto, términos, políticas, libro de reclamaciones). */
@@ -45,5 +52,12 @@ export const tenants: Record<string, TenantBundle> = {
     storefront: storefrontOf(squishStorefront),
     seo: squishSeo as Seo,
     media: squishMedia as MediaMap,
+  },
+  bloom: {
+    tenant: bloomTenant as Tenant,
+    catalog: bloomCatalog as unknown as Catalog,
+    storefront: storefrontOf(bloomStorefront),
+    seo: bloomSeo as Seo,
+    media: bloomMedia as MediaMap,
   },
 };

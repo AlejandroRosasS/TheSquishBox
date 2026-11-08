@@ -1,0 +1,21 @@
+{
+  "_note": "Marca nueva: sin datos de ejemplo. Pedidos, ventas y notificaciones salen de la base de datos.",
+  "today": "2026-11-08",
+  "costs": {},
+  "lineNotes": {},
+  "deliveryCosts": {},
+  "orders": [],
+  "partyRequests": [],
+  "igPosts": [],
+  "weekSales": { "total": 0, "count": 0, "contribution": 0, "bars": [0, 0, 0, 0, 0, 0, 0] },
+  "notifications": {
+    "telegram": { "on": false, "status": "No configurado", "recipients": [] },
+    "email": { "on": false, "status": "No configurado", "recipients": [] },
+    "whatsapp": { "on": false, "status": "No configurado", "recipients": [] }
+  },
+  "sales": {
+    "lines": [],
+    "fair": { "name": "", "dates": "", "days": 0, "fixedCosts": [] },
+    "recent": []
+  }
+}

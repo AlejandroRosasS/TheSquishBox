@@ -1,0 +1,65 @@
+{
+  "slug": "bloom",
+  "name": "The Bloom Studio",
+  "instagram": "[usuario por definir]",
+  "city": "Lima, Perú",
+  "tagline": "[lema por definir]",
+  "motto": "[frase por definir]",
+  "domain": "thebloomstudioperu.com",
+  "whatsapp": "+51 9XX XXX XXX",
+  "currency": "PEN",
+  "locale": "es-PE",
+  "fonts": {
+    "display": "Fraunces",
+    "body": "DM Sans",
+    "googleFontsUrl": "https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap"
+  },
+  "logo": {
+    "type": "css",
+    "lines": [
+      { "text": "THE BLOOM", "color": "#FFFFFF" },
+      { "text": "STUDIO", "color": "#E7B8B0" }
+    ],
+    "background": "#2E2A27"
+  },
+  "brandColors": {
+    "ink": "#2E2A27",
+    "rose": "#C2697A",
+    "blush": "#F2D5D0",
+    "sage": "#8BA888",
+    "cream": "#FBF6F1"
+  },
+  "defaultPalette": "provisional",
+  "palettes": {
+    "provisional": {
+      "name": "Provisional (cambiar por la de la marca)",
+      "bg": "#FBF6F1",
+      "surface": "#FFFFFF",
+      "primary": "#A8495C",
+      "onPrimary": "#FFFFFF",
+      "accent": "#6E8F6B",
+      "text": "#2E2A27",
+      "text2": "#6B615B",
+      "border": "#EADFD6"
+    }
+  },
+  "highlights": [],
+  "customOrder": {
+    "enabled": true,
+    "label": "A medida",
+    "description": "Cuéntanos qué buscas y te cotizamos un arreglo personalizado",
+    "adminLabel": "Pedidos a medida",
+    "adminShort": "A medida"
+  },
+  "payments": {
+    "provider": "culqi",
+    "methods": ["yape"],
+    "yape": { "phone": "+51 9XX XXX XXX", "qr": "" }
+  },
+  "fulfillment": {
+    "delivery": "[zonas y tarifas por definir]",
+    "pickup": "[recojo por definir]"
+  },
+  "salesChannels": ["web", "instagram", "ferias", "otros"],
+  "notes": "Marca recién creada (2026-11-08). Todo lo que está entre corchetes, con XX o en la paleta provisional es placeholder: confirmar con la marca. Los productos se traen desde Instagram."
+}

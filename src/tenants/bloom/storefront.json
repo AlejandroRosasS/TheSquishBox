@@ -1,0 +1,183 @@
+{
+  "_note": "Textos provisionales de The Bloom Studio (2026-11-08). Todo se edita en Admin › Textos; lo que está entre corchetes o con XX es placeholder por confirmar con la marca.",
+  "brand": {
+    "ink": "ink",
+    "emphasis": "blush",
+    "highlights": [
+      { "bg": "rose", "fg": "#FFFFFF" },
+      { "bg": "blush", "fg": "ink" },
+      { "bg": "sage", "fg": "#FFFFFF" },
+      { "bg": "ink", "fg": "#FFFFFF" }
+    ]
+  },
+  "announce": "Delivery en Lima · Coordinamos tu entrega por WhatsApp",
+  "nav": [
+    { "label": "Tienda", "href": "/tienda" },
+    { "label": "A medida", "href": "/fiesta" },
+    { "label": "Contacto", "href": "/contacto" }
+  ],
+  "hero": {
+    "image": "img/por-definir.svg",
+    "alt": "Foto principal por definir",
+    "eyebrow": "The Bloom Studio",
+    "title": "[Título principal *por definir*]",
+    "lead": "[Texto de bienvenida por definir. Se edita en Admin › Textos.]",
+    "primaryCta": { "label": "Ver la tienda", "href": "/tienda" },
+    "secondaryCta": { "label": "Pedir a medida", "href": "/fiesta" }
+  },
+  "highlights": [
+    { "label": "Tienda", "href": "/tienda" },
+    { "label": "A medida", "href": "/fiesta" }
+  ],
+  "tiles": [
+    { "image": "img/por-definir.svg", "alt": "Foto por definir", "eyebrow": "Catálogo", "title": "Tienda", "href": "/tienda" },
+    { "image": "img/por-definir.svg", "alt": "Foto por definir", "eyebrow": "Personalizado", "title": "A medida", "href": "/fiesta" },
+    { "image": "img/por-definir.svg", "alt": "Foto por definir", "eyebrow": "Escríbenos", "title": "Contacto", "href": "/contacto" }
+  ],
+  "featured": {
+    "eyebrow": "Destacados",
+    "title": "Nuestros *favoritos*",
+    "productIds": [],
+    "viewAll": "Ver todo",
+    "viewAllMobile": "Ver toda la tienda"
+  },
+  "partyBand": {
+    "image": "img/por-definir.svg",
+    "alt": "Foto por definir",
+    "eyebrow": "A medida",
+    "title": "Un arreglo pensado *para tu ocasión*",
+    "lead": "Cuéntanos qué buscas y te enviamos la cotización por WhatsApp.",
+    "steps": ["Cuéntanos la ocasión y la fecha", "Te escribimos por WhatsApp con el precio", "Confirmas y coordinamos la entrega"],
+    "cta": "Pedir a medida"
+  },
+  "inside": {
+    "image": "img/por-definir.svg",
+    "alt": "Foto por definir",
+    "eyebrow": "[Sección por definir]",
+    "title": "[Título *por definir*]",
+    "lead": "[Texto por definir. Se edita en Admin › Textos.]",
+    "body": ""
+  },
+  "models": {
+    "eyebrow": "Desde nuestro Instagram",
+    "title": "Inspírate con *nuestros trabajos*",
+    "footnote": "Etiquétanos en Instagram para aparecer aquí.",
+    "max": 6,
+    "photos": []
+  },
+  "tips": {
+    "eyebrow": "Cuidados",
+    "title": "[Consejos de cuidado *por definir*]",
+    "items": []
+  },
+  "footer": {
+    "about": "The Bloom Studio. Lima, Perú.",
+    "shop": [
+      { "label": "Tienda", "href": "/tienda" },
+      { "label": "A medida", "href": "/fiesta" }
+    ],
+    "help": [
+      { "label": "Entregas en Lima", "href": "/entregas" },
+      { "label": "Cambios y devoluciones", "href": "/cambios-y-devoluciones" },
+      { "label": "Contáctanos", "href": "/contacto" }
+    ]
+  },
+  "business": {
+    "legalName": "[Razón social por definir]",
+    "ruc": "[RUC por definir]",
+    "address": "[Dirección por definir]",
+    "email": "[correo por definir]",
+    "phone": "+51 9XX XXX XXX",
+    "hours": "[Horario por definir]"
+  },
+  "catalog": {
+    "title": "Toda la *tienda*",
+    "lead": "[Texto del catálogo por definir.]",
+    "allLabel": "Todo",
+    "priceRanges": [
+      { "label": "Hasta S/ 100", "max": 100 },
+      { "label": "S/ 100 – S/ 200", "min": 100, "max": 200 },
+      { "label": "Más de S/ 200", "min": 200 }
+    ],
+    "partyCta": { "title": "¿Buscas algo especial?", "text": "Te armamos un arreglo a medida para tu ocasión.", "cta": "Pedir a medida" }
+  },
+  "product": {
+    "variantQuestion": "Elige una opción",
+    "partyHint": "¿Buscas algo distinto? [Pídelo a medida](/fiesta) y te cotizamos.",
+    "deliveryNote": "**Entrega coordinada.** Después de tu compra te escribimos por WhatsApp para acordar fecha y hora. El delivery se calcula según tu distrito.",
+    "tipsTitle": "Cuidados",
+    "soldOutAllText": "Déjanos tu correo y te avisamos cuando vuelva. O pide un arreglo a medida.",
+    "soldOutVariantText": "Déjanos tu correo y te avisamos cuando vuelva. Mientras tanto, elige otra opción disponible.",
+    "moreTitle": "También te puede *gustar*"
+  },
+  "cart": {
+    "emptyTitle": "Tu carrito está *vacío*",
+    "emptyLead": "Mira la tienda o pídenos un arreglo a medida.",
+    "emptyPrimary": { "label": "Ver la tienda", "href": "/tienda" },
+    "emptySecondary": { "label": "A medida", "href": "/fiesta" },
+    "popularTitle": "Los más pedidos",
+    "popularIds": [],
+    "deliveryNote": "Coordinamos fecha y hora de entrega por WhatsApp después de tu compra."
+  },
+  "checkout": {
+    "deliveryLabel": "Lima Metropolitana",
+    "pickupLabel": "[Recojo por definir]",
+    "pickupNote": "**Recojo**\nTe escribimos por WhatsApp para coordinar el lugar y la hora.",
+    "giftHint": "Lo escribimos a mano en una tarjeta. 120 caracteres máx.",
+    "deliveryRatesAreExample": true,
+    "deliveryRates": {
+      "Barranco": null, "Jesús María": null, "La Molina": null, "Lince": null, "Magdalena del Mar": null,
+      "Miraflores": null, "Pueblo Libre": null, "San Borja": null, "San Isidro": null, "San Miguel": null,
+      "Santiago de Surco": null, "Surquillo": null, "Chorrillos": null
+    },
+    "defaultDistrict": "Miraflores"
+  },
+  "confirmation": {
+    "title": "¡Gracias, {name}! *Recibimos tu pedido*",
+    "lead": "Te enviamos el resumen a {email}. Te escribimos por WhatsApp para coordinar la entrega.",
+    "collectNote": ""
+  },
+  "party": {
+    "productId": "",
+    "eyebrow": "A medida",
+    "title": "Un arreglo pensado *para tu ocasión*",
+    "lead": "Cuéntanos qué buscas y te mandamos la cotización por WhatsApp. Si te gusta, confirmas y coordinamos la entrega.",
+    "image": "img/por-definir.svg",
+    "imageAlt": "Foto por definir",
+    "steps": [
+      { "title": "Nos cuentas qué buscas", "text": "Ocasión, fecha, colores y presupuesto." },
+      { "title": "Te cotizamos", "text": "Te escribimos por WhatsApp con el precio." },
+      { "title": "Confirmas y pagas", "text": "Coordinamos la entrega contigo." }
+    ],
+    "quantityQuestion": "¿Cuántos necesitas?",
+    "quantities": ["1", "2", "3", "5", "10"],
+    "otherQuantityLabel": "Otra cantidad",
+    "defaultQuantity": "1",
+    "boxQuestion": "¿Qué tipo de arreglo buscas?",
+    "boxes": [
+      { "name": "[Tipo de arreglo por definir]", "sizes": [{ "name": "[Tamaño por definir]", "price": 0 }] }
+    ],
+    "sizeQuestion": "¿De qué tamaño?",
+    "unsureLabel": "Aún no sé",
+    "extrasLabel": "¿Con florero?",
+    "extrasOptions": ["Sí, con florero", "No, sin florero", "Aún no sé"],
+    "districts": ["Surco", "Miraflores", "San Isidro", "La Molina", "San Borja", "Otro distrito de Lima"],
+    "commentsPlaceholder": "Ej.: es para un aniversario, le gustan los tonos pastel.",
+    "footnote": "Respondemos en horario de atención. Sin compromiso.",
+    "sentTitle": "¡Recibimos *tu pedido*!",
+    "sentLead": "Gracias, {name}. Te escribimos por WhatsApp al {phone} con tu cotización."
+  },
+  "notFound": {
+    "image": "img/por-definir.svg",
+    "alt": "Foto por definir",
+    "title": "Esta página *no existe*",
+    "lead": "La página que buscas se movió o ya no existe. Mira la tienda o escríbenos."
+  },
+  "comingSoon": {
+    "metaDescription": "Nuestra tienda online está en construcción. Muy pronto podrás comprar aquí.",
+    "tape": "🚧 Tienda en construcción 🚧",
+    "title": "Muy pronto *abrimos*",
+    "lead": "Estamos preparando nuestra tienda online. Mientras tanto, mira las novedades y escríbenos por Instagram.",
+    "photos": []
+  }
+}
