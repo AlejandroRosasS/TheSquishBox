@@ -1,65 +1,127 @@
 {
   "slug": "bloom",
   "name": "The Bloom Studio",
-  "instagram": "[usuario por definir]",
+  "instagram": "the.bloomstudio.pe",
   "city": "Lima, Perú",
-  "tagline": "[lema por definir]",
-  "motto": "[frase por definir]",
+  "tagline": "Arreglos florales permanentes",
+  "motto": "Flores, diseño y aromas que perduran",
   "domain": "thebloomstudioperu.com",
-  "whatsapp": "+51 9XX XXX XXX",
+  "whatsapp": "+51 967 746 145",
   "currency": "PEN",
   "locale": "es-PE",
   "fonts": {
-    "display": "Fraunces",
-    "body": "DM Sans",
-    "googleFontsUrl": "https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap"
+    "display": "Cormorant Garamond",
+    "body": "Manrope",
+    "googleFontsUrl": "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700;800&display=swap"
   },
   "logo": {
-    "type": "css",
+    "type": "image",
+    "image": "img/logo.png",
     "lines": [
-      { "text": "THE BLOOM", "color": "#FFFFFF" },
-      { "text": "STUDIO", "color": "#E7B8B0" }
+      {
+        "text": "THE BLOOM",
+        "color": "#FFFFFF"
+      },
+      {
+        "text": "Studio",
+        "color": "#E9E4D8"
+      }
     ],
-    "background": "#2E2A27"
+    "background": "#344034"
   },
   "brandColors": {
-    "ink": "#2E2A27",
-    "rose": "#C2697A",
-    "blush": "#F2D5D0",
-    "sage": "#8BA888",
-    "cream": "#FBF6F1"
+    "ink": "#344034",
+    "cream": "#F3ECE1",
+    "gold": "#A8874F",
+    "sage": "#4F6B4A",
+    "rose": "#D9A1A8",
+    "white": "#FBF8F2"
   },
-  "defaultPalette": "provisional",
+  "defaultPalette": "original",
   "palettes": {
-    "provisional": {
-      "name": "Provisional (cambiar por la de la marca)",
-      "bg": "#FBF6F1",
-      "surface": "#FFFFFF",
-      "primary": "#A8495C",
-      "onPrimary": "#FFFFFF",
-      "accent": "#6E8F6B",
-      "text": "#2E2A27",
-      "text2": "#6B615B",
-      "border": "#EADFD6"
+    "original": {
+      "name": "Original",
+      "bg": "#F3ECE1",
+      "surface": "#FBF8F2",
+      "primary": "#344034",
+      "onPrimary": "#FBF8F2",
+      "accent": "#A8874F",
+      "text": "#26302A",
+      "text2": "#685A4A",
+      "border": "#E0D5C3"
+    },
+    "noel": {
+      "name": "Noël Rouge",
+      "bg": "#F3ECE3",
+      "surface": "#FCF8F3",
+      "primary": "#6B2A2E",
+      "onPrimary": "#FCF6EE",
+      "accent": "#A8823F",
+      "text": "#2B2222",
+      "text2": "#6A5753",
+      "border": "#E4D6C9"
+    },
+    "nordic": {
+      "name": "Nordic Whisper",
+      "bg": "#EEEFEA",
+      "surface": "#FAFBF8",
+      "primary": "#46544D",
+      "onPrimary": "#FAFBF8",
+      "accent": "#9C8D6E",
+      "text": "#232823",
+      "text2": "#5A615A",
+      "border": "#D9DDD4"
+    },
+    "golden": {
+      "name": "Golden Hour",
+      "bg": "#F5EDE0",
+      "surface": "#FDF9F2",
+      "primary": "#6A4E2B",
+      "onPrimary": "#FDF9F2",
+      "accent": "#B8924D",
+      "text": "#2C2419",
+      "text2": "#6B5B45",
+      "border": "#E7D9C2"
+    },
+    "rosa": {
+      "name": "Rosa empolvado",
+      "bg": "#F5ECE9",
+      "surface": "#FCF8F6",
+      "primary": "#6E4650",
+      "onPrimary": "#FCF8F6",
+      "accent": "#B08672",
+      "text": "#2D2326",
+      "text2": "#685A5E",
+      "border": "#E6D6D2"
     }
   },
   "highlights": [],
   "customOrder": {
     "enabled": true,
     "label": "A medida",
-    "description": "Cuéntanos qué buscas y te cotizamos un arreglo personalizado",
+    "description": "Diseñamos piezas a medida para tu espacio",
     "adminLabel": "Pedidos a medida",
     "adminShort": "A medida"
   },
   "payments": {
     "provider": "culqi",
-    "methods": ["yape"],
-    "yape": { "phone": "+51 9XX XXX XXX", "qr": "" }
+    "methods": [
+      "yape"
+    ],
+    "yape": {
+      "phone": "+51 9XX XXX XXX",
+      "qr": ""
+    }
   },
   "fulfillment": {
-    "delivery": "[zonas y tarifas por definir]",
-    "pickup": "[recojo por definir]"
+    "delivery": "Lima Metropolitana, tarifa por distrito (configurable)",
+    "pickup": "Recojo en taller (dirección por definir)"
   },
-  "salesChannels": ["web", "instagram", "ferias", "otros"],
-  "notes": "Marca recién creada (2026-11-08). Todo lo que está entre corchetes, con XX o en la paleta provisional es placeholder: confirmar con la marca. Los productos se traen desde Instagram."
+  "salesChannels": [
+    "web",
+    "instagram",
+    "ferias",
+    "otros"
+  ],
+  "notes": "Marca creada 2026-11-08. Paletas, tipografías y textos del prototipo de Bloom (thebloomstudioperu-prototype en Vercel); logo enviado por Alejandro. Pendiente: Yape+QR, datos legales, dirección del taller. Los productos se traen desde Instagram."
 }

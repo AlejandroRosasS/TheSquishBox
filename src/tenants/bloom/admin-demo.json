@@ -3,19 +3,60 @@
   "today": "2026-11-08",
   "costs": {},
   "lineNotes": {},
-  "deliveryCosts": {},
+  "deliveryCosts": {
+    "Miraflores": 10,
+    "San Isidro": 10,
+    "Barranco": 11,
+    "Surquillo": 8,
+    "Santiago de Surco": 12,
+    "San Borja": 12,
+    "La Molina": 19,
+    "Jesús María": 11,
+    "Lince": 8,
+    "Chorrillos": 17
+  },
   "orders": [],
   "partyRequests": [],
   "igPosts": [],
-  "weekSales": { "total": 0, "count": 0, "contribution": 0, "bars": [0, 0, 0, 0, 0, 0, 0] },
+  "weekSales": {
+    "total": 0,
+    "count": 0,
+    "contribution": 0,
+    "bars": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
   "notifications": {
-    "telegram": { "on": false, "status": "No configurado", "recipients": [] },
-    "email": { "on": false, "status": "No configurado", "recipients": [] },
-    "whatsapp": { "on": false, "status": "No configurado", "recipients": [] }
+    "telegram": {
+      "on": false,
+      "status": "No configurado",
+      "recipients": []
+    },
+    "email": {
+      "on": false,
+      "status": "No configurado",
+      "recipients": []
+    },
+    "whatsapp": {
+      "on": false,
+      "status": "No configurado",
+      "recipients": []
+    }
   },
   "sales": {
     "lines": [],
-    "fair": { "name": "", "dates": "", "days": 0, "fixedCosts": [] },
+    "fair": {
+      "name": "",
+      "dates": "",
+      "days": 0,
+      "fixedCosts": []
+    },
     "recent": []
   }
 }

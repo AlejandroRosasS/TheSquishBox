@@ -1,13 +1,22 @@
 {
   "_note": "SEO de la tienda. Se edita desde Admin › SEO. Una descripción vacía usa la descripción general.",
-  "siteTitle": "The Bloom Studio",
+  "siteTitle": "The Bloom Studio · Arreglos florales permanentes",
   "titleTemplate": "%s · The Bloom Studio",
-  "description": "The Bloom Studio. Lima, Perú.",
-  "shareImage": "img/por-definir.svg",
+  "description": "Arreglos florales permanentes. Detalles que transforman espacios. Lima, Perú.",
+  "shareImage": "img/logo.png",
   "pages": {
-    "tienda": { "title": "Tienda", "description": "" },
-    "fiesta": { "title": "A medida", "description": "Cuéntanos qué buscas y te cotizamos un arreglo personalizado" },
-    "carrito": { "title": "Tu carrito", "description": "" }
+    "tienda": {
+      "title": "Tienda",
+      "description": ""
+    },
+    "fiesta": {
+      "title": "A medida",
+      "description": "Diseñamos piezas a medida para tu espacio"
+    },
+    "carrito": {
+      "title": "Tu carrito",
+      "description": ""
+    }
   },
   "products": {},
   "indexing": false,

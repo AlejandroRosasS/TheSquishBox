@@ -1,85 +1,184 @@
 {
-  "_note": "Textos provisionales de The Bloom Studio (2026-11-08). Todo se edita en Admin › Textos; lo que está entre corchetes o con XX es placeholder por confirmar con la marca.",
+  "_note": "Textos de The Bloom Studio tomados del prototipo de diseño (2026-11-08). Se editan en Admin › Textos; lo que está entre corchetes o con XX es placeholder.",
   "brand": {
     "ink": "ink",
-    "emphasis": "blush",
+    "emphasis": "gold",
     "highlights": [
-      { "bg": "rose", "fg": "#FFFFFF" },
-      { "bg": "blush", "fg": "ink" },
-      { "bg": "sage", "fg": "#FFFFFF" },
-      { "bg": "ink", "fg": "#FFFFFF" }
+      {
+        "bg": "ink",
+        "fg": "#FBF8F2"
+      },
+      {
+        "bg": "gold",
+        "fg": "#FBF8F2"
+      },
+      {
+        "bg": "sage",
+        "fg": "#FBF8F2"
+      },
+      {
+        "bg": "rose",
+        "fg": "ink"
+      }
     ]
   },
   "announce": "Delivery en Lima · Coordinamos tu entrega por WhatsApp",
   "nav": [
-    { "label": "Tienda", "href": "/tienda" },
-    { "label": "A medida", "href": "/fiesta" },
-    { "label": "Contacto", "href": "/contacto" }
+    {
+      "label": "Arreglos listos",
+      "href": "/tienda"
+    },
+    {
+      "label": "A medida",
+      "href": "/fiesta"
+    },
+    {
+      "label": "Contacto",
+      "href": "/contacto"
+    }
   ],
   "hero": {
     "image": "img/por-definir.svg",
     "alt": "Foto principal por definir",
     "eyebrow": "The Bloom Studio",
-    "title": "[Título principal *por definir*]",
-    "lead": "[Texto de bienvenida por definir. Se edita en Admin › Textos.]",
-    "primaryCta": { "label": "Ver la tienda", "href": "/tienda" },
-    "secondaryCta": { "label": "Pedir a medida", "href": "/fiesta" }
+    "title": "Flores, diseño y aromas *que perduran*",
+    "lead": "Creamos arreglos florales permanentes para espacios que se viven todos los días, sin perder su belleza.",
+    "primaryCta": {
+      "label": "Ver arreglos",
+      "href": "/tienda"
+    },
+    "secondaryCta": {
+      "label": "Pedir a medida",
+      "href": "/fiesta"
+    }
   },
   "highlights": [
-    { "label": "Tienda", "href": "/tienda" },
-    { "label": "A medida", "href": "/fiesta" }
+    {
+      "label": "Arreglos",
+      "href": "/tienda"
+    },
+    {
+      "label": "A medida",
+      "href": "/fiesta"
+    },
+    {
+      "label": "Clientes",
+      "href": "#modelos"
+    },
+    {
+      "label": "Cuidados",
+      "href": "#tips"
+    }
   ],
   "tiles": [
-    { "image": "img/por-definir.svg", "alt": "Foto por definir", "eyebrow": "Catálogo", "title": "Tienda", "href": "/tienda" },
-    { "image": "img/por-definir.svg", "alt": "Foto por definir", "eyebrow": "Personalizado", "title": "A medida", "href": "/fiesta" },
-    { "image": "img/por-definir.svg", "alt": "Foto por definir", "eyebrow": "Escríbenos", "title": "Contacto", "href": "/contacto" }
+    {
+      "image": "img/por-definir.svg",
+      "alt": "Foto por definir",
+      "eyebrow": "Compra directa",
+      "title": "Arreglos listos",
+      "href": "/tienda"
+    },
+    {
+      "image": "img/por-definir.svg",
+      "alt": "Foto por definir",
+      "eyebrow": "Para tu espacio",
+      "title": "A medida",
+      "href": "/fiesta"
+    },
+    {
+      "image": "img/por-definir.svg",
+      "alt": "Foto por definir",
+      "eyebrow": "Escríbenos",
+      "title": "Contacto",
+      "href": "/contacto"
+    }
   ],
   "featured": {
     "eyebrow": "Destacados",
-    "title": "Nuestros *favoritos*",
+    "title": "Arreglos *listos* para llevar",
     "productIds": [],
-    "viewAll": "Ver todo",
-    "viewAllMobile": "Ver toda la tienda"
+    "viewAll": "Ver todos",
+    "viewAllMobile": "Ver todos los arreglos"
   },
   "partyBand": {
     "image": "img/por-definir.svg",
     "alt": "Foto por definir",
     "eyebrow": "A medida",
-    "title": "Un arreglo pensado *para tu ocasión*",
-    "lead": "Cuéntanos qué buscas y te enviamos la cotización por WhatsApp.",
-    "steps": ["Cuéntanos la ocasión y la fecha", "Te escribimos por WhatsApp con el precio", "Confirmas y coordinamos la entrega"],
-    "cta": "Pedir a medida"
+    "title": "Diseñamos piezas *a medida*",
+    "lead": "Pensadas en tus colores, tu estilo y tu espacio. Cuéntanos qué imaginas y te enviamos una cotización.",
+    "steps": [
+      "Completa el formulario con tu idea",
+      "Te enviamos la propuesta y el precio",
+      "Pagas con un link y coordinamos la entrega"
+    ],
+    "cta": "Cotizar mi arreglo"
   },
   "inside": {
     "image": "img/por-definir.svg",
     "alt": "Foto por definir",
-    "eyebrow": "[Sección por definir]",
-    "title": "[Título *por definir*]",
-    "lead": "[Texto por definir. Se edita en Admin › Textos.]",
-    "body": ""
+    "eyebrow": "Nuestra historia",
+    "title": "Tres amigas. Tres estilos. *Una misma pasión* por transformar espacios.",
+    "lead": "The Bloom Studio nació de tres amigas con estilos diferentes y una pasión en común: la decoración y el poder de transformar un espacio.",
+    "body": "Creamos arreglos florales permanentes para quienes buscan incorporar flores a sus espacios de una manera práctica, duradera y especial. Cada arreglo tiene su propia personalidad."
   },
   "models": {
-    "eyebrow": "Desde nuestro Instagram",
-    "title": "Inspírate con *nuestros trabajos*",
+    "eyebrow": "En sus espacios",
+    "title": "Así lucen *en casa* de nuestros clientes",
     "footnote": "Etiquétanos en Instagram para aparecer aquí.",
     "max": 6,
     "photos": []
   },
   "tips": {
     "eyebrow": "Cuidados",
-    "title": "[Consejos de cuidado *por definir*]",
-    "items": []
+    "title": "Para que tu arreglo *perdure*",
+    "items": [
+      {
+        "title": "Sin agua",
+        "text": "Son flores permanentes: no necesitan riego ni luz directa."
+      },
+      {
+        "title": "Quita el polvo",
+        "text": "Una vez al mes con un plumero suave o secadora en aire frío."
+      },
+      {
+        "title": "Lejos del sol",
+        "text": "Evita la luz solar directa por horas para conservar el color."
+      },
+      {
+        "title": "Dale forma",
+        "text": "Si una rama se mueve en el traslado, acomódala con cuidado."
+      }
+    ]
   },
   "footer": {
-    "about": "The Bloom Studio. Lima, Perú.",
+    "about": "Arreglos florales permanentes. Detalles que transforman espacios. Lima, Perú.",
     "shop": [
-      { "label": "Tienda", "href": "/tienda" },
-      { "label": "A medida", "href": "/fiesta" }
+      {
+        "label": "Arreglos listos",
+        "href": "/tienda"
+      },
+      {
+        "label": "A medida",
+        "href": "/fiesta"
+      }
     ],
     "help": [
-      { "label": "Entregas en Lima", "href": "/entregas" },
-      { "label": "Cambios y devoluciones", "href": "/cambios-y-devoluciones" },
-      { "label": "Contáctanos", "href": "/contacto" }
+      {
+        "label": "Entregas en Lima",
+        "href": "/entregas"
+      },
+      {
+        "label": "Cuidados",
+        "href": "/#tips"
+      },
+      {
+        "label": "Cambios y devoluciones",
+        "href": "/cambios-y-devoluciones"
+      },
+      {
+        "label": "Contáctanos",
+        "href": "/contacto"
+      }
     ]
   },
   "business": {
@@ -87,97 +186,281 @@
     "ruc": "[RUC por definir]",
     "address": "[Dirección por definir]",
     "email": "[correo por definir]",
-    "phone": "+51 9XX XXX XXX",
+    "phone": "+51 967 746 145",
     "hours": "[Horario por definir]"
   },
   "catalog": {
-    "title": "Toda la *tienda*",
-    "lead": "[Texto del catálogo por definir.]",
-    "allLabel": "Todo",
+    "title": "Arreglos *listos*",
+    "lead": "Flores permanentes listas para llegar a tu espacio. Elige con o sin florero.",
+    "allLabel": "Todos",
     "priceRanges": [
-      { "label": "Hasta S/ 100", "max": 100 },
-      { "label": "S/ 100 – S/ 200", "min": 100, "max": 200 },
-      { "label": "Más de S/ 200", "min": 200 }
+      {
+        "label": "Hasta S/ 200",
+        "max": 200
+      },
+      {
+        "label": "S/ 200 – S/ 300",
+        "min": 200,
+        "max": 300
+      },
+      {
+        "label": "Más de S/ 300",
+        "min": 300
+      }
     ],
-    "partyCta": { "title": "¿Buscas algo especial?", "text": "Te armamos un arreglo a medida para tu ocasión.", "cta": "Pedir a medida" }
+    "partyCta": {
+      "title": "¿No encuentras el ideal?",
+      "text": "Lo diseñamos a medida para tu espacio.",
+      "cta": "Cotizar a medida"
+    }
   },
   "product": {
-    "variantQuestion": "Elige una opción",
-    "partyHint": "¿Buscas algo distinto? [Pídelo a medida](/fiesta) y te cotizamos.",
+    "variantQuestion": "Presentación",
+    "partyHint": "¿Lo quieres en otros colores? [Pídelo a medida](/fiesta).",
     "deliveryNote": "**Entrega coordinada.** Después de tu compra te escribimos por WhatsApp para acordar fecha y hora. El delivery se calcula según tu distrito.",
     "tipsTitle": "Cuidados",
-    "soldOutAllText": "Déjanos tu correo y te avisamos cuando vuelva. O pide un arreglo a medida.",
-    "soldOutVariantText": "Déjanos tu correo y te avisamos cuando vuelva. Mientras tanto, elige otra opción disponible.",
+    "soldOutAllText": "Déjanos tu correo y te avisamos cuando vuelva. O pídelo a medida con los colores que prefieras.",
+    "soldOutVariantText": "Déjanos tu correo y te avisamos cuando vuelva. Mientras tanto, elige otra presentación.",
     "moreTitle": "También te puede *gustar*"
   },
   "cart": {
     "emptyTitle": "Tu carrito está *vacío*",
-    "emptyLead": "Mira la tienda o pídenos un arreglo a medida.",
-    "emptyPrimary": { "label": "Ver la tienda", "href": "/tienda" },
-    "emptySecondary": { "label": "A medida", "href": "/fiesta" },
+    "emptyLead": "Elige un arreglo listo o cuéntanos qué imaginas para tu espacio.",
+    "emptyPrimary": {
+      "label": "Ver arreglos listos",
+      "href": "/tienda"
+    },
+    "emptySecondary": {
+      "label": "Pedir a medida",
+      "href": "/fiesta"
+    },
     "popularTitle": "Los más pedidos",
     "popularIds": [],
-    "deliveryNote": "Coordinamos fecha y hora de entrega por WhatsApp después de tu compra."
+    "deliveryNote": "Coordinamos fecha y hora por WhatsApp después de tu compra."
   },
   "checkout": {
     "deliveryLabel": "Lima Metropolitana",
-    "pickupLabel": "[Recojo por definir]",
-    "pickupNote": "**Recojo**\nTe escribimos por WhatsApp para coordinar el lugar y la hora.",
-    "giftHint": "Lo escribimos a mano en una tarjeta. 120 caracteres máx.",
+    "pickupLabel": "Recojo en taller · Gratis",
+    "pickupNote": "**Taller The Bloom Studio**\n[Dirección del taller], Lima · [Horario de recojo]",
+    "giftHint": "La escribimos a mano en una tarjeta. 120 caracteres máx.",
     "deliveryRatesAreExample": true,
     "deliveryRates": {
-      "Barranco": null, "Jesús María": null, "La Molina": null, "Lince": null, "Magdalena del Mar": null,
-      "Miraflores": null, "Pueblo Libre": null, "San Borja": null, "San Isidro": null, "San Miguel": null,
-      "Santiago de Surco": null, "Surquillo": null, "Chorrillos": null
+      "Barranco": 15,
+      "Jesús María": 15,
+      "La Molina": 25,
+      "Lince": 12,
+      "Magdalena del Mar": 15,
+      "Miraflores": 15,
+      "Pueblo Libre": 18,
+      "San Borja": 18,
+      "San Isidro": 15,
+      "San Miguel": 18,
+      "Santiago de Surco": 20,
+      "Surquillo": 12,
+      "Chorrillos": 25,
+      "Callao": null,
+      "Ate": null,
+      "Los Olivos": null
     },
     "defaultDistrict": "Miraflores"
   },
   "confirmation": {
-    "title": "¡Gracias, {name}! *Recibimos tu pedido*",
-    "lead": "Te enviamos el resumen a {email}. Te escribimos por WhatsApp para coordinar la entrega.",
-    "collectNote": ""
+    "title": "¡Gracias, {name}! *Tu pedido está confirmado*",
+    "lead": "Te enviamos el resumen a {email}.",
+    "collectNote": "Te escribiremos por WhatsApp para coordinar la entrega y confirmar el costo final del delivery."
   },
   "party": {
     "productId": "",
     "eyebrow": "A medida",
-    "title": "Un arreglo pensado *para tu ocasión*",
-    "lead": "Cuéntanos qué buscas y te mandamos la cotización por WhatsApp. Si te gusta, confirmas y coordinamos la entrega.",
+    "title": "Un arreglo pensado *para tu espacio*",
+    "lead": "Cuéntanos tu idea. Te respondemos por WhatsApp con una propuesta y su precio. Si te gusta, pagas con un link y coordinamos la entrega.",
     "image": "img/por-definir.svg",
     "imageAlt": "Foto por definir",
     "steps": [
-      { "title": "Nos cuentas qué buscas", "text": "Ocasión, fecha, colores y presupuesto." },
-      { "title": "Te cotizamos", "text": "Te escribimos por WhatsApp con el precio." },
-      { "title": "Confirmas y pagas", "text": "Coordinamos la entrega contigo." }
+      {
+        "title": "Envías tu idea",
+        "text": "Espacio, colores, tamaño y fotos."
+      },
+      {
+        "title": "Te cotizamos",
+        "text": "Te escribimos por WhatsApp con la propuesta."
+      },
+      {
+        "title": "Confirmas y pagas",
+        "text": "Con un link seguro."
+      }
     ],
-    "quantityQuestion": "¿Cuántos necesitas?",
-    "quantities": ["1", "2", "3", "5", "10"],
+    "quantityQuestion": "¿Cuántos arreglos?",
+    "quantities": [
+      "1",
+      "2",
+      "3",
+      "5"
+    ],
     "otherQuantityLabel": "Otra cantidad",
     "defaultQuantity": "1",
-    "boxQuestion": "¿Qué tipo de arreglo buscas?",
+    "boxQuestion": "Tipo de espacio",
     "boxes": [
-      { "name": "[Tipo de arreglo por definir]", "sizes": [{ "name": "[Tamaño por definir]", "price": 0 }] }
+      {
+        "name": "Sala",
+        "sizes": [
+          {
+            "name": "Pequeño (hasta 40 cm)",
+            "price": 0
+          },
+          {
+            "name": "Mediano (40 – 70 cm)",
+            "price": 0
+          },
+          {
+            "name": "Grande (más de 70 cm)",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Comedor",
+        "sizes": [
+          {
+            "name": "Pequeño (hasta 40 cm)",
+            "price": 0
+          },
+          {
+            "name": "Mediano (40 – 70 cm)",
+            "price": 0
+          },
+          {
+            "name": "Grande (más de 70 cm)",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Dormitorio",
+        "sizes": [
+          {
+            "name": "Pequeño (hasta 40 cm)",
+            "price": 0
+          },
+          {
+            "name": "Mediano (40 – 70 cm)",
+            "price": 0
+          },
+          {
+            "name": "Grande (más de 70 cm)",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Oficina",
+        "sizes": [
+          {
+            "name": "Pequeño (hasta 40 cm)",
+            "price": 0
+          },
+          {
+            "name": "Mediano (40 – 70 cm)",
+            "price": 0
+          },
+          {
+            "name": "Grande (más de 70 cm)",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Negocio / recepción",
+        "sizes": [
+          {
+            "name": "Pequeño (hasta 40 cm)",
+            "price": 0
+          },
+          {
+            "name": "Mediano (40 – 70 cm)",
+            "price": 0
+          },
+          {
+            "name": "Grande (más de 70 cm)",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Evento",
+        "sizes": [
+          {
+            "name": "Pequeño (hasta 40 cm)",
+            "price": 0
+          },
+          {
+            "name": "Mediano (40 – 70 cm)",
+            "price": 0
+          },
+          {
+            "name": "Grande (más de 70 cm)",
+            "price": 0
+          }
+        ]
+      },
+      {
+        "name": "Otro",
+        "sizes": [
+          {
+            "name": "Pequeño (hasta 40 cm)",
+            "price": 0
+          },
+          {
+            "name": "Mediano (40 – 70 cm)",
+            "price": 0
+          },
+          {
+            "name": "Grande (más de 70 cm)",
+            "price": 0
+          }
+        ]
+      }
     ],
-    "sizeQuestion": "¿De qué tamaño?",
+    "sizeQuestion": "Tamaño aproximado",
     "unsureLabel": "Aún no sé",
     "extrasLabel": "¿Con florero?",
-    "extrasOptions": ["Sí, con florero", "No, sin florero", "Aún no sé"],
-    "districts": ["Surco", "Miraflores", "San Isidro", "La Molina", "San Borja", "Otro distrito de Lima"],
-    "commentsPlaceholder": "Ej.: es para un aniversario, le gustan los tonos pastel.",
+    "extrasOptions": [
+      "Con florero",
+      "Sin florero",
+      "Aún no sé"
+    ],
+    "districts": [
+      "Surco",
+      "Miraflores",
+      "San Isidro",
+      "La Molina",
+      "San Borja",
+      "Otro distrito de Lima"
+    ],
+    "commentsPlaceholder": "Ej.: un arreglo bajo para la mesa del comedor, en blancos y verdes, que no tape la vista.",
     "footnote": "Respondemos en horario de atención. Sin compromiso.",
-    "sentTitle": "¡Recibimos *tu pedido*!",
-    "sentLead": "Gracias, {name}. Te escribimos por WhatsApp al {phone} con tu cotización."
+    "sentTitle": "Recibimos *tu idea*",
+    "sentLead": "Gracias, {name}. Te escribiremos por WhatsApp al {phone} con una propuesta y su precio."
   },
   "notFound": {
     "image": "img/por-definir.svg",
     "alt": "Foto por definir",
-    "title": "Esta página *no existe*",
-    "lead": "La página que buscas se movió o ya no existe. Mira la tienda o escríbenos."
+    "title": "Esta flor *no está aquí*",
+    "lead": "La página que buscas se movió o ya no existe. Pero hay muchos arreglos esperándote."
   },
   "comingSoon": {
     "metaDescription": "Nuestra tienda online está en construcción. Muy pronto podrás comprar aquí.",
     "tape": "🚧 Tienda en construcción 🚧",
-    "title": "Muy pronto *abrimos*",
-    "lead": "Estamos preparando nuestra tienda online. Mientras tanto, mira las novedades y escríbenos por Instagram.",
-    "photos": []
+    "title": "Muy pronto *florecemos*",
+    "lead": "Estamos preparando nuestra tienda online de arreglos florales permanentes. Mientras tanto, mira las novedades y escríbenos por Instagram.",
+    "photos": [],
+    "colors": {
+      "ink": "#344034",
+      "pink": "#A8874F",
+      "teal": "#E0D5C3",
+      "lime": "#E3CFA5",
+      "purple": "#6E8466",
+      "yellow": "#F3ECE1"
+    }
   }
 }
