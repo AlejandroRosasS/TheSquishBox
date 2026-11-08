@@ -14,11 +14,14 @@ import { AdminPage, DemoNote } from "../AdminPage";
 import { dayLabel } from "../AdminSales";
 import { Thumb, UploadButton } from "../PhotoPicker";
 import { AIBox, AIClose, AIPlus, AISearch, AITrash } from "../AdminIcons";
+import { QuotesPanel, RecipesPanel } from "./QuotePanels";
 
 const TABS = [
   { id: "insumos", label: "Insumos" },
   { id: "compras", label: "Compras" },
   { id: "proveedores", label: "Proveedores" },
+  { id: "recetas", label: "Recetas" },
+  { id: "cotizador", label: "Cotizador" },
 ] as const;
 type TabId = (typeof TABS)[number]["id"];
 const isTab = (v: string): v is TabId => TABS.some((t) => t.id === v);
@@ -38,7 +41,7 @@ export function InventoryView() {
   const today = useToday();
   const [tab, setTab] = useState<TabId>("insumos");
   const [open, setOpen] = useState<string | null>(null);
-  const tabRefs = useRef<Record<TabId, HTMLButtonElement | null>>({ insumos: null, compras: null, proveedores: null });
+  const tabRefs = useRef<Record<TabId, HTMLButtonElement | null>>({ insumos: null, compras: null, proveedores: null, recetas: null, cotizador: null });
   useEffect(() => {
     const sync = () => { const h = window.location.hash.slice(1); if (isTab(h)) setTab(h); };
     sync();
@@ -69,6 +72,8 @@ export function InventoryView() {
     insumos: "Lo que compras para armar tus productos, con su stock y costo promedio.",
     compras: "Cada compra recalcula el costo promedio. Aquí queda dónde compraste y a cuánto.",
     proveedores: "Dónde compras: nacional o importado, y cuánto tardan en entregar.",
+    recetas: "Qué insumos lleva cada producto: su costo real, el precio sugerido y tu margen.",
+    cotizador: "Arma precios a medida con tus recetas e insumos, y mándalos por WhatsApp.",
   }[tab];
 
   if (!today || !inv.hydrated) {
@@ -107,7 +112,7 @@ export function InventoryView() {
   return (
     <AdminPage title="Inventario">
       <div className="a-head"><div className="stack g1"><h1 className="a-h1">Inventario</h1><p className="a-sub">{sub}</p></div></div>
-      <div className="a-seg a-tabs" role="tablist" aria-label="Secciones de inventario" onKeyDown={onTabKey}>
+      <div className="a-seg a-tabs inv-tabs" role="tablist" aria-label="Secciones de inventario" onKeyDown={onTabKey}>
         {TABS.map((t) => (
           <button key={t.id} ref={(el) => { tabRefs.current[t.id] = el; }} id={`inv-tab-${t.id}`} type="button" role="tab" className={tab === t.id ? "on" : ""} aria-selected={tab === t.id} aria-controls={`inv-panel-${t.id}`} tabIndex={tab === t.id ? 0 : -1} onClick={() => pick(t.id)}>{t.label}</button>
         ))}
@@ -116,7 +121,10 @@ export function InventoryView() {
         {tab === "insumos" ? (
           openSupply ? <SupplyDetail supply={openSupply} st={states.get(openSupply.id)!} today={today} onBack={() => setOpen(null)} />
             : <SuppliesList states={states} onOpen={setOpen} />
-        ) : tab === "compras" ? <PurchasesPanel today={today} states={states} /> : <SuppliersPanel />}
+        ) : tab === "compras" ? <PurchasesPanel today={today} states={states} />
+          : tab === "proveedores" ? <SuppliersPanel />
+          : tab === "recetas" ? <RecipesPanel states={states} />
+          : <QuotesPanel states={states} today={today} />}
       </div>
       <DemoNote untilDb>Demo: el inventario se guarda en este navegador.</DemoNote>
     </AdminPage>
