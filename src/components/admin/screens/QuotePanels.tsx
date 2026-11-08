@@ -9,6 +9,8 @@ import {
 } from "@/lib/pricing";
 import { useAdmin, useAdminCatalog } from "../AdminContext";
 import { useInventory } from "../AdminInventory";
+import { usePaymentFees } from "../AdminFees";
+import Link from "next/link";
 import { dayLabel } from "../AdminSales";
 import { Thumb } from "../PhotoPicker";
 import { AIBox, AIClose, AIPlus, AISearch, AITrash, AIWhatsApp } from "../AdminIcons";
@@ -27,7 +29,10 @@ function useCosting(states: Map<string, SupplyState>) {
   const supplies = useMemo(() => new Map(data.supplies.map((s) => [s.id, s])), [data.supplies]);
   const avg = (id: string) => states.get(id)?.avgCost ?? 0;
   const recipe = (product: string, variant: string) => data.recipes.find((r) => recipeKey(r.product, r.variant) === recipeKey(product, variant));
-  return { supplies, avg, recipe, rules: data.pricing };
+  // La tasa de IGV es la de Ajustes › Comisiones e IGV (la misma que descuenta Ventas y márgenes).
+  const { fees } = usePaymentFees();
+  const rules = useMemo(() => ({ ...data.pricing, igvRate: fees.igvRate }), [data.pricing, fees.igvRate]);
+  return { supplies, avg, recipe, rules };
 }
 
 function MarginTag({ price, cost, rules }: { price: number; cost: number; rules: PricingRules }) {
@@ -185,6 +190,7 @@ function RecipeEditor({ product, variant, states, onDone }: { product: string; v
 function RulesCard() {
   const inv = useInventory();
   const { toast } = useAdmin();
+  const { fees } = usePaymentFees();
   const r = inv.data.pricing;
   const [f, setF] = useState({ mode: r.mode, margin: String(r.margin), multiplier: String(r.multiplier), rounding: r.rounding, igv: r.igv });
   const dirty = f.mode !== r.mode || f.margin !== String(r.margin) || f.multiplier !== String(r.multiplier) || f.rounding !== r.rounding || f.igv !== r.igv;
@@ -211,7 +217,8 @@ function RulesCard() {
           </select>
         </div>
         <div className="a-field"><span style={{ fontSize: 13, fontWeight: 600 }}>IGV</span>
-          <label className="row g2" style={{ minHeight: 44 }}><input type="checkbox" checked={f.igv} onChange={(e) => setF({ ...f, igv: e.target.checked })} style={{ width: 20, height: 20 }} />Sumar IGV (18 %) al precio</label>
+          <label className="row g2" style={{ minHeight: 44 }}><input type="checkbox" checked={f.igv} onChange={(e) => setF({ ...f, igv: e.target.checked })} style={{ width: 20, height: 20 }} />Sumar IGV ({fees.igvRate} %) al precio</label>
+          <span className="a-cap">La tasa se cambia en <Link href="/admin/ajustes#pagos">Ajustes › Comisiones e IGV</Link>.</span>
         </div>
       </div>
       <p className="a-cap">La mano de obra se sumará más adelante (MVP v2).</p>

@@ -5,10 +5,13 @@
 import type { Supply } from "./inventory";
 
 export type Rounding = "none" | "sol" | "9" | "10";
-export type PricingRules = { mode: "margin" | "multiplier"; margin: number; multiplier: number; rounding: Rounding; igv: boolean };
+/** `igvRate` (%): no se guarda con las reglas; viene de Ajustes › Comisiones e IGV (un solo lugar para la tasa). */
+export type PricingRules = { mode: "margin" | "multiplier"; margin: number; multiplier: number; rounding: Rounding; igv: boolean; igvRate?: number };
 /** Sin datos de la marca: margen 50 %, sin IGV, redondeo al sol. La marca lo cambia en Cotizador. */
 export const DEFAULT_RULES: PricingRules = { mode: "margin", margin: 50, multiplier: 3, rounding: "sol", igv: false };
+/** Tasa por defecto si la marca no la configuró (Perú, 18 %). */
 export const IGV = 0.18;
+const igvOf = (r: Pick<PricingRules, "igvRate">) => (r.igvRate === undefined ? IGV : r.igvRate / 100);
 export const ROUNDING_LABEL: Record<Rounding, string> = { none: "Sin redondeo", sol: "Al sol", "9": "Terminar en 9", "10": "De 10 en 10" };
 
 export type RecipeLine = { supply: string; qty: number; /** Nombre de la parte opcional, p. ej. «Con florero». */ optional?: string };
@@ -84,13 +87,13 @@ export function roundPrice(n: number, r: Rounding): number {
 export function suggestedPrice(cost: number, rules: PricingRules): { base: number; withIgv: number; price: number } {
   const m = Math.min(Math.max(rules.margin, 0), 95) / 100;
   const base = rules.mode === "margin" ? cost / (1 - m) : cost * Math.max(rules.multiplier, 0);
-  const withIgv = rules.igv ? base * (1 + IGV) : base;
+  const withIgv = rules.igv ? base * (1 + igvOf(rules)) : base;
   return { base: r2(base), withIgv: r2(withIgv), price: roundPrice(withIgv, rules.rounding) };
 }
 
 /** Margen real de un precio de venta (sin IGV si las reglas lo incluyen): (precio − costo) / precio. */
-export function realMargin(price: number, cost: number, rules: Pick<PricingRules, "igv">): number | null {
-  const net = rules.igv ? price / (1 + IGV) : price;
+export function realMargin(price: number, cost: number, rules: Pick<PricingRules, "igv" | "igvRate">): number | null {
+  const net = rules.igv ? price / (1 + igvOf(rules)) : price;
   return net > 0 ? Math.round(((net - cost) / net) * 1000) / 10 : null;
 }
 
