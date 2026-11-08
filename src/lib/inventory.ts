@@ -3,6 +3,7 @@
  * El stock y el costo promedio ponderado se calculan repasando los movimientos en orden: el historial
  * es la única fuente de verdad (ver supabase/migrations/0011_inventory.sql).
  */
+import type { PricingRules, Quote, Recipe } from "./pricing";
 
 export type SupplierOrigin = "nacional" | "importado";
 export type Supplier = { id: string; name: string; origin: SupplierOrigin; leadDays: number | null; contact: string; note: string; archived: boolean };
@@ -45,8 +46,17 @@ export type Movement = {
   createdAt: string;
 };
 
-export type InventoryData = { enabled: boolean; suppliers: Supplier[]; supplies: Supply[]; movements: Movement[] };
-export const EMPTY_INVENTORY: InventoryData = { enabled: false, suppliers: [], supplies: [], movements: [] };
+export type InventoryData = {
+  enabled: boolean;
+  suppliers: Supplier[];
+  supplies: Supply[];
+  movements: Movement[];
+  pricing: PricingRules;
+  recipes: Recipe[];
+  quotes: Quote[];
+};
+export const EMPTY_INVENTORY: InventoryData = { enabled: false, suppliers: [], supplies: [], movements: [], // Mismo valor que DEFAULT_RULES en pricing.ts (aquí literal para no importar código en las pruebas).
+  pricing: { mode: "margin", margin: 50, multiplier: 3, rounding: "sol", igv: false }, recipes: [], quotes: [] };
 
 export const KIND_LABEL: Record<MovementKind, string> = { purchase: "Compra", waste: "Merma", adjust: "Ajuste por conteo", use: "Uso interno" };
 

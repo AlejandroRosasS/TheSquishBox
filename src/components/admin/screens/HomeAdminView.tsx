@@ -8,7 +8,9 @@ import { money, moneyShort, ORDER_STATUS, todayLabel } from "@/lib/admin/format"
 import { useAdmin, useAdminCatalog, useOrders } from "../AdminContext";
 import { AdminPage } from "../AdminPage";
 import { useAdminCounts } from "../AdminShell";
-import { AIBell, AIChevron, AIInstagram } from "../AdminIcons";
+import { AIBell, AIChevron, AIInstagram, AIPlus } from "../AdminIcons";
+import { useInventory } from "../AdminInventory";
+import { useToday } from "@/lib/useToday";
 
 const DAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
@@ -36,6 +38,9 @@ export function HomeAdminView() {
     .slice(0, 4) as { p: (typeof catalog.products)[number]; label: string; cls: string; cap: string }[];
   const maxBar = Math.max(...demo.weekSales.bars);
   const partyLabel = tenant.customOrder.adminLabel ?? tenant.customOrder.label;
+  // Con el inventario prendido, el cotizador queda a un toque (se conoce recién en el navegador).
+  const mounted = !!useToday();
+  const quotesOn = useInventory().data.enabled && mounted;
 
   const summary = (o: (typeof orders)[number]) =>
     o.lines.map((l) => `${pname(l.productId)?.name ?? l.name ?? l.productId}${l.qty > 1 ? ` ×${l.qty}` : ""}`).join(" + ");
@@ -48,9 +53,12 @@ export function HomeAdminView() {
           <h1 className="a-h1">Hola, equipo</h1>
           <p className="a-sub">{todayLabel(demo.today)} · esto es lo que necesita atención hoy.</p>
         </div>
-        {c.newPosts > 0 && (
-          <Link className="a-btn" href="/admin/instagram"><AIInstagram />{c.newPosts} posts nuevos en Instagram</Link>
-        )}
+        <div className="row g2" style={{ flexWrap: "wrap" }}>
+          {quotesOn && <Link className="a-btn primary" href="/admin/inventario#cotizador"><AIPlus size="sm" />Nueva cotización</Link>}
+          {c.newPosts > 0 && (
+            <Link className="a-btn" href="/admin/instagram"><AIInstagram />{c.newPosts} posts nuevos en Instagram</Link>
+          )}
+        </div>
       </div>
 
       <div className="kpis">
