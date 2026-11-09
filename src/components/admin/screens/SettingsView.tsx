@@ -5,8 +5,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { dataKey, usePersisted } from "@/lib/admin/storage";
 import { useAdmin } from "../AdminContext";
 import { AdminPage, DemoNote, Switch } from "../AdminPage";
-import { AIChevron, AIInstagram } from "../AdminIcons";
+import { AIChevron } from "../AdminIcons";
 import { CulqiSettings } from "../CulqiSettings";
+import { IgConnectionRow } from "../IgConnectionRow";
+import { YapeSettings } from "../YapeSettings";
 import { PaymentFeesPanel } from "./PaymentFeesPanel";
 import { useInventory } from "../AdminInventory";
 import { useToday } from "@/lib/useToday";
@@ -104,7 +106,10 @@ export function SettingsView() {
       <div role="tabpanel" id="aj-panel-conexiones" aria-labelledby="aj-tab-conexiones" hidden={tab !== "conexiones"}>
         <section className="a-card" aria-labelledby="aj-con">
           <h2 className="a-h2" id="aj-con">Conexiones</h2>
-          <div className="row g3"><span className="ch-ico"><AIInstagram /></span><div className="grow"><b>Instagram</b><p className="a-cap">@{tenant.instagram} · sincroniza cada 15 min</p></div><span className="st pagado">Conectado</span></div>
+          <IgConnectionRow />
+          <hr className="a-hr" />
+          <YapeSettings />
+          <hr className="a-hr" />
           <CulqiSettings />
         </section>
       </div>
