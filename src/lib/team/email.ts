@@ -37,10 +37,18 @@ ${m.lines.map((l) => `<p style="margin:0 0 8px">${esc(l)}</p>`).join("\n")}
       }),
       signal: AbortSignal.timeout(10_000),
     });
-    if (res.ok) return { ok: true };
-    const json = (await res.json().catch(() => ({}))) as { message?: string };
+    const json = (await res.json().catch(() => ({}))) as { id?: string; message?: string };
+    // Queda en los logs de Vercel: con el id se busca el correo en Resend (si no aparece, la key es de otra cuenta).
+    const sender = env("ALERTS_FROM_EMAIL");
+    const key = env("RESEND_API_KEY").slice(0, 7);
+    if (res.ok) {
+      console.info(`[team-email] enviado id=${json.id ?? "?"} from=${sender} key=${key}… subject="${m.subject}"`);
+      return { ok: true };
+    }
+    console.error(`[team-email] Resend ${res.status}: ${json.message ?? "sin detalle"} from=${sender} key=${key}…`);
     return { ok: false, error: json.message ?? `error ${res.status}` };
   } catch (e) {
+    console.error(`[team-email] sin respuesta de Resend: ${e instanceof Error ? e.message : e}`);
     return { ok: false, error: e instanceof Error ? e.message : "sin respuesta" };
   }
 }
