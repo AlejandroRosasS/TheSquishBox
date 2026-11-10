@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { telegram } from "@/lib/alerts/channels";
 import { formatPrice } from "@/lib/format";
-import { fingerprint, parseMoney, type CatalogLite, type SaleDraft, type SaleLineDraft } from "@/lib/sales/csv";
+import { CUSTOM_PRODUCT, fingerprint, parseMoney, type CatalogLite, type SaleDraft, type SaleLineDraft } from "@/lib/sales/csv";
 import { limaToday, makePricer } from "@/lib/sales/pricer";
 import { saleRow } from "@/lib/sales/rows";
 import { salesContext } from "@/lib/sales/server";
@@ -13,10 +13,20 @@ import { tenantsOfChat, type TgChat } from "@/lib/telegram/bot";
  * Mientras se arma, la venta vive en `sales_imports` (status pending, un solo elemento en `sales`
  * con el campo `wizard`): así no hace falta otra tabla y el webhook sigue sin estado.
  * Cada paso edita el mismo mensaje del bot; solo el monto o una cantidad «otra» se escriben.
+ * «Pedido a medida» (cualquier marca): se elige una cotización aceptada (con su precio y costo) o se escribe
+ * una descripción y el monto. Queda como ítem CUSTOM_PRODUCT con nombre y costo propios.
  */
 
-type Step = "canal" | "pago" | "items" | "cantidad" | "cantidad_txt" | "total" | "total_txt";
-type Wizard = { step: Step; page: number; pick?: { productId: string; variantId: string }; total?: number; msgId?: number; askId?: number };
+type Step = "canal" | "pago" | "items" | "cantidad" | "cantidad_txt" | "medida" | "medida_txt" | "medida_monto_txt" | "total" | "total_txt";
+type Wizard = { step: Step; page: number; pick?: { productId: string; variantId: string }; custom?: string; total?: number; msgId?: number; askId?: number };
+/** Pasos en los que el bot espera que le escriban (en grupos, respondiendo a su mensaje). */
+const TEXT_STEPS: Step[] = ["cantidad_txt", "medida_txt", "medida_monto_txt", "total_txt"];
+const PROMPTS: Partial<Record<Step, [string, string]>> = {
+  cantidad_txt: ["¿Cuántas unidades? (solo el número)", "Cantidad"],
+  medida_txt: ["¿Qué fue? Una descripción corta, por ejemplo: Arreglo de rosas para Carla", "Descripción"],
+  medida_monto_txt: ["¿Cuánto cobraste por ese pedido? (por ejemplo 180 o 180.50)", "Monto en soles"],
+  total_txt: ["¿Cuánto cobraste en total? (por ejemplo 65.50)", "Monto en soles"],
+};
 type Draft = SaleDraft & { wizard: Wizard };
 type Tenant = { id: string; name: string };
 type Row = { id: string; tenant_id: string; chat_id: string; sales: Draft[]; status: string; created_at: string };
@@ -39,7 +49,19 @@ function options(catalog: CatalogLite, price: ReturnType<typeof makePricer>, day
     }),
   );
 }
-const lineName = (catalog: CatalogLite, l: Pick<SaleLineDraft, "productId" | "variantId">) => {
+type Quote = { id: string; title: string; client: string | null; price: number; cost: number };
+/** Cotizaciones aceptadas que todavía no se registraron como venta (módulo de Inventario; sin él, ninguna). */
+async function openQuotes(db: SupabaseClient, tenantId: string): Promise<Quote[]> {
+  const { data, error } = await db.from("inv_quotes").select("id, title, client, price, cost").eq("tenant_id", tenantId).eq("status", "accepted").order("created_at", { ascending: false }).limit(30);
+  if (error || !data?.length) return [];
+  const { data: sold } = await db.from("manual_sales").select("items").eq("tenant_id", tenantId).contains("items", [{ product: CUSTOM_PRODUCT }]);
+  const used = new Set(((sold ?? []) as { items: { product: string; variant: string }[] }[]).flatMap((r) => r.items.filter((i) => i.product === CUSTOM_PRODUCT).map((i) => i.variant)));
+  return (data as Quote[]).filter((q) => !used.has(q.id)).slice(0, PAGE).map((q) => ({ ...q, price: Number(q.price), cost: Number(q.cost) }));
+}
+const quoteName = (q: Quote) => `${q.title}${q.client ? ` · ${q.client}` : ""}`;
+
+const lineName = (catalog: CatalogLite, l: Pick<SaleLineDraft, "productId" | "variantId" | "name">) => {
+  if (l.productId === CUSTOM_PRODUCT) return `A medida: ${l.name || "sin descripción"}`;
   const p = catalog.products.find((x) => x.id === l.productId);
   if (!p) return l.productId;
   return `${p.name}${p.variants.length > 1 ? ` (${p.variants.find((v) => v.id === l.variantId)?.label ?? l.variantId})` : ""}`;
@@ -49,7 +71,7 @@ const cut = (s: string, n = 56) => (s.length > n ? `${s.slice(0, n - 1)}…` : s
 type Button = { text: string; callback_data: string };
 type View = { text: string; keyboard: Button[][] };
 
-function render(d: Draft, brand: string, catalog: CatalogLite, opts: Option[]): View {
+function render(d: Draft, brand: string, catalog: CatalogLite, opts: Option[], quotes: Quote[]): View {
   const w = d.wizard;
   const id = d.ref; // los botones llevan el id de la importación, guardado en ref hasta registrar
   const b = (text: string, action: string): Button => ({ text, callback_data: `v:${id}:${action}` });
@@ -75,10 +97,15 @@ function render(d: Draft, brand: string, catalog: CatalogLite, opts: Option[]): 
       const page = Math.min(w.page, pages - 1);
       const rows: Button[][] = opts.slice(page * PAGE, page * PAGE + PAGE).map((o, i) => [b(cut(`${o.name} · ${formatPrice(o.price)}`), `i:${page * PAGE + i}`)]);
       if (pages > 1) rows.push([b("◀️", `pg:${(page + pages - 1) % pages}`), b(`${page + 1}/${pages}`, `pg:${page}`), b("▶️", `pg:${(page + 1) % pages}`)]);
+      const custom = b("✳️ Pedido a medida", "m");
+      rows.push([custom]);
       if (d.lines.length) rows.push([b("↩️ Quitar el último", "del"), b(`✅ Listo · ${formatPrice(web)}`, "done")]);
       else rows.push([b("↩️ Atrás", "back")]);
       rows.push([cancel]);
-      if (!opts.length) return ask("No hay productos publicados en la web. Agrégalos en el panel (Productos) y vuelve a intentar.", [[cancel]]);
+      if (!opts.length) {
+        const end: Button[][] = d.lines.length ? [[b("↩️ Quitar el último", "del"), b(`✅ Listo · ${formatPrice(web)}`, "done")]] : [[b("↩️ Atrás", "back")]];
+        return ask(d.lines.length ? "¿Algo más? Otro pedido a medida o toca «Listo»." : "No hay productos publicados en la web, pero puedes registrar un pedido a medida.", [[custom], ...end, [cancel]]);
+      }
       return ask(d.lines.length ? "¿Algo más? Elige otro producto o toca «Listo»." : "¿Qué producto se llevó? Puedes agregar varios.", rows);
     }
     case "cantidad": {
@@ -91,6 +118,15 @@ function render(d: Draft, brand: string, catalog: CatalogLite, opts: Option[]): 
     }
     case "cantidad_txt":
       return ask("Escríbeme la cantidad (solo el número).", [[b("↩️ Atrás", "back"), cancel]]);
+    case "medida":
+      return ask(
+        quotes.length ? "¿Es una de estas cotizaciones aceptadas? Si no, escribe qué fue." : "Escríbeme qué fue y luego el monto.",
+        [...quotes.map((q, i) => [b(cut(`${quoteName(q)} · ${formatPrice(q.price)}`), `mq:${i}`)]), [b("✏️ Escribir qué fue", "mt")], [b("↩️ Atrás", "back"), cancel]],
+      );
+    case "medida_txt":
+      return ask("Escríbeme una descripción corta del pedido.", [[b("↩️ Atrás", "back"), cancel]]);
+    case "medida_monto_txt":
+      return ask(`Pedido a medida: ${w.custom ?? ""}\nEscríbeme cuánto cobraste por él.`, [[b("↩️ Atrás", "back"), cancel]]);
     case "total": {
       const total = w.total ?? web;
       const rows: Button[][] = [[b(`✅ Registrar con ${formatPrice(total)}`, "ok")], [b("✏️ Otro monto", "t")]];
@@ -115,7 +151,8 @@ async function show(db: SupabaseClient, row: Row, d: Draft, mode: "edit" | "new"
   const ctx = await salesContext(db, row.tenant_id);
   const { data: t } = await db.from("tenants").select("name").eq("id", row.tenant_id).maybeSingle();
   const opts = options(ctx.catalog, makePricer(ctx.catalog, ctx.campaigns), d.day);
-  const v = render({ ...d, ref: row.id }, (t?.name as string) ?? "la tienda", ctx.catalog, opts);
+  const quotes = d.wizard.step === "medida" ? await openQuotes(db, row.tenant_id) : [];
+  const v = render({ ...d, ref: row.id }, (t?.name as string) ?? "la tienda", ctx.catalog, opts, quotes);
   const chatId = Number(row.chat_id);
   const body = { chat_id: chatId, text: v.text, reply_markup: { inline_keyboard: v.keyboard } };
   if (mode === "edit" && d.wizard.msgId) {
@@ -220,6 +257,17 @@ export async function onVtaButton(db: SupabaseClient, q: TgCallback) {
     say = `Agregado x${arg}`;
   } else if (action === "qx" && w.step === "cantidad") {
     w.step = "cantidad_txt";
+  } else if (action === "m" && w.step === "items") {
+    w.step = (await openQuotes(db, row.tenant_id)).length ? "medida" : "medida_txt";
+  } else if (action === "mt" && w.step === "medida") {
+    w.step = "medida_txt";
+  } else if (action === "mq" && w.step === "medida") {
+    const q = (await openQuotes(db, row.tenant_id))[+arg];
+    if (!q) return void (await answer("Esa cotización ya no está disponible"));
+    d.lines = addLine(d.lines, { productId: CUSTOM_PRODUCT, variantId: q.id, qty: 1, price: q.price, name: quoteName(q), cost: q.cost });
+    w.total = undefined;
+    w.step = "items";
+    say = "Agregado";
   } else if (action === "del" && w.step === "items" && d.lines.length) {
     d.lines = d.lines.slice(0, -1);
     w.total = undefined;
@@ -230,29 +278,30 @@ export async function onVtaButton(db: SupabaseClient, q: TgCallback) {
   } else if (action === "tw" && w.step === "total") {
     w.total = undefined;
   } else if (action === "back") {
-    const prev: Partial<Record<Step, Step>> = { pago: "canal", items: "pago", cantidad: "items", cantidad_txt: "cantidad", total: "items", total_txt: "total" };
+    const prev: Partial<Record<Step, Step>> = { pago: "canal", items: "pago", cantidad: "items", cantidad_txt: "cantidad", medida: "items", medida_txt: "items", medida_monto_txt: "medida_txt", total: "items", total_txt: "total" };
     if (!prev[w.step]) return void (await answer());
     w.step = prev[w.step]!;
     if (w.step === "items") w.pick = undefined;
+    if (w.step === "items" || w.step === "medida_txt") w.custom = undefined;
   } else return void (await answer());
 
   w.askId = undefined;
   await store(db, id, d);
   await show(db, row, d, "edit");
-  if (w.step === "cantidad_txt" || w.step === "total_txt") {
-    // En los grupos el bot solo lee lo que le responden: pide la respuesta con «responder».
-    const { json } = await telegram("sendMessage", {
-      chat_id: msg.chat.id,
-      text: w.step === "total_txt" ? "¿Cuánto cobraste en total? (por ejemplo 65.50)" : "¿Cuántas unidades? (solo el número)",
-      reply_markup: { force_reply: true, selective: true, input_field_placeholder: w.step === "total_txt" ? "Monto en soles" : "Cantidad" },
-    });
-    const askId = (json.result as { message_id?: number } | undefined)?.message_id;
-    if (askId) {
-      w.askId = askId;
-      await store(db, id, d);
-    }
-  }
+  await askText(db, id, d, msg.chat.id);
   await answer(say);
+}
+
+/** Si el paso espera texto, lo pide con «responder» (en los grupos el bot solo lee lo que le responden). */
+async function askText(db: SupabaseClient, id: string, d: Draft, chatId: number) {
+  const p = PROMPTS[d.wizard.step];
+  if (!p) return;
+  const { json } = await telegram("sendMessage", { chat_id: chatId, text: p[0], reply_markup: { force_reply: true, selective: true, input_field_placeholder: p[1] } });
+  const askId = (json.result as { message_id?: number } | undefined)?.message_id;
+  if (askId) {
+    d.wizard.askId = askId;
+    await store(db, id, d);
+  }
 }
 
 /**
@@ -265,7 +314,7 @@ export async function onVtaText(db: SupabaseClient, tenant: Tenant, m: TgMessage
   const { data } = await db.from("sales_imports").select("id, tenant_id, chat_id, sales, status, created_at").eq("chat_id", String(m.chat.id)).eq("tenant_id", tenant.id).eq("status", "pending").order("created_at", { ascending: false }).limit(10);
   const waiting = ((data ?? []) as Row[]).filter((r) => {
     const w = r.sales?.[0]?.wizard;
-    return w && (w.step === "cantidad_txt" || w.step === "total_txt") && Date.now() - Date.parse(r.created_at) <= EXPIRES_MS;
+    return w && TEXT_STEPS.includes(w.step) && Date.now() - Date.parse(r.created_at) <= EXPIRES_MS;
   });
   const reply = m.reply_to_message?.message_id;
   const row = waiting.find((r) => reply && r.sales[0].wizard.askId === reply) ?? (m.chat.type === "private" ? waiting[0] : undefined);
@@ -290,6 +339,19 @@ export async function onVtaText(db: SupabaseClient, tenant: Tenant, m: TgMessage
     w.pick = undefined;
     w.total = undefined;
     w.step = "items";
+  } else if (w.step === "medida_txt") {
+    w.custom = text.replace(/\s+/g, " ").slice(0, 80);
+    w.step = "medida_monto_txt";
+  } else if (w.step === "medida_monto_txt") {
+    const price = parseMoney(text);
+    if (price === null || price <= 0 || price > MAX_TOTAL) {
+      await retry("No entendí el monto. Escríbelo en soles, por ejemplo 180 o 180.50.");
+      return true;
+    }
+    d.lines = addLine(d.lines, { productId: CUSTOM_PRODUCT, variantId: "", qty: 1, price, name: w.custom ?? "" });
+    w.custom = undefined;
+    w.total = undefined;
+    w.step = "items";
   } else {
     const total = parseMoney(text);
     if (total === null || total <= 0 || total > MAX_TOTAL) {
@@ -302,6 +364,7 @@ export async function onVtaText(db: SupabaseClient, tenant: Tenant, m: TgMessage
   w.askId = undefined;
   await store(db, row.id, d);
   await show(db, row, d, "new");
+  await askText(db, row.id, d, m.chat.id);
   return true;
 }
 
