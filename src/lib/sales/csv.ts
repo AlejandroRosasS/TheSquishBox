@@ -25,7 +25,14 @@ type Col = (typeof SALES_COLUMNS)[number];
 export const MANUAL_CHANNELS: [string, string][] = [["ig", "Instagram"], ["feria", "Ferias"], ["otros", "Otros"]];
 export const PAY_METHODS = ["Yape", "Plin", "Efectivo", "Transferencia", "Tarjeta (POS)"];
 
-export type SaleLineDraft = { productId: string; variantId: string; qty: number; price: number; campaignId?: string; campaign?: string; listPrice?: number };
+export type SaleLineDraft = {
+  productId: string; variantId: string; qty: number; price: number; campaignId?: string; campaign?: string; listPrice?: number;
+  /** Solo pedidos a medida (productId = CUSTOM_PRODUCT): descripción y costo unitario (de la cotización, si la hay). */
+  name?: string; cost?: number;
+};
+
+/** Producto de las ventas a medida (arreglo para una clienta, caja personalizada…): no está en el catálogo. variantId = id de la cotización o "". */
+export const CUSTOM_PRODUCT = "a-medida";
 export type SaleDraft = { ref: string; day: string; channel: string; client: string; pay: string; lines: SaleLineDraft[]; dIn: number; dOut: number; note: string; rows: number[] };
 
 export type CatalogLite = { products: { id: string; name: string; variants: { id: string; label: string; price: number }[] }[] };
@@ -299,7 +306,7 @@ export function salesToCsv(sales: ExportSale[], catalog: CatalogLite): string {
       const v = p?.variants.find((x) => x.id === l.variantId);
       out.push([
         s.day, s.ref, s.channel, s.client, s.pay,
-        p?.id ?? l.productId, v?.label ?? l.variantLabel ?? l.variantId, l.qty, l.price.toFixed(2), l.campaign ?? "",
+        p?.id ?? l.productId, v?.label ?? (l.productId === CUSTOM_PRODUCT ? l.name : undefined) ?? l.variantLabel ?? l.variantId, l.qty, l.price.toFixed(2), l.campaign ?? "",
         i ? "" : s.dIn ? s.dIn.toFixed(2) : "", i ? "" : s.dOut ? s.dOut.toFixed(2) : "", i ? "" : s.note,
       ]);
     });

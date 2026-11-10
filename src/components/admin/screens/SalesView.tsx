@@ -77,7 +77,7 @@ export function SalesView() {
     const dd = first ? deductions(dIn, rule, fees.igvRate, false) : { igv: 0, fee: 0 };
     return {
       pid: l.productId, ch, line: prod(l.productId)?.line ?? "", units: l.qty, rev, listRev: (l.listPrice ?? l.price) * l.qty,
-      cost: cost(l.productId, l.variantId) * l.qty, dIn: first ? dIn : 0, dOut: first ? dOut : 0, orders: first ? 1 : 0, camp: l.campaignId ?? "", campName: l.campaign ?? "",
+      cost: (l.cost ?? cost(l.productId, l.variantId)) * l.qty, dIn: first ? dIn : 0, dOut: first ? dOut : 0, orders: first ? 1 : 0, camp: l.campaignId ?? "", campName: l.campaign ?? "",
       igv: d.igv, fee: d.fee, dCut: dd.igv + dd.fee, card: key === "card_web" || key === "card_pos", fair: null,
     };
   };
@@ -132,11 +132,11 @@ export function SalesView() {
   const recent = [
     ...manual.slice().reverse().map((s) => {
       const r = s.lines.reduce((a, l) => a + l.price * l.qty, 0);
-      const c = s.lines.reduce((a, l) => a + cost(l.productId, l.variantId) * l.qty, 0);
+      const c = s.lines.reduce((a, l) => a + (l.cost ?? cost(l.productId, l.variantId)) * l.qty, 0);
       const ls = s.lines.map((l, i) => saleLine(l, s.channel, !i, s.dIn, s.dOut, s.pay));
       const cutS = sum(ls, "igv") + sum(ls, "fee") + sum(ls, "dCut");
       const camps = [...new Set(s.lines.filter((l) => l.campaignId).map((l) => campName(l.campaignId!, l.campaign)))];
-      return { date: s.date, detail: s.lines.map((l) => `${prod(l.productId)?.name ?? l.productId} x${l.qty}`).join(" + "), note: camps.length ? `${saleCaption(s, money)} · campaña ${camps.join(", ")}` : saleCaption(s, money), channel: s.channel, revenue: r + s.dIn, contribution: r - c + s.dIn - s.dOut - cutS };
+      return { date: s.date, detail: s.lines.map((l) => `${prod(l.productId)?.name ?? (l.name ? `A medida: ${l.name}` : l.productId)} x${l.qty}`).join(" + "), note: camps.length ? `${saleCaption(s, money)} · campaña ${camps.join(", ")}` : saleCaption(s, money), channel: s.channel, revenue: r + s.dIn, contribution: r - c + s.dIn - s.dOut - cutS };
     }),
     ...demo.sales.recent,
   ];

@@ -23,7 +23,7 @@ export function fitTotal(lines: SaleLineDraft[], total: number): SaleLineDraft[]
   const units = lines.reduce((a, l) => a + l.qty, 0);
   const out = lines.map((l) => {
     const unit = web > 0 ? Math.round((cents(l.price) * target) / web) : Math.round(target / units);
-    return { productId: l.productId, variantId: l.variantId, qty: l.qty, price: unit / 100 };
+    return { productId: l.productId, variantId: l.variantId, qty: l.qty, price: unit / 100, ...(l.name ? { name: l.name } : {}), ...(l.cost !== undefined ? { cost: l.cost } : {}) };
   });
   const rest = target - out.reduce((a, l) => a + cents(l.price) * l.qty, 0);
   if (!rest) return out;
@@ -41,7 +41,7 @@ export function fitTotal(lines: SaleLineDraft[], total: number): SaleLineDraft[]
 
 /** Junta la misma opción en una sola línea (si eligen dos veces el mismo producto). */
 export function addLine(lines: SaleLineDraft[], line: SaleLineDraft): SaleLineDraft[] {
-  const i = lines.findIndex((l) => l.productId === line.productId && l.variantId === line.variantId && l.price === line.price);
+  const i = lines.findIndex((l) => l.productId === line.productId && l.variantId === line.variantId && l.price === line.price && l.name === line.name);
   if (i < 0) return [...lines, line];
   return lines.map((l, j) => (j === i ? { ...l, qty: Math.min(999, l.qty + line.qty) } : l));
 }

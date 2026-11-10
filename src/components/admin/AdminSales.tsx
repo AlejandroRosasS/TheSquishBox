@@ -2,14 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { dataKey, usePersisted } from "@/lib/admin/storage";
-import type { Pricer, SaleDraft } from "@/lib/sales/csv";
+import { CUSTOM_PRODUCT, type Pricer, type SaleDraft } from "@/lib/sales/csv";
 import { makePricer } from "@/lib/sales/pricer";
 import { saleRow } from "@/lib/sales/rows";
 import { useAdmin, useAdminCatalog } from "./AdminContext";
 import { useCampaigns } from "./AdminCampaigns";
 import { useDb } from "./DbContext";
 
-export type ManualSaleLine = { productId: string; variantId: string; qty: number; price: number; campaignId?: string; campaign?: string; listPrice?: number };
+export type ManualSaleLine = { productId: string; variantId: string; qty: number; price: number; campaignId?: string; campaign?: string; listPrice?: number; name?: string; cost?: number };
 export type ManualSale = {
   id: string;
   /** Referencia para no cargar dos veces la misma venta. */
@@ -68,7 +68,7 @@ function useLocalSales(on: boolean): SalesState {
   return { sales, add, hydrated, available: true };
 }
 
-type Item = { product: string; variant: string; name?: string; variant_label?: string; qty: number; price: number | string; list_price?: number | string; campaign_id?: string; campaign?: string };
+type Item = { product: string; variant: string; name?: string; variant_label?: string; cost?: number | string; qty: number; price: number | string; list_price?: number | string; campaign_id?: string; campaign?: string };
 type Row = { id: string; ref: string | null; channel: string; items: Item[]; note: string | null; sold_at: string; client: string | null; pay: string | null; delivery_in: number | string; delivery_out: number | string; source: ManualSale["source"] };
 const COLUMNS = "id, ref, channel, items, note, sold_at, client, pay, delivery_in, delivery_out, source";
 const missingColumn = (e: { code?: string }) => ["PGRST204", "42703", "PGRST205", "42P01", "42P10"].includes(e.code ?? "");
@@ -80,6 +80,7 @@ function fromRow(r: Row): ManualSale {
     dIn: Number(r.delivery_in ?? 0), dOut: Number(r.delivery_out ?? 0), source: r.source,
     lines: (r.items ?? []).map((it) => ({
       productId: it.product, variantId: it.variant, qty: Number(it.qty ?? 1), price: Number(it.price ?? 0),
+      ...(it.product === CUSTOM_PRODUCT ? { name: it.name ?? "", ...(it.cost != null ? { cost: Number(it.cost) } : {}) } : {}),
       ...(it.campaign_id ? { campaignId: it.campaign_id, campaign: it.campaign, listPrice: Number(it.list_price ?? it.price ?? 0) } : {}),
     })),
   };
