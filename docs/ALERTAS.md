@@ -30,6 +30,8 @@ Un canal sin sus variables aparece como «Falta configurar» en Notificaciones. 
 
 ### Telegram (gratis, 5 minutos)
 
+**Un bot por marca.** Cada proyecto de Vercel tiene su `TELEGRAM_BOT_TOKEN`. Cada despliegue envía por Telegram solo los avisos de su marca (`TENANT`) y su webhook solo atiende a su marca; el correo y WhatsApp sí los puede enviar cualquier despliegue.
+
 1. En Telegram, abre **@BotFather** › `/newbot`. Ponle un nombre (por ejemplo «Alertas de pedidos») y un usuario que termine en `bot`.
 2. Copia el token que te da y guárdalo como `TELEGRAM_BOT_TOKEN`.
 3. El webhook se configura solo: la primera vez que alguien toca **Vincular chat o grupo** en producción, la app apunta el bot a `https://<dominio>/api/telegram/webhook` (con una clave que sale del token). En local y en vistas previas sigue leyendo con `getUpdates`.
@@ -95,6 +97,8 @@ select cron.schedule('alertas', '* * * * *', $$
   );
 $$);
 ```
+
+Haz un cron **por marca** (cada uno con la URL y el `CRON_SECRET` de su proyecto): como cada marca tiene su bot, los reintentos de Telegram de una marca solo los puede hacer su propio despliegue. Guarda el secreto en Vault (`select vault.create_secret('<CRON_SECRET>', 'cron_secret_bloom');`) y usa `(select decrypted_secret from vault.decrypted_secrets where name = 'cron_secret_bloom')` en vez del texto.
 
 Cuando la tienda pase al dominio final, cambia la URL con `cron.unschedule('alertas')` y vuelve a crearlo.
 

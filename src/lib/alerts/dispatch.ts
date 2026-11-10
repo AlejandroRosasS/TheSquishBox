@@ -3,6 +3,7 @@ import { ORDER_COLUMNS, type OrderRow } from "@/lib/db/orders";
 import { CHANNEL_NAMES, type ChannelKey } from "./config";
 import { sendAlert } from "./channels";
 import { orderMessage } from "./message";
+import { tenantSlug } from "@/lib/tenant";
 
 type OutboxRow = {
   id: number;
@@ -21,20 +22,53 @@ export const MAX_ATTEMPTS = BACKOFF_MIN.length + 1;
 
 export type DispatchResult = { sent: number; retried: number; failed: number };
 
+const CLAIM_COLUMNS = "id, tenant_id, order_id, event, channel, recipient, label, attempts, status";
+
 /**
- * Envía los avisos pendientes (de todas las marcas). Se llama apenas entra un pedido,
- * cada minuto desde el cron de Supabase y cada vez que el panel recarga pedidos. Varias llamadas
- * a la vez no se pisan: claim_alerts reparte los avisos con `for update skip locked`.
+ * Toma hasta `max` avisos vencidos que este despliegue puede enviar: correo y WhatsApp de cualquier marca
+ * (son cuentas de la plataforma) y Telegram solo de su marca, porque cada marca tiene su propio bot
+ * (TELEGRAM_BOT_TOKEN de su proyecto) y otro bot no puede escribir en sus chats.
+ * Cada aviso se reserva con un update condicionado a sus intentos: si otra llamada lo tomó primero, se salta.
+ */
+async function claimOwn(db: SupabaseClient, ownTenantId: string | null, max: number): Promise<OutboxRow[]> {
+  let q = db
+    .from("alert_outbox")
+    .select(CLAIM_COLUMNS)
+    .in("status", ["pending", "sending"])
+    .lte("next_attempt_at", new Date().toISOString())
+    .order("next_attempt_at")
+    .limit(max);
+  q = ownTenantId ? q.or(`channel.neq.telegram,tenant_id.eq.${ownTenantId}`) : q.neq("channel", "telegram");
+  const { data, error } = await q;
+  if (error) throw new Error(error.message);
+  const claimed = await Promise.all(
+    ((data ?? []) as (OutboxRow & { status: string })[]).map(async ({ status, ...row }) => {
+      const { data: got } = await db
+        .from("alert_outbox")
+        .update({ status: "sending", attempts: row.attempts + 1, next_attempt_at: new Date(Date.now() + 120_000).toISOString() })
+        .eq("id", row.id)
+        .eq("attempts", row.attempts)
+        .eq("status", status)
+        .select("id");
+      return got?.length ? { ...row, attempts: row.attempts + 1 } : null;
+    }),
+  );
+  return claimed.filter((r): r is OutboxRow => r !== null);
+}
+
+/**
+ * Envía los avisos pendientes que le tocan a este despliegue (ver claimOwn). Se llama apenas entra un pedido,
+ * cada minuto desde el cron de Supabase (uno por marca) y cada vez que el panel recarga pedidos.
  */
 export async function dispatchAlerts(db: SupabaseClient, origin: string, budgetMs = 20_000): Promise<DispatchResult> {
   const started = Date.now();
   const out: DispatchResult = { sent: 0, retried: 0, failed: 0 };
   const brands = new Map<string, string>();
+  const { data: own } = await db.from("tenants").select("id").eq("slug", tenantSlug()).maybeSingle();
+  const ownTenantId = (own?.id as string | undefined) ?? null;
 
   while (Date.now() - started < budgetMs) {
-    const { data, error } = await db.rpc("claim_alerts", { max_rows: 20 });
-    if (error) throw new Error(error.message);
-    const batch = (data ?? []) as OutboxRow[];
+    const batch = await claimOwn(db, ownTenantId, 20);
     if (!batch.length) break;
 
     const orderIds = [...new Set(batch.map((r) => r.order_id).filter(Boolean))] as string[];
