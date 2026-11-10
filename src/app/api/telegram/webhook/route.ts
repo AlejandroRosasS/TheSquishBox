@@ -9,9 +9,10 @@ import { saleRow } from "@/lib/sales/rows";
 import { existingRefs, salesContext } from "@/lib/sales/server";
 import { downloadFile, linkChat, tenantsOfChat, webhookSecret, type TgChat } from "@/lib/telegram/bot";
 import { onVtaButton, onVtaText, startVta } from "@/lib/telegram/vta";
+import { tenantSlug } from "@/lib/tenant";
 
 /**
- * Webhook del bot de la plataforma (@PedidosAlertasBot). Recibe:
+ * Webhook del bot de la marca de este despliegue (cada marca tiene su bot y su TELEGRAM_BOT_TOKEN). Recibe:
  * - /start <código>: vincula el chat a las alertas de una marca.
  * - Un CSV de ventas (archivo o texto pegado): responde con un resumen y botones Registrar/Cancelar.
  * - /prompt: el prompt para armar el CSV con Claude o ChatGPT.
@@ -84,14 +85,11 @@ async function onMessage(m: Message) {
     return;
   }
 
-  const tenants = await tenantsOfChat(db, m.chat.id);
+  // Solo la marca de este bot: un mismo chat (por ejemplo, tu chat privado) puede estar con los bots de varias marcas.
+  const tenants = (await tenantsOfChat(db, m.chat.id)).filter((t) => t.slug === tenantSlug());
   if (!tenants.length) {
     // Un chat sin vincular no ve datos de ninguna marca.
     if (cmd || m.document || looksLikeCsv(text)) await send(m.chat.id, "Este chat todavía no está vinculado a una tienda. Vincúlalo en el panel: Notificaciones › Telegram › Vincular chat o grupo.");
-    return;
-  }
-  if (tenants.length > 1) {
-    await send(m.chat.id, `Este chat recibe avisos de varias marcas (${tenants.map((t) => t.name).join(", ")}). Para cargar ventas usa un chat vinculado a una sola marca.`);
     return;
   }
   const tenant = tenants[0];
