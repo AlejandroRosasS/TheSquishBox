@@ -2,9 +2,11 @@ import type { Product } from "@/lib/types";
 import type { DemoOrder, LogEntry, Note, OrderStatus, PartyRequest, PartyStatus } from "@/lib/admin/types";
 import { publicClient } from "./public";
 
-/** Número de pedido visible: 42 → "0042". Las fiestas llevan prefijo: "F-0042". */
+/** Número de pedido visible: 42 → "0042". Las fiestas llevan prefijo: "F-0042"; los mensajes de Contacto, "C-0042". */
 export const orderCode = (n: number) => String(n).padStart(4, "0");
-export const partyCode = (n: number) => `F-${orderCode(n)}`;
+/** `party`: el JSON guardado en orders.party (si es un mensaje de contacto, lleva kind "contact"). */
+export const partyCode = (n: number, party?: unknown) => `${isContactParty(party) ? "C" : "F"}-${orderCode(n)}`;
+export const isContactParty = (party: unknown) => !!party && typeof party === "object" && (party as Record<string, unknown>).kind === "contact";
 
 // ─────────── Tienda: crear pedidos (sin sesión, vía RPC) ───────────
 
@@ -38,8 +40,11 @@ export function kickAlerts() {
 
 export type PlacePartyInput = {
   customer: { name: string; phone: string; email: string };
-  delivery: { district: string; date: string };
-  party: { box: string; qty: string; size: string; extras: string; idea: string; refs: string[] };
+  delivery: { district: string; date: string } | Record<string, never>;
+  /** Fiesta: caja, cantidad, opciones… · Contacto: kind "contact", motivo (reason) y mensaje (idea). */
+  party:
+    | { box: string; qty: string; size: string; extras: string; idea: string; refs: string[] }
+    | { kind: "contact"; reason: string; idea: string; refs: string[] };
 };
 
 export async function placePartyRequest(slug: string, input: PlacePartyInput): Promise<number> {
@@ -194,8 +199,9 @@ export function toAdminParty(r: OrderRow): DbParty {
   const quote = (p.quote ?? {}) as Record<string, unknown>;
   const refs = Array.isArray(p.refs) ? (p.refs as string[]) : [];
   return {
-    id: partyCode(r.number),
+    id: partyCode(r.number, p),
     dbId: r.id,
+    ...(isContactParty(p) ? { contact: true, reason: str(p.reason) } : {}),
     name: str(c.name),
     when: whenShort(r.created_at),
     phone: str(c.phone),

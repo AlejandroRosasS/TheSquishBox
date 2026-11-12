@@ -14,7 +14,7 @@ import { AdminPage, Switch } from "../AdminPage";
 import { AIAlert, AIMail, AITelegram, AIWhatsApp } from "../AdminIcons";
 
 type Status = { server: boolean; ready: Record<ChannelKey, boolean>; bot: string | null; whatsappTemplate: boolean };
-type OutRow = { id: number; channel: ChannelKey; label: string; status: string; last_error: string | null; created_at: string; event: string; orders: { number: number; kind: string } | null };
+type OutRow = { id: number; channel: ChannelKey; label: string; status: string; last_error: string | null; created_at: string; event: string; orders: { number: number; kind: string; party?: unknown } | null };
 type TgLink = { chatUrl: string; groupUrl: string; until: number };
 
 const CH_STYLE: Record<ChannelKey, { icon: ReactNode; bg: string; fg: string }> = {
@@ -50,7 +50,7 @@ export function NotificationsLive() {
   const loadRecent = useCallback(async () => {
     const { data } = await db.client
       .from("alert_outbox")
-      .select("id, channel, label, status, last_error, created_at, event, orders(number, kind)")
+      .select("id, channel, label, status, last_error, created_at, event, orders(number, kind, party)")
       .eq("tenant_id", tenantId)
       .order("created_at", { ascending: false })
       .limit(20);
@@ -328,7 +328,7 @@ export function NotificationsLive() {
               <ul className="stack g2" style={{ listStyle: "none", margin: 0, padding: 0 }}>
                 {recent.map((r) => {
                   const [label, cls] = OUT_STATUS[r.status] ?? [r.status, "cancelado"];
-                  const code = r.orders ? (r.orders.kind === "party" ? partyCode(r.orders.number) : orderCode(r.orders.number)) : null;
+                  const code = r.orders ? (r.orders.kind === "party" ? partyCode(r.orders.number, r.orders.party) : orderCode(r.orders.number)) : null;
                   return (
                     <li key={r.id} className="stack" style={{ gap: 2 }}>
                       <div className="row g2" style={{ justifyContent: "space-between" }}>

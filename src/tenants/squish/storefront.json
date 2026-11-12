@@ -14,7 +14,7 @@
   "nav": [
     { "label": "Cajas sorpresa", "href": "/tienda?linea=cajas" },
     { "label": "Mystery Squish", "href": "/tienda?linea=mystery" },
-    { "label": "Para tu fiesta", "href": "/fiesta" }
+    { "label": "Contacto", "href": "/contacto" }
   ],
   "hero": {
     "image": "img/patitas.jpg",
@@ -23,7 +23,7 @@
     "title": "Abre, descubre, *colecciona* e intercambia",
     "lead": "Cada squishy viene escondido en su sobre. Más de 80 modelos para descubrir. ¿Cuál te tocará?",
     "primaryCta": { "label": "Quiero mi Squish Box", "href": "/p/the-squish-box" },
-    "secondaryCta": { "label": "Pedir para mi fiesta", "href": "/fiesta" }
+    "secondaryCta": { "label": "Pedir para mi fiesta", "href": "/contacto" }
   },
   "highlights": [
     { "label": "Unboxings", "href": "#modelos" },
@@ -33,7 +33,7 @@
   ],
   "tiles": [
     { "image": "img/caja-regalo.jpg", "alt": "The Squish Box envuelta con lazo morado", "eyebrow": "4 squishies + cartilla", "title": "Cajas sorpresa", "href": "/tienda?linea=cajas" },
-    { "image": "img/mama-pensando.jpg", "alt": "Mamá pensando qué regalar en un cumpleaños", "eyebrow": "Mini Box para invitados", "title": "Para cumpleaños", "href": "/fiesta" },
+    { "image": "img/mama-pensando.jpg", "alt": "Mamá pensando qué regalar en un cumpleaños", "eyebrow": "Mini Box para invitados", "title": "Para cumpleaños", "href": "/contacto" },
     { "image": "img/ajolote.jpg", "alt": "Ajolote squishy rosado con glitter en una mano", "eyebrow": "1 squishy grande", "title": "Mystery Squish", "href": "/tienda?linea=mystery" }
   ],
   "featured": {
@@ -107,13 +107,13 @@
     "shop": [
       { "label": "Cajas sorpresa", "href": "/tienda?linea=cajas" },
       { "label": "Mystery Squish", "href": "/tienda?linea=mystery" },
-      { "label": "Para tu fiesta", "href": "/fiesta" }
+      { "label": "Contacto", "href": "/contacto" }
     ],
     "help": [
       { "label": "Entregas en Lima", "href": "/entregas" },
       { "label": "Squishy tips", "href": "/#tips" },
       { "label": "Cambios y devoluciones", "href": "/cambios-y-devoluciones" },
-      { "label": "Contáctanos", "href": "/contacto" }
+      { "label": "Contacto", "href": "/contacto" }
     ]
   },
   "business": {
@@ -137,7 +137,7 @@
   },
   "product": {
     "variantQuestion": "¿Cuántos squishies?",
-    "partyHint": "¿Son para todos tus invitados? [Cotiza tu fiesta](/fiesta) y te armamos todas las que necesites.",
+    "partyHint": "¿Son para todos tus invitados? [Cotiza tu fiesta](/contacto) y te armamos todas las que necesites.",
     "deliveryNote": "**Entrega coordinada.** Después de tu compra te escribimos por WhatsApp para acordar fecha y hora. El delivery se calcula según tu distrito.",
     "tipsTitle": "Squishy tips",
     "soldOutAllText": "Déjanos tu correo y te avisamos cuando vuelva. O pide Mini Box sorpresa para los invitados de tu fiesta.",
@@ -148,7 +148,7 @@
     "emptyTitle": "Tu carrito está *vacío*",
     "emptyLead": "¿Listo para descubrir cuál te toca? Elige tu caja sorpresa o arma las sorpresas de tu fiesta.",
     "emptyPrimary": { "label": "Ver cajas sorpresa", "href": "/tienda" },
-    "emptySecondary": { "label": "Para tu fiesta", "href": "/fiesta" },
+    "emptySecondary": { "label": "Contacto", "href": "/contacto" },
     "popularTitle": "Los más pedidos",
     "popularIds": ["the-squish-box", "mystery-squish", "mini-box-cumple", "mini-box-recompra"],
     "deliveryNote": "Coordinamos fecha y hora de entrega por WhatsApp después de tu compra."

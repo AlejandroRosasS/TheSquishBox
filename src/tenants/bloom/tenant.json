@@ -98,10 +98,11 @@
   "highlights": [],
   "customOrder": {
     "enabled": true,
-    "label": "A medida",
-    "description": "Diseñamos piezas a medida para tu espacio",
-    "adminLabel": "Pedidos a medida",
-    "adminShort": "A medida"
+    "form": "contact",
+    "label": "Contacto",
+    "description": "Mensajes que llegan desde la página Contacto",
+    "adminLabel": "Mensajes de contacto",
+    "adminShort": "Contacto"
   },
   "payments": {
     "provider": "culqi",

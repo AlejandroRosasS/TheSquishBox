@@ -1,5 +1,6 @@
 "use client";
 
+import { customOrderHref, isContactForm } from "@/lib/customOrder";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import type { Product } from "@/lib/types";
@@ -191,7 +192,7 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
                   <div className="row g3 wrap-row">
                     <button className="btn ghost grow" type="submit">Avísame cuando vuelva</button>
                     {allOut && tenant.customOrder.enabled && (
-                      <Link className="btn grow" href="/fiesta">Pídela {tenant.customOrder.label.toLowerCase()}</Link>
+                      <Link className="btn grow" href={customOrderHref(tenant)}>{isContactForm(tenant) ? tenant.customOrder.label : `Pídela ${tenant.customOrder.label.toLowerCase()}`}</Link>
                     )}
                   </div>
                 </>

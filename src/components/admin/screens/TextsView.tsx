@@ -14,6 +14,7 @@ import { previewPage } from "../PreviewPage";
 import type { PreviewFocus } from "../previewFocus";
 import { AIUndo } from "../AdminIcons";
 import { COMPLAINTS_ROUTE, CONTACT_ROUTE, LEGAL_ROUTES } from "@/lib/legal";
+import { customOrderHref, isContactForm } from "@/lib/customOrder";
 
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -57,7 +58,8 @@ export function TextsView() {
   const { tenant, catalog } = bundle;
   const doc = useDoc<Storefront>("texts", bundle.storefront);
   const [appearance] = useStoredDoc<{ tokens: Tokens }>("appearance");
-  const sections = TEXT_SECTIONS.filter((s) => !s.needsCustomOrder || tenant.customOrder.enabled);
+  const form = isContactForm(tenant) ? "contact" : "party";
+  const sections = TEXT_SECTIONS.filter((s) => (!s.needsCustomOrder || tenant.customOrder.enabled) && (!s.form || s.form === form));
   const [secId, setSecIdRaw] = useState(sections[1]?.id ?? sections[0].id);
   /** Campo con foco en el editor (ej. "tiles.1.title"): la vista previa lo resalta. */
   const [fieldPath, setFieldPath] = useState<string | null>(null);
@@ -82,7 +84,7 @@ export function TextsView() {
       "/tienda",
       ...catalog.lines.map((l) => `/tienda?linea=${l.id}`),
       ...catalog.products.map((p) => `/p/${p.id}`),
-      ...(tenant.customOrder.enabled ? ["/fiesta"] : []),
+      ...(tenant.customOrder.enabled ? [customOrderHref(tenant)] : []),
       "/carrito",
       ...Object.values(LEGAL_ROUTES),
       CONTACT_ROUTE,
@@ -90,7 +92,7 @@ export function TextsView() {
       "#modelos",
       "#tips",
     ],
-    [catalog, tenant.customOrder.enabled],
+    [catalog, tenant],
   );
 
   const changedFromPublished = (keys: (keyof Storefront)[]) => keys.some((k) => !same(sf[k], doc.published[k]));

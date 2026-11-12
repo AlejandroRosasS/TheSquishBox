@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { DELIVERY_STATUS, money, ORDER_STATUS, PARTY_STATUS } from "@/lib/admin/format";
+import { DELIVERY_STATUS, money, ORDER_STATUS, partyStatus } from "@/lib/admin/format";
 import type { DemoOrder, PartyRequest } from "@/lib/admin/types";
 import { useAdmin, useAdminCatalog, useOrders, useParty } from "../AdminContext";
 import { AdminPage } from "../AdminPage";
@@ -62,7 +62,7 @@ export function OrdersView() {
         <div className="stack g1">
           <h1 className="a-h1">Pedidos</h1>
           <p className="a-sub">
-            {nNew} nuevos{parties.length ? ` · ${nParty} de ${partyLabel.toLowerCase()} por cotizar` : ""} · {nDiff} diferencias de delivery por resolver
+            {nNew} nuevos{parties.length ? ` · ${nParty} de ${partyLabel.toLowerCase()} ${customOrder.form === "contact" ? "por responder" : "por cotizar"}` : ""} · {nDiff} diferencias de delivery por resolver
           </p>
         </div>
         <div className="row g2" style={{ flexWrap: "wrap" }}>
@@ -81,19 +81,23 @@ export function OrdersView() {
         <div className="a-table">
           <div className="a-tr head" style={cols}><span>Pedido</span><span>Cliente y productos</span><span>Entrega</span><span>Total</span><span>Delivery</span><span>Estado</span></div>
           {partyRows.map((r) => {
-            const [sl, sc] = PARTY_STATUS[r.status];
+            const [sl, sc] = partyStatus(r);
             const total = (parseFloat(r.price) || 0) + (parseFloat(r.deliveryFee) || 0);
             return (
               <Link key={r.id} className="a-tr" href={`/admin/pedidos/${r.id}`} style={cols}>
                 <span className="c-d" style={{ fontWeight: 700 }}>#{r.id}</span>
                 <span className="stack">
                   <span className="row g2"><b>{r.name}</b><span className="st nuevo">{partyLabel}</span></span>
-                  <span className="a-cap">{r.qty} · {r.size}</span>
-                  <span className="c-m a-cap" style={{ marginTop: 2 }}>#{r.id} · {r.district} · {r.date}</span>
+                  {r.contact ? (
+                    <span className="a-cap" style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{[r.reason, r.idea].filter(Boolean).join(" · ")}</span>
+                  ) : (
+                    <span className="a-cap">{r.qty} · {r.size}</span>
+                  )}
+                  <span className="c-m a-cap" style={{ marginTop: 2 }}>#{r.id}{r.contact ? "" : ` · ${r.district} · ${r.date}`}</span>
                 </span>
-                <span className="c-d stack"><span>{r.district}</span><span className="a-cap">{r.date}</span></span>
+                <span className="c-d stack">{r.contact ? <span className="a-cap">—</span> : <><span>{r.district}</span><span className="a-cap">{r.date}</span></>}</span>
                 <span className="money" style={{ fontWeight: 700, textAlign: "right" }}>
-                  {total ? money(total) : <span className="a-cap">Por cotizar</span>}
+                  {total ? money(total) : <span className="a-cap">{r.contact ? "Por responder" : "Por cotizar"}</span>}
                   <span className="c-m" style={{ marginTop: 6 }}><span className={`st ${sc}`}>{sl}</span></span>
                 </span>
                 <span className="c-d"><span className="a-cap">Recibido {r.when}</span></span>

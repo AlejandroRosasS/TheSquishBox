@@ -1,5 +1,5 @@
 import { formatPrice } from "@/lib/format";
-import { dayLabel, orderCode, partyCode, type OrderRow } from "@/lib/db/orders";
+import { dayLabel, isContactParty, orderCode, partyCode, type OrderRow } from "@/lib/db/orders";
 
 export type AlertMessage = {
   /** Primera línea, también asunto del correo. */
@@ -24,7 +24,16 @@ export function orderMessage(o: OrderRow, origin: string): AlertMessage {
 
   if (o.kind === "party") {
     const p = (o.party ?? {}) as Record<string, unknown>;
-    const code = partyCode(o.number);
+    const code = partyCode(o.number, p);
+    if (isContactParty(p)) {
+      const reason = str(p.reason);
+      return {
+        title: `Nuevo mensaje de contacto ${code}`,
+        lines: [who, reason ? `Motivo: ${reason}` : "", str(c.email), str(p.idea)].filter(Boolean),
+        oneLine: [code, str(c.name), reason, str(p.idea).replace(/\s+/g, " ").slice(0, 120)].filter(Boolean).join(" · "),
+        url: `${origin}/admin/pedidos/${code}`,
+      };
+    }
     const what = [str(p.qty), str(p.box), str(p.size)].filter(Boolean).join(" · ");
     const where = [str(d.district), date].filter(Boolean).join(" · ");
     const lines = [who, where, what, str(p.extras), str(p.idea)].filter(Boolean);

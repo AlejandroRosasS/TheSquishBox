@@ -1,6 +1,7 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
+import { isContactForm, PARTY_ROUTE } from "@/lib/customOrder";
 import { useId, useMemo } from "react";
 import type { Seo, SeoPage } from "@/lib/types";
 import { asset } from "@/lib/assets";
@@ -57,7 +58,10 @@ export function SeoView() {
 
   const pages: { key: string; name: string; path: string; fallback: SeoPage }[] = [
     { key: "tienda", name: "Tienda (catálogo)", path: "/tienda", fallback: { title: "Tienda", description: "" } },
-    ...(tenant.customOrder.enabled ? [{ key: "fiesta", name: tenant.customOrder.label, path: "/fiesta", fallback: { title: tenant.customOrder.label, description: tenant.customOrder.description } }] : []),
+    // Con el formulario en Contacto no hay página aparte (Contacto toma sus textos de Admin › Textos).
+    ...(tenant.customOrder.enabled && !isContactForm(tenant)
+      ? [{ key: "fiesta", name: tenant.customOrder.label, path: PARTY_ROUTE, fallback: { title: tenant.customOrder.label, description: tenant.customOrder.description } }]
+      : []),
     { key: "carrito", name: "Carrito", path: "/carrito", fallback: { title: "Tu carrito", description: "" } },
   ];
   const setPage = (key: string, patch: Partial<SeoPage>) => set({ pages: { ...seo.pages, [key]: { ...(seo.pages[key] ?? { title: "", description: "" }), ...patch } } });

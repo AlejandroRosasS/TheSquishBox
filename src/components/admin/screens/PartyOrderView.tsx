@@ -2,14 +2,14 @@
 
 /* eslint-disable @next/next/no-img-element */
 import { asset } from "@/lib/assets";
-import { money, PARTY_STATUS } from "@/lib/admin/format";
+import { money, partyStatus } from "@/lib/admin/format";
 import { useAdmin, useParty } from "../AdminContext";
 import { useOrdersFromDb } from "../AdminOrders";
 import { AdminPage, DemoNote } from "../AdminPage";
 import { AICheck, AIInfo, AIWhatsApp } from "../AdminIcons";
 import { waTo } from "./OrderView";
 
-/** Detalle de un pedido para fiesta (cotización). Vive dentro de Pedidos: /admin/pedidos/<id>. */
+/** Detalle de un pedido para fiesta (cotización) o de un mensaje del formulario de Contacto. Vive dentro de Pedidos: /admin/pedidos/<id>. */
 export function PartyOrderView({ id }: { id: string }) {
   const { bundle, toast } = useAdmin();
   const { tenant } = bundle;
@@ -29,12 +29,14 @@ export function PartyOrderView({ id }: { id: string }) {
   const price = parseFloat(cur.price) || 0;
   const fee = parseFloat(cur.deliveryFee) || 0;
   const first = cur.name.split(" ")[0] ?? "";
+  const [sl, sc] = partyStatus(cur);
+  const title = cur.contact ? `Mensaje ${cur.id}` : `Pedido ${cur.id}`;
 
   return (
-    <AdminPage title={`Pedido ${cur.id}`} back={{ href: "/admin/pedidos", label: "Pedidos" }}>
+    <AdminPage title={title} back={{ href: "/admin/pedidos", label: "Pedidos" }}>
       <div className="a-head">
         <div className="stack g1">
-          <h1 className="a-h1">Pedido {cur.id} <span className="st nuevo" style={{ verticalAlign: "middle" }}>{label}</span></h1>
+          <h1 className="a-h1">{title} <span className="st nuevo" style={{ verticalAlign: "middle" }}>{label}</span></h1>
           <p className="a-sub">Recibido {cur.when} · {tenant.customOrder.description}</p>
         </div>
       </div>
@@ -43,8 +45,13 @@ export function PartyOrderView({ id }: { id: string }) {
         <div className="a-card">
           <div className="a-card-h" style={{ alignItems: "flex-start" }}>
             <div className="stack g1"><p className="a-cap">{cur.id} · {cur.when}</p><h2 className="a-h2" style={{ fontSize: 20 }}>{cur.name}</h2><p className="a-cap">{cur.phone} · {cur.mail}</p></div>
-            <span className={`st ${PARTY_STATUS[cur.status][1]}`}>{PARTY_STATUS[cur.status][0]}</span>
+            <span className={`st ${sc}`}>{sl}</span>
           </div>
+          {cur.contact ? (
+            <dl className="kv">
+              <dt>Motivo</dt><dd>{cur.reason || "—"}</dd>
+            </dl>
+          ) : (
           <dl className="kv">
             {cur.box && <><dt>Caja</dt><dd>{cur.box}</dd></>}
             <dt>Cantidad</dt><dd>{cur.qty}</dd>
@@ -54,7 +61,8 @@ export function PartyOrderView({ id }: { id: string }) {
             <dt>Fecha</dt><dd>{cur.date}</dd>
             <dt>Entrega</dt><dd>{cur.district}</dd>
           </dl>
-          {cur.idea && <div style={{ background: "#F5F5F2", borderRadius: 10, padding: "12px 14px" }}><p className="a-label" style={{ marginBottom: 4 }}>Comentarios</p><p>{cur.idea}</p></div>}
+          )}
+          {cur.idea && <div style={{ background: "#F5F5F2", borderRadius: 10, padding: "12px 14px" }}><p className="a-label" style={{ marginBottom: 4 }}>{cur.contact ? "Mensaje" : "Comentarios"}</p><p style={{ whiteSpace: "pre-wrap" }}>{cur.idea}</p></div>}
           {cur.refs.length > 0 && (
             <>
               <p className="a-label">Fotos de referencia ({cur.refs.length})</p>
@@ -62,11 +70,14 @@ export function PartyOrderView({ id }: { id: string }) {
             </>
           )}
           <div className="row g2 wrap-row">
-            {waTo(cur.phone) ? <a className="a-btn wa" href={waTo(cur.phone, `Hola ${first}, te escribimos de ${tenant.name} por tu pedido ${cur.id}.`) ?? "#"} target="_blank" rel="noreferrer"><AIWhatsApp />Responder por WhatsApp</a> : null}
+            {waTo(cur.phone) ? <a className="a-btn wa" href={waTo(cur.phone, cur.contact ? `Hola ${first}, te escribimos de ${tenant.name} por tu mensaje.` : `Hola ${first}, te escribimos de ${tenant.name} por tu pedido ${cur.id}.`) ?? "#"} target="_blank" rel="noreferrer"><AIWhatsApp />Responder por WhatsApp</a> : null}
+            {cur.contact && cur.status === "nueva" && <button className="a-btn" type="button" onClick={() => { update(cur.id, { status: "cotizada" }); toast("Marcado como respondido"); }}><AICheck size="sm" />Marcar como respondido</button>}
+            {cur.contact && cur.status !== "nueva" && <button className="a-btn" type="button" onClick={() => update(cur.id, { status: "nueva" })}>Volver a «Nuevo»</button>}
             {cur.status !== "descartada" && <button className="a-btn danger" type="button" onClick={() => { update(cur.id, { status: "descartada" }); toast("Descartado"); }}>Descartar</button>}
           </div>
         </div>
 
+        {!cur.contact && (
         <div className="a-card">
           <h2 className="a-h2">Cotización</h2>
           <div className="a-grid2">
@@ -88,6 +99,7 @@ export function PartyOrderView({ id }: { id: string }) {
           )}
           {cur.status === "descartada" && <button className="a-btn" type="button" onClick={() => update(cur.id, { status: "nueva" })}>Volver a «Nuevo»</button>}
         </div>
+        )}
         {!fromDb && <DemoNote>Solicitudes de ejemplo. Los cambios se guardan en este navegador.</DemoNote>}
       </section>
       </div>

@@ -35,7 +35,11 @@ export type Tenant = {
   defaultPalette: string;
   palettes: Record<string, PaletteTokens>;
   highlights: string[];
-  customOrder: { enabled: boolean; label: string; description: string; adminLabel?: string; adminShort?: string };
+  /**
+   * Página de pedido especial de la marca. `form`: "party" = formulario de cotización (/fiesta);
+   * "contact" = formulario en la página Contacto (/contacto) con motivo y mensaje; /fiesta redirige ahí. Sin `form` = "party".
+   */
+  customOrder: { enabled: boolean; label: string; description: string; adminLabel?: string; adminShort?: string; form?: "party" | "contact" };
   payments: {
     provider: string;
     methods: string[];
@@ -208,6 +212,18 @@ export type Storefront = {
     extrasOptions: string[];
     districts: string[];
     commentsPlaceholder: string;
+    footnote: string;
+    sentTitle: string;
+    sentLead: string;
+  };
+  /** Formulario de la página Contacto (/contacto). Se edita en Admin › Textos › Contacto. */
+  contactForm: {
+    formTitle: string;
+    reasonLabel: string;
+    reasons: string[];
+    messageLabel: string;
+    messagePlaceholder: string;
+    submitLabel: string;
     footnote: string;
     sentTitle: string;
     sentLead: string;

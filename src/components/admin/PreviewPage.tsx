@@ -139,6 +139,8 @@ export function previewPage(secId: string, path: string | null, bundle: TenantBu
     }
     case "party":
       return { where: "Pedido especial", node: <PartyForm />, chrome: true, scope: ["main"] };
+    case "contactForm":
+      return { where: "Contacto", node: <ContactView bundle={bundle} />, chrome: true, scope: ["main"] };
     case "notFound":
       return {
         where: "Página no encontrada (404)",

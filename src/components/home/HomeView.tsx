@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { customOrderHref, isContactForm } from "@/lib/customOrder";
 import type { TenantBundle } from "@/tenants";
 import { Photo } from "@/components/Photo";
 import { SLOTS } from "@/lib/media";
@@ -13,7 +14,7 @@ export function HomeView({ bundle }: { bundle: TenantBundle }) {
   const featured = sf.featured.productIds
     .map((id) => catalog.products.find((p) => p.id === id))
     .filter((p) => p && p.status !== "draft") as typeof catalog.products;
-  const soldOutSuffix = tenant.customOrder.enabled ? `pídela ${tenant.customOrder.label.toLowerCase()}` : undefined;
+  const soldOutSuffix = tenant.customOrder.enabled && !isContactForm(tenant) ? `pídela ${tenant.customOrder.label.toLowerCase()}` : undefined;
   const ig = `https://www.instagram.com/${tenant.instagram}/`;
   const models = sf.models.photos
     ? sf.models.photos.map((m) => ({ name: m.alt, image: m.image }))
@@ -100,7 +101,7 @@ export function HomeView({ bundle }: { bundle: TenantBundle }) {
                   </li>
                 ))}
               </ol>
-              <div><Link className="btn light" href="/fiesta">{sf.partyBand.cta}</Link></div>
+              <div><Link className="btn light" href={customOrderHref(tenant)}>{sf.partyBand.cta}</Link></div>
             </div>
           </div>
         </section>
