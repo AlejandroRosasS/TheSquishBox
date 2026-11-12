@@ -154,6 +154,13 @@ export function SeoView() {
               <input id="seo-gv" className="a-input" value={seo.googleVerification} placeholder="Ej.: AbC123…" onChange={(e) => set({ googleVerification: e.target.value.trim() })} />
               <span className="a-cap">Pega solo el código del meta tag «google-site-verification». Sirve para ver cómo te encuentran en Google.</span>
             </div>
+            <div className="row between g3">
+              <div>
+                <b>Mapa del sitio (sitemap.xml)</b>
+                <p className="a-cap">Se arma solo con la portada, el catálogo, cada producto publicado, Contacto y las páginas legales. En Search Console, envía <code>sitemap.xml</code> en la sección Sitemaps.</p>
+              </div>
+              <a className="a-btn sm" href="/sitemap.xml" target="_blank" rel="noreferrer">Ver sitemap</a>
+            </div>
             <p className="a-cap">Mientras la tienda esté en construcción, el sitio de demo no se indexa aunque esto esté encendido.</p>
           </section>
         </div>

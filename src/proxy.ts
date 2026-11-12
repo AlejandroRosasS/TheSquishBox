@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { cleanHost, isPreviewHost, storeLive } from "@/lib/hosts";
 
 /**
  * Mientras la tienda de una marca está en construcción:
@@ -8,16 +9,15 @@ import { NextResponse, type NextRequest } from "next/server";
  * Para lanzar la tienda en el dominio principal, pon STORE_LIVE=1 en las variables del proyecto.
  * Con la tienda lanzada, demo.<dominio> y *.vercel.app siguen sin indexar para que Google
  * solo vea el dominio principal (sin contenido duplicado).
+ * /robots.txt y /sitemap.xml no pasan por aquí (ver matcher): se arman en src/lib/sitemap.ts.
  */
-const PREVIEW_HOSTS = /^(demo\.|localhost$|127\.0\.0\.1$)|\.vercel\.app$/i;
-
 export function proxy(request: NextRequest) {
-  const host = (request.headers.get("host") ?? "").split(":")[0];
+  const host = cleanHost(request.headers.get("host"));
   const { pathname } = request.nextUrl;
 
-  const preview = !host || PREVIEW_HOSTS.test(host);
+  const preview = isPreviewHost(host);
 
-  if (process.env.STORE_LIVE === "1" && !preview) return NextResponse.next();
+  if (storeLive() && !preview) return NextResponse.next();
 
   if (!preview) {
     // /pronto y las rutas del servidor (cron de Instagram, webhooks) siguen funcionando.
