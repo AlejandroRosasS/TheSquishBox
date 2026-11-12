@@ -169,3 +169,122 @@ export function isLong(key: string, value: string) {
 
 export const isImageKey = (key: string) => key === "image";
 export const isRichCandidate = (key: string) => /title|lead|text|Hint|Note|note/i.test(key);
+
+/**
+ * Etiqueta HTML/SEO con la que la tienda publica cada campo de Textos.
+ * Clave: ruta dentro de storefront con los índices de listas como `*` (ej. "tips.items.*.title").
+ * Debe seguir a los componentes de la tienda (HomeView, ContactView, LegalView…): si cambia
+ * el HTML de una página, actualiza aquí su etiqueta.
+ */
+export type SeoTag = { tags: string[]; hint?: string };
+
+const H1 = "Título principal de la página (H1): lo primero que Google lee para saber de qué trata. Hay uno solo por página.";
+const H2 = "Subtítulo de sección (H2): ayuda a Google a entender las partes de la página.";
+const ALT = "Texto alternativo (alt): lo leen Google Imágenes y los lectores de pantalla. Describe lo que se ve.";
+const TITLE_TAG = "También es el título de la pestaña y del resultado en Google (<title>).";
+const META = "También es la meta description: el texto gris debajo del título en Google.";
+const LINK = "Texto del enlace (<a>): dice a Google a qué página lleva.";
+const NOT_META = "Párrafo visible (<p>). La meta description de Inicio se edita en Admin › SEO.";
+
+const p = (hint?: string): SeoTag => ({ tags: ["p"], hint });
+const h = (n: 1 | 2 | 3 | 4, hint?: string): SeoTag => ({ tags: [`h${n}`], hint });
+const a: SeoTag = { tags: ["a"], hint: LINK };
+const alt: SeoTag = { tags: ["alt"], hint: ALT };
+const eyebrow = p("Texto chico arriba del título (<p>, no es encabezado).");
+
+const SEO_TAGS: Record<string, SeoTag> = {
+  "nav.*.label": { tags: ["a", "nav"], hint: "Enlace del menú principal (<nav>)." },
+  "hero.eyebrow": eyebrow,
+  "hero.title": h(1, H1),
+  "hero.lead": p(NOT_META),
+  "hero.alt": { tags: ["alt"], hint: `${ALT} Es la foto más importante de Inicio.` },
+  "hero.primaryCta.label": a,
+  "hero.secondaryCta.label": a,
+  "highlights.*.label": a,
+  "tiles.*.alt": alt,
+  "tiles.*.eyebrow": { tags: ["span"], hint: "Va dentro del enlace del acceso; no es encabezado." },
+  "tiles.*.title": { tags: ["span", "a"], hint: "Se ve grande pero no es encabezado: es el texto del enlace del acceso." },
+  "featured.eyebrow": eyebrow,
+  "featured.title": h(2, H2),
+  "featured.viewAll": a,
+  "featured.viewAllMobile": a,
+  "partyBand.eyebrow": eyebrow,
+  "partyBand.title": h(2, H2),
+  "partyBand.lead": p(),
+  "partyBand.alt": alt,
+  "partyBand.steps": { tags: ["li"], hint: "Lista numerada (<ol>)." },
+  "partyBand.cta": a,
+  "inside.eyebrow": eyebrow,
+  "inside.title": h(2, H2),
+  "inside.lead": p(),
+  "inside.body": p(),
+  "inside.alt": alt,
+  "models.eyebrow": eyebrow,
+  "models.title": h(2, H2),
+  "models.footnote": p(),
+  "models.photos.*.alt": { tags: ["alt"], hint: `${ALT} Pon el nombre del modelo.` },
+  "tips.eyebrow": eyebrow,
+  "tips.title": h(2, H2),
+  "tips.items.*.title": h(3),
+  "tips.items.*.text": p(),
+  "footer.about": p(),
+  "footer.shop.*.label": a,
+  "footer.help.*.label": a,
+  "contact.eyebrow": { tags: ["p", "title"], hint: `Texto chico arriba del título. ${TITLE_TAG}` },
+  "contact.title": h(1, H1),
+  "contact.lead": { tags: ["p", "meta description"], hint: META },
+  "contactForm.formTitle": h(2),
+  "contactForm.sentTitle": h(2),
+  "contactForm.sentLead": p(),
+  "contactForm.footnote": p(),
+  "legalPages.*.title": { tags: ["h1", "title"], hint: `${H1} ${TITLE_TAG}` },
+  "legalPages.*.lead": { tags: ["p", "meta description"], hint: META },
+  "legalPages.*.sections.*.title": h(2, H2),
+  "legalPages.*.sections.*.text": p(),
+  "complaints.title": { tags: ["h1", "title"], hint: `${H1} ${TITLE_TAG}` },
+  "complaints.lead": { tags: ["p", "meta description"], hint: META },
+  "catalog.title": h(1, H1),
+  "catalog.lead": p("Párrafo visible (<p>). La meta description de la tienda se edita en Admin › SEO."),
+  "catalog.partyCta.title": p("Se ve como título pero es un párrafo (<p>)."),
+  "catalog.partyCta.text": p(),
+  "catalog.partyCta.cta": a,
+  "product.moreTitle": h(2),
+  "product.tipsTitle": h(3),
+  "cart.emptyTitle": { tags: ["h1"], hint: "Título del carrito vacío. El carrito no aparece en Google (noindex)." },
+  "cart.emptyLead": p(),
+  "cart.popularTitle": h(2),
+  "cart.emptyPrimary.label": a,
+  "cart.emptySecondary.label": a,
+  "confirmation.title": { tags: ["h1"], hint: "Página privada del pedido: no aparece en Google (noindex)." },
+  "confirmation.lead": p(),
+  "party.eyebrow": eyebrow,
+  "party.title": h(1, H1),
+  "party.lead": p(),
+  "party.imageAlt": alt,
+  "party.sentTitle": h(1),
+  "party.sentLead": p(),
+  "notFound.title": { tags: ["h1"], hint: "Título de la página 404 (Google no la indexa)." },
+  "notFound.lead": p(),
+  "notFound.alt": alt,
+};
+
+/** Etiqueta HTML/SEO del campo en `path` (ej. "hero.title" → h1). */
+export function seoTagFor(path: string): SeoTag | undefined {
+  const norm = path.replace(/\.\d+(?=\.|$)/g, ".*");
+  return SEO_TAGS[norm] ?? SEO_TAGS[norm.replace(/\.\*$/, "")];
+}
+
+/** Campos que también salen como <title> o meta description (su largo cuenta en Google). */
+const LIMITS: Record<string, number> = { title: 60, "meta description": 160 };
+
+/** Aviso de SEO para el valor de un campo, o null si está bien. */
+export function seoWarning(tag: SeoTag | undefined, value: string): string | null {
+  if (!tag) return null;
+  const v = value.trim();
+  if (tag.tags.includes("h1") && !v) return "Sin H1 la página pierde su título principal para Google.";
+  if (tag.tags.includes("alt") && !v) return "Sin descripción, Google no sabe qué muestra la foto.";
+  for (const t of ["title", "meta description"]) {
+    if (tag.tags.includes(t) && v.length > LIMITS[t]) return `Google suele cortar el ${t === "title" ? "título" : "texto"} después de ${LIMITS[t]} caracteres (tiene ${v.length}).`;
+  }
+  return null;
+}
