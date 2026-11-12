@@ -25,7 +25,7 @@ insert into public.products (tenant_id, slug, name, line, badge, status, kind, o
     kind = excluded.kind, options_label = excluded.options_label,
     description = excluded.description, images = excluded.images, position = excluded.position, updated_at = now();
 insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, image, position)
-  select pr.tenant_id, pr.id, 'unica', 'Caja completa', 69, true, 24, null, 0
+  select pr.tenant_id, pr.id, 'unica', 'Caja completa', 69, false, 24, null, 0
   from public.products pr where pr.tenant_id = (select id from public.tenants where slug = 'squish') and pr.slug = 'the-squish-box'
   on conflict (product_id, key) do update set label = excluded.label, price = excluded.price,
     price_is_reference = excluded.price_is_reference, stock = excluded.stock, image = excluded.image, position = excluded.position;
@@ -35,7 +35,7 @@ insert into public.products (tenant_id, slug, name, line, badge, status, kind, o
     kind = excluded.kind, options_label = excluded.options_label,
     description = excluded.description, images = excluded.images, position = excluded.position, updated_at = now();
 insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, image, position)
-  select pr.tenant_id, pr.id, 'unica', '1 squishy grande', 29, true, 3, null, 0
+  select pr.tenant_id, pr.id, 'unica', '1 squishy grande', 29, false, 3, null, 0
   from public.products pr where pr.tenant_id = (select id from public.tenants where slug = 'squish') and pr.slug = 'mystery-squish'
   on conflict (product_id, key) do update set label = excluded.label, price = excluded.price,
     price_is_reference = excluded.price_is_reference, stock = excluded.stock, image = excluded.image, position = excluded.position;
@@ -45,12 +45,12 @@ insert into public.products (tenant_id, slug, name, line, badge, status, kind, o
     kind = excluded.kind, options_label = excluded.options_label,
     description = excluded.description, images = excluded.images, position = excluded.position, updated_at = now();
 insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, image, position)
-  select pr.tenant_id, pr.id, '2', '2 squishies', 18, true, 30, null, 0
+  select pr.tenant_id, pr.id, '2', '2 squishies', 18, false, 30, null, 0
   from public.products pr where pr.tenant_id = (select id from public.tenants where slug = 'squish') and pr.slug = 'mini-box-cumple'
   on conflict (product_id, key) do update set label = excluded.label, price = excluded.price,
     price_is_reference = excluded.price_is_reference, stock = excluded.stock, image = excluded.image, position = excluded.position;
 insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, image, position)
-  select pr.tenant_id, pr.id, '3', '3 squishies', 24, true, 4, null, 1
+  select pr.tenant_id, pr.id, '3', '3 squishies', 24, false, 4, null, 1
   from public.products pr where pr.tenant_id = (select id from public.tenants where slug = 'squish') and pr.slug = 'mini-box-cumple'
   on conflict (product_id, key) do update set label = excluded.label, price = excluded.price,
     price_is_reference = excluded.price_is_reference, stock = excluded.stock, image = excluded.image, position = excluded.position;
@@ -60,12 +60,12 @@ insert into public.products (tenant_id, slug, name, line, badge, status, kind, o
     kind = excluded.kind, options_label = excluded.options_label,
     description = excluded.description, images = excluded.images, position = excluded.position, updated_at = now();
 insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, image, position)
-  select pr.tenant_id, pr.id, '4', '4 squishies', 39, true, 15, null, 0
+  select pr.tenant_id, pr.id, '4', '4 squishies', 39, false, 15, null, 0
   from public.products pr where pr.tenant_id = (select id from public.tenants where slug = 'squish') and pr.slug = 'mini-box-recompra'
   on conflict (product_id, key) do update set label = excluded.label, price = excluded.price,
     price_is_reference = excluded.price_is_reference, stock = excluded.stock, image = excluded.image, position = excluded.position;
 insert into public.product_variants (tenant_id, product_id, key, label, price, price_is_reference, stock, image, position)
-  select pr.tenant_id, pr.id, '5', '5 squishies', 47, true, 10, null, 1
+  select pr.tenant_id, pr.id, '5', '5 squishies', 47, false, 10, null, 1
   from public.products pr where pr.tenant_id = (select id from public.tenants where slug = 'squish') and pr.slug = 'mini-box-recompra'
   on conflict (product_id, key) do update set label = excluded.label, price = excluded.price,
     price_is_reference = excluded.price_is_reference, stock = excluded.stock, image = excluded.image, position = excluded.position;
