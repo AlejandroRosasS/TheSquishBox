@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { use, useId, useMemo, useState } from "react";
 import { formatPrice } from "@/lib/format";
-import { productKind } from "@/lib/catalog";
+import { MAX_LINE_QTY, minQty, productKind } from "@/lib/catalog";
 import type { AdminProduct } from "@/lib/admin/types";
 import type { Variant } from "@/lib/types";
 import { ProductView } from "@/components/product/ProductView";
@@ -75,6 +75,7 @@ export function ProductEditorView({ params }: { params: Promise<{ id: string }> 
   }
 
   const edit = (patch: Partial<AdminProduct>) => setDraft({ ...p, ...patch });
+  const min = minQty(p);
   const options = productKind(p) === "options";
   const editVar = (i: number, patch: Partial<Variant>) => edit({ variants: p.variants.map((v, j) => (j === i ? { ...v, ...patch } : v)) });
   const dirty = draft !== null || costs !== null;
@@ -273,6 +274,21 @@ export function ProductEditorView({ params }: { params: Promise<{ id: string }> 
                 <p className="a-cap" style={{ marginTop: 10 }}>Se descuenta solo con cada venta. Al llegar a 0, {options ? "esa opción pasa" : "el producto pasa"} a «Agotado».</p>
               </div>
             )}
+            <div className="var-row" style={{ borderTop: "1px solid var(--a-border)", paddingTop: 12 }}>
+              <div>
+                <b id="ed-min">Pedido mínimo</b>
+                <p className="a-cap">
+                  {min > 1
+                    ? `En la tienda la cantidad empieza en ${min} y no se puede bajar de ahí${options ? " (por opción)" : ""}.`
+                    : "Se puede pedir desde 1 unidad. Súbelo para lo hecho a medida."}
+                </p>
+              </div>
+              <div className="stepq" role="group" aria-labelledby="ed-min">
+                <button type="button" onClick={() => edit({ minQty: min - 1 > 1 ? min - 1 : undefined })} disabled={min <= 1} aria-label="Bajar pedido mínimo">−</button>
+                <span aria-live="polite">{min}</span>
+                <button type="button" onClick={() => edit({ minQty: min + 1 })} disabled={min >= MAX_LINE_QTY} aria-label="Subir pedido mínimo">+</button>
+              </div>
+            </div>
           </section>
 
           <section className="a-card" aria-labelledby="ed-pub">
@@ -288,7 +304,7 @@ export function ProductEditorView({ params }: { params: Promise<{ id: string }> 
           <section className="a-card" aria-labelledby="ed-prev">
             <h2 className="a-h2" id="ed-prev">Así se ve en la tienda</h2>
             <StorePreview bundle={previewBundle} mode="m" maxHeight={820} label={`Vista previa de ${p.name || "este producto"} en la tienda`}>
-              <ProductView key={p.variants.map((v) => v.id).join("|")} product={p} lineLabel={lineName} />
+              <ProductView key={`${p.variants.map((v) => v.id).join("|")}·${min}`} product={p} lineLabel={lineName} />
             </StorePreview>
           </section>
           <DemoNote>Demo: los cambios de productos se guardan en este navegador y se ven en el panel. La tienda en vivo los toma cuando conectemos la base de datos (Fase 3).</DemoNote>

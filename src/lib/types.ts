@@ -90,6 +90,8 @@ export type Product = {
   images: string[];
   /** false = se vende sin contar unidades (siempre disponible salvo que se marque agotado). */
   trackStock?: boolean;
+  /** Pedido mínimo por línea del carrito (unidades de una misma opción). Si falta, 1. */
+  minQty?: number;
 };
 
 export type Line = { id: string; name: string; order: number };

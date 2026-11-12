@@ -3,7 +3,7 @@
 import type { CartLine } from "./CartProvider";
 import { useCart } from "./CartProvider";
 import { formatPrice } from "@/lib/format";
-import { hasOptions } from "@/lib/catalog";
+import { hasOptions, minQty } from "@/lib/catalog";
 import { IconMinus, IconPlus } from "@/components/Icons";
 
 /** Selector de variante + cantidad + quitar, compartido por el drawer y la página de carrito. */
@@ -19,9 +19,9 @@ export function VariantSelect({ line, currency }: { line: CartLine; currency: st
       style={{ alignSelf: "flex-start" }}
     >
       {line.product.variants.map((v) => (
-        <option key={v.id} value={v.id} disabled={v.stock <= 0}>
+        <option key={v.id} value={v.id} disabled={v.stock < minQty(line.product)}>
           {v.label} · {formatPrice(v.price, currency)}
-          {v.stock <= 0 ? " · Agotado" : ""}
+          {v.stock < minQty(line.product) ? " · Agotado" : ""}
         </option>
       ))}
     </select>
@@ -32,14 +32,16 @@ export function QtyControl({ line, compact }: { line: CartLine; compact?: boolea
   const { setQty } = useCart();
   const btn = compact ? { height: 36, width: 38 } : undefined;
   const atMax = line.qty >= line.variant.stock;
+  const min = minQty(line.product);
   return (
     <div className="qty" style={compact ? { height: 38 } : undefined}>
       <button
         type="button"
         style={btn}
         onClick={() => setQty(line.productId, line.variantId, line.qty - 1)}
-        disabled={line.qty <= 1}
+        disabled={line.qty <= min}
         aria-label={`Quitar uno de ${line.product.name}`}
+        title={min > 1 && line.qty <= min ? `Pedido mínimo: ${min} unidades` : undefined}
       >
         <IconMinus size={compact ? "xs" : "sm"} />
       </button>
@@ -55,6 +57,13 @@ export function QtyControl({ line, compact }: { line: CartLine; compact?: boolea
       </button>
     </div>
   );
+}
+
+/** «Pedido mínimo: N» debajo de la cantidad, solo si el producto tiene un mínimo mayor a 1. */
+export function MinQtyNote({ line }: { line: CartLine }) {
+  const min = minQty(line.product);
+  if (min <= 1) return null;
+  return <p className="small muted" style={{ fontSize: 12 }}>Pedido mínimo: {min} unidades</p>;
 }
 
 export function RemoveButton({ line }: { line: CartLine }) {
