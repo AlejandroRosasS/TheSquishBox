@@ -18,3 +18,13 @@ export function whatsappLink(phone: string, text?: string): string | null {
   if (/x/i.test(phone) || digits.length < 9) return null;
   return `https://wa.me/${digits}${text ? `?text=${encodeURIComponent(text)}` : ""}`;
 }
+
+/** Texto sin las marcas de `Rich` (*énfasis*, **negrita**, [texto](/ruta)): para <title>, meta y alt. */
+export function plainText(text: string): string {
+  return text
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/\*([^*]+)\*/g, "$1")
+    .replace(/\s*\n\s*/g, " ")
+    .trim();
+}

@@ -3,6 +3,7 @@ import type { TenantBundle } from "@/tenants";
 import type { Product, Seo, SeoPage } from "./types";
 import { asset } from "./assets";
 import { validDomain } from "./hosts";
+import { plainText } from "./format";
 
 /** Nombre de página que reconoce Admin › SEO (las rutas públicas que se indexan). */
 export type SeoPageKey = "tienda" | "fiesta" | "carrito";
@@ -56,10 +57,12 @@ function og(bundle: TenantBundle, path: string, title: string, description: stri
  * metadataBase (el dominio de la marca), igual que el sitemap.
  */
 function build(bundle: TenantBundle, page: SeoPage, path: string, image?: string): Metadata {
-  const description = page.description || bundle.seo.description;
-  const full = applyTemplate(bundle.seo, page.title);
+  // Sin marcas de formato: un *énfasis* del texto no debe llegar con asteriscos a Google.
+  const description = plainText(page.description || bundle.seo.description);
+  const title = plainText(page.title);
+  const full = applyTemplate(bundle.seo, title);
   return {
-    title: page.title,
+    title,
     description,
     alternates: { canonical: path },
     openGraph: og(bundle, path, full, description, image),

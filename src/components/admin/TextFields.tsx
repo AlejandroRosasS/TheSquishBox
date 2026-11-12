@@ -1,7 +1,8 @@
 "use client";
 
 import { useId, type ReactNode } from "react";
-import { HIDDEN_KEYS, PRODUCT_LIST_KEYS, isImageKey, isLong, isRichCandidate, itemLabelFor, labelFor } from "@/lib/admin/textSchema";
+import { HIDDEN_KEYS, PRODUCT_LIST_KEYS, isImageKey, isLong, isRichCandidate, itemLabelFor, labelFor, seoTagFor, seoWarning } from "@/lib/admin/textSchema";
+import { plainText } from "@/lib/format";
 import { AIDown, AIPlus, AITrash, AIUp } from "./AdminIcons";
 import { Switch } from "./AdminPage";
 import { BUSINESS_TOGGLES } from "@/lib/legal";
@@ -39,19 +40,46 @@ function move<T>(arr: T[], i: number, d: number): T[] {
   return out;
 }
 
-function TextInput({ k, value, onChange }: { k: string; value: string; onChange: (v: string) => void }) {
+/** Etiquetas HTML/SEO del campo (h1, alt, meta description…) al lado de su nombre. */
+function SeoTags({ tags }: { tags: string[] }) {
+  return (
+    <span className="a-seo-tags">
+      <span className="sr-only">(se publica como {tags.join(" y ")})</span>
+      {tags.map((t) => (
+        <code key={t} className="a-seo" aria-hidden="true" title="Etiqueta con la que se publica en la tienda">{t === "title" || t === "meta description" || t === "alt" ? t : `<${t}>`}</code>
+      ))}
+    </span>
+  );
+}
+
+function TextInput({ k, value, onChange, path }: { k: string; value: string; onChange: (v: string) => void; path?: string }) {
   const id = useId();
+  const hintId = useId();
   const long = isLong(k, value);
   const vars = value.match(/\{\w+\}/g);
   const marks = /\*|\[[^\]]*\]\(/.test(value);
   const rich = isRichCandidate(k) || marks;
+  const seo = path ? seoTagFor(path) : undefined;
+  const warn = seoWarning(seo, value);
+  const heading = seo?.tags.some((t) => /^h[1-6]$/.test(t));
+  const describedBy = seo?.hint || warn ? hintId : undefined;
   return (
     <div className="a-field">
-      <label htmlFor={id}>{labelFor(k)}</label>
+      <label htmlFor={id} className="a-seo-label">
+        {labelFor(k)}
+        {seo && <SeoTags tags={seo.tags} />}
+      </label>
       {long ? (
-        <textarea id={id} className="a-textarea" value={value} rows={value.length > 240 ? 7 : 3} onChange={(e) => onChange(e.target.value)} />
+        <textarea id={id} className="a-textarea" value={value} rows={value.length > 240 ? 7 : 3} aria-describedby={describedBy} onChange={(e) => onChange(e.target.value)} />
       ) : (
-        <input id={id} className="a-input" value={value} onChange={(e) => onChange(e.target.value)} list={k === "href" ? "tx-routes" : undefined} />
+        <input id={id} className="a-input" value={value} aria-describedby={describedBy} onChange={(e) => onChange(e.target.value)} list={k === "href" ? "tx-routes" : undefined} />
+      )}
+      {(seo?.hint || warn) && (
+        <span id={hintId} className="a-cap">
+          {warn && <b className="a-seo-warn">{warn} </b>}
+          {seo?.hint}
+          {heading && marks && <> En Google se lee sin asteriscos: «{plainText(value)}».</>}
+        </span>
       )}
       {(vars || (rich && marks)) && (
         <span className="a-cap">
@@ -124,7 +152,7 @@ export function FieldEditor({ k, value, onChange, ctx, depth = 0, path = k, inLi
           <div className="color-in"><input id={id} type="color" value={/^#[0-9a-f]{6}$/i.test(value) ? value : "#000000"} onChange={(e) => onChange(e.target.value.toUpperCase())} /><span className="a-cap">{value}</span></div>
         </div>
       );
-    return <div data-path={path}><TextInput k={k} value={value} onChange={onChange} /></div>;
+    return <div data-path={path}><TextInput k={k} path={path} value={value} onChange={onChange} /></div>;
   }
   if (typeof value === "number") {
     return (
@@ -150,7 +178,7 @@ export function FieldEditor({ k, value, onChange, ctx, depth = 0, path = k, inLi
             {!simple && <p className="a-label">{itemLabelFor(k)} {i + 1}</p>}
             <div className="grow stack g3">
               {simple ? (
-                <TextInput k={k} value={item as string} onChange={(v) => onChange(items.map((x, j) => (j === i ? v : x)))} />
+                <TextInput k={k} path={at(i)} value={item as string} onChange={(v) => onChange(items.map((x, j) => (j === i ? v : x)))} />
               ) : (
                 <ObjectFields k={k} path={at(i)} inList obj={item as Record<string, Json>} ctx={ctx} depth={depth + 1} onChange={(v) => onChange(items.map((x, j) => (j === i ? v : x)))} />
               )}

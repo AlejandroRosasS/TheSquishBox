@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import type { TenantBundle } from "@/tenants";
 import { Logo } from "./Logo";
 import { IconBook, IconInstagram, IconMail, IconWhatsApp } from "./Icons";
-import { whatsappLink } from "@/lib/format";
+import { plainText, whatsappLink } from "@/lib/format";
 import { businessOf, COMPLAINTS_ROUTE, isPlaceholder, isShown, LEGAL_ROUTES } from "@/lib/legal";
 
 /** `year` lo pasa el layout del servidor (cacheado); en la vista previa del admin se calcula en el cliente. */
@@ -80,7 +80,7 @@ export function Footer({ bundle, year }: { bundle: TenantBundle; year?: ReactNod
         </div>
         <Link className="book-link" href={COMPLAINTS_ROUTE}>
           <IconBook size="sm" />
-          <span>{storefront.complaints.title}</span>
+          <span>{plainText(storefront.complaints.title)}</span>
         </Link>
       </div>
     </footer>

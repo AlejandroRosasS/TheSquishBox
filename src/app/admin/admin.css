@@ -581,3 +581,9 @@ button.a-tr.inv-row:focus-visible { outline: 3px solid var(--a-focus); outline-o
 .usr-role-card li.ok::before { content: "✓"; color: var(--a-green); }
 .usr-role-card li.no::before { content: "✕"; color: var(--a-red); }
 .usr-role-card li.no { color: var(--a-text-2); }
+
+/* Textos: etiqueta HTML/SEO de cada campo (h1, alt, meta description…) */
+.a-seo-label { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.a-seo-tags { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+.a-seo { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; font-weight: 600; line-height: 1; padding: 3px 6px; border-radius: 6px; background: var(--a-blue-bg); color: var(--a-blue); }
+.a-seo-warn { color: var(--a-amber); font-weight: 600; }

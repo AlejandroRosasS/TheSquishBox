@@ -10,6 +10,7 @@ import {
   type Complaint, type ComplaintInput,
 } from "@/lib/legal";
 import { ComplaintSheet } from "./ComplaintSheet";
+import { Rich } from "@/components/Rich";
 
 const EMPTY: ComplaintInput = {
   consumer: { name: "", docType: "DNI", docNumber: "", address: "", phone: "", email: "", guardian: "" },
@@ -122,7 +123,7 @@ export function ComplaintForm() {
       <div className="stack g5" style={{ maxWidth: 760, margin: "0 auto" }}>
         <header className="stack g3">
           <p className="eyebrow">{tenant.name}</p>
-          <h1 className="h1">{sf.complaints.title}</h1>
+          <h1 className="h1"><Rich text={sf.complaints.title} /></h1>
           <p className="lead">{sf.complaints.lead}</p>
         </header>
 
