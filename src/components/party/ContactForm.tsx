@@ -111,7 +111,7 @@ export function ContactForm() {
           </div>
           {sendError && <div className="alert" role="alert"><IconAlert /><span className="small">No pudimos enviar tu mensaje. Revisa tu conexión e inténtalo otra vez.</span></div>}
           <button className="btn block" type="submit" disabled={sending}>{sending ? "Enviando…" : cf.submitLabel}</button>
-          {cf.footnote && <p className="small muted" style={{ textAlign: "center" }}>{cf.footnote}</p>}
+          {cf.footnote && <p className="small muted" style={{ textAlign: "center" }}><Rich text={cf.footnote} /></p>}
         </form>
   );
 }

@@ -228,7 +228,7 @@ export function PartyForm() {
           </div>
           {sendError && <div className="alert" role="alert"><IconAlert /><span className="small">No pudimos enviar tu pedido. Revisa tu conexión e inténtalo otra vez.</span></div>}
           <button className="btn block" type="submit" disabled={sending}>{sending ? "Enviando…" : "Pedir cotización"}</button>
-          <p className="small muted" style={{ textAlign: "center" }}>{party.footnote}</p>
+          <p className="small muted" style={{ textAlign: "center" }}><Rich text={party.footnote} /></p>
         </form>
       </div>
     </div>
