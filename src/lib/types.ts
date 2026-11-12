@@ -120,7 +120,8 @@ export type PartyBox = { name: string; sizes: { name: string; price: number }[] 
 type Img = { image: string; imageMobile?: string; alt: string };
 
 /** Textos e imágenes de la tienda pública (lo que en los mockups estaba escrito a mano). */
-export type Business = { legalName: string; ruc: string; address: string; email: string; phone: string; hours: string };
+/** `hidden`: datos que no se muestran en Contacto ni en el pie (ver BUSINESS_TOGGLES). Razón social y RUC siempre se ven. */
+export type Business = { legalName: string; ruc: string; address: string; email: string; phone: string; hours: string; hidden?: string[] };
 export type LegalPageKey = "terms" | "returns" | "shipping" | "privacy";
 export type LegalDoc = { title: string; lead: string; sections: { title: string; text: string }[] };
 

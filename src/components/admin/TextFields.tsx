@@ -1,8 +1,10 @@
 "use client";
 
-import { useId } from "react";
+import { useId, type ReactNode } from "react";
 import { HIDDEN_KEYS, PRODUCT_LIST_KEYS, isImageKey, isLong, isRichCandidate, itemLabelFor, labelFor } from "@/lib/admin/textSchema";
 import { AIDown, AIPlus, AITrash, AIUp } from "./AdminIcons";
+import { Switch } from "./AdminPage";
+import { BUSINESS_TOGGLES } from "@/lib/legal";
 import { SlotImage } from "./SlotImage";
 import { useAdminMedia } from "./AdminMedia";
 import { OriginTag, Thumb, UploadButton } from "./PhotoPicker";
@@ -181,6 +183,27 @@ export function FieldEditor({ k, value, onChange, ctx, depth = 0, path = k, inLi
 
 export type { Json };
 
+/** Interruptor «Mostrar» al lado de un dato de la empresa: lo apagado no se ve en Contacto ni en el pie. */
+function ShownToggle({ name, k, obj, onChange, children }: { name: string; k: string; obj: Record<string, Json>; onChange: (v: Json) => void; children: ReactNode }) {
+  const hidden = Array.isArray(obj.hidden) ? (obj.hidden as string[]) : [];
+  const on = !hidden.includes(k);
+  const set = (v: boolean) => {
+    const next = v ? hidden.filter((x) => x !== k) : [...hidden, k];
+    const o: Record<string, Json> = { ...obj, hidden: next };
+    if (!next.length) delete o.hidden;
+    onChange(o);
+  };
+  return (
+    <div className="row g3" style={{ alignItems: "flex-end" }}>
+      <div className="grow" style={{ opacity: on ? 1 : 0.55 }}>{children}</div>
+      <div className="stack g1" style={{ alignItems: "center", minWidth: 64, paddingBottom: 8 }}>
+        <span className="a-cap">{on ? "Visible" : "Oculto"}</span>
+        <Switch on={on} onChange={set} label={`Mostrar ${name.toLowerCase()} en la tienda`} />
+      </div>
+    </div>
+  );
+}
+
 /**
  * Campos de un objeto. Si tiene foto (`image`), se edita con su formato de la tienda:
  * en secciones con formatos distintos (portada, accesos) se puede elegir otra foto para celular.
@@ -205,7 +228,16 @@ function ObjectFields({ k, path, inList, obj, onChange, ctx, depth }: { k: strin
           />
         </div>
         )}
-      {entries.map(([ck, cv]) => <FieldEditor key={ck} k={ck} path={`${path}.${ck}`} value={cv} ctx={ctx} depth={depth} onChange={(v) => onChange({ ...obj, [ck]: v })} />)}
+      {entries.map(([ck, cv]) => {
+        const field = <FieldEditor key={ck} k={ck} path={`${path}.${ck}`} value={cv} ctx={ctx} depth={depth} onChange={(v) => onChange({ ...obj, [ck]: v })} />;
+        if (path !== "business" || !(BUSINESS_TOGGLES as readonly string[]).includes(ck)) return field;
+        return <ShownToggle key={ck} name={labelFor(ck)} k={ck} obj={obj} onChange={onChange}>{field}</ShownToggle>;
+      })}
+      {path === "business" && (
+        <ShownToggle name="Instagram" k="instagram" obj={obj} onChange={onChange}>
+          <p className="a-cap grow">Instagram de la marca (la cuenta conectada en Ajustes › Conexiones)</p>
+        </ShownToggle>
+      )}
     </>
   );
 }
