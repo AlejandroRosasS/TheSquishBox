@@ -39,7 +39,7 @@ export const TEXT_SECTIONS: TextSection[] = [
 ];
 
 /** Claves que no son texto (o se editan en otra pantalla): no se muestran en Textos. */
-export const HIDDEN_KEYS = new Set(["_note", "legal", "legalLinks", "brand", "deliveryRates", "deliveryRatesAreExample", "defaultDistrict", "productId", "max"]);
+export const HIDDEN_KEYS = new Set(["_note", "legal", "legalLinks", "brand", "deliveryRates", "deliveryRatesAreExample", "defaultDistrict", "productId", "max", "hidden"]);
 
 /** Claves que guardan ids de productos: se editan con casillas. */
 export const PRODUCT_LIST_KEYS = new Set(["productIds", "popularIds"]);

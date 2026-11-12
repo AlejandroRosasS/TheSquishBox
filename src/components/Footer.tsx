@@ -4,15 +4,20 @@ import type { TenantBundle } from "@/tenants";
 import { Logo } from "./Logo";
 import { IconBook, IconInstagram, IconMail, IconWhatsApp } from "./Icons";
 import { whatsappLink } from "@/lib/format";
-import { businessOf, COMPLAINTS_ROUTE, isPlaceholder, LEGAL_ROUTES } from "@/lib/legal";
+import { businessOf, COMPLAINTS_ROUTE, isPlaceholder, isShown, LEGAL_ROUTES } from "@/lib/legal";
 
 /** `year` lo pasa el layout del servidor (cacheado); en la vista previa del admin se calcula en el cliente. */
 export function Footer({ bundle, year }: { bundle: TenantBundle; year?: ReactNode }) {
   const { tenant, storefront } = bundle;
   const ig = `https://www.instagram.com/${tenant.instagram}/`;
-  const wa = whatsappLink(tenant.whatsapp);
   const b = businessOf(tenant, storefront);
-  const mail = isPlaceholder(b.email) ? null : `mailto:${b.email}`;
+  // Lo que se apagó en Textos › Contacto y empresa no se muestra (razón social y RUC siempre).
+  const showIg = isShown(b, "instagram");
+  const showPhone = isShown(b, "phone");
+  const showMail = isShown(b, "email");
+  const showAddress = isShown(b, "address");
+  const wa = showPhone ? whatsappLink(tenant.whatsapp) : null;
+  const mail = !showMail || isPlaceholder(b.email) ? null : `mailto:${b.email}`;
   const legal = storefront.legalPages;
   return (
     <footer className="footer">
@@ -22,9 +27,11 @@ export function Footer({ bundle, year }: { bundle: TenantBundle; year?: ReactNod
             <Logo tenant={tenant} size="lg" />
             <p className="small" style={{ maxWidth: 300, opacity: 0.85 }}>{storefront.footer.about}</p>
             <div className="social">
-              <a href={ig} aria-label="Instagram" target="_blank" rel="noreferrer">
-                <IconInstagram size="sm" />
-              </a>
+              {showIg && (
+                <a href={ig} aria-label="Instagram" target="_blank" rel="noreferrer">
+                  <IconInstagram size="sm" />
+                </a>
+              )}
               {wa && (
                 <a href={wa} aria-label="WhatsApp" target="_blank" rel="noreferrer">
                   <IconWhatsApp size="sm" />
@@ -56,10 +63,10 @@ export function Footer({ bundle, year }: { bundle: TenantBundle; year?: ReactNod
           <div>
             <h4>Contacto</h4>
             <ul>
-              <li><a href={ig} target="_blank" rel="noreferrer">@{tenant.instagram}</a></li>
-              <li>{wa ? <a href={wa} target="_blank" rel="noreferrer">WhatsApp {b.phone}</a> : <>WhatsApp {b.phone}</>}</li>
-              <li>{mail ? <a href={mail}>{b.email}</a> : b.email}</li>
-              <li>{isPlaceholder(b.address) ? tenant.city : b.address}</li>
+              {showIg && <li><a href={ig} target="_blank" rel="noreferrer">@{tenant.instagram}</a></li>}
+              {showPhone && <li>{wa ? <a href={wa} target="_blank" rel="noreferrer">WhatsApp {b.phone}</a> : <>WhatsApp {b.phone}</>}</li>}
+              {showMail && <li>{mail ? <a href={mail}>{b.email}</a> : b.email}</li>}
+              {showAddress && <li>{isPlaceholder(b.address) ? tenant.city : b.address}</li>}
             </ul>
           </div>
         </div>

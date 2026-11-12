@@ -1,6 +1,6 @@
 import type { TenantBundle } from "@/tenants";
 import { whatsappLink } from "@/lib/format";
-import { businessOf, isPlaceholder } from "@/lib/legal";
+import { businessOf, isPlaceholder, isShown } from "@/lib/legal";
 import { isContactForm } from "@/lib/customOrder";
 import { Rich } from "@/components/Rich";
 import { ContactForm } from "@/components/party/ContactForm";
@@ -14,9 +14,11 @@ import { IconClock, IconInstagram, IconMail, IconPin, IconWhatsApp } from "@/com
 export function ContactView({ bundle }: { bundle: TenantBundle }) {
   const { tenant, storefront: sf } = bundle;
   const b = businessOf(tenant, sf);
-  const wa = whatsappLink(b.phone);
+  const show = { phone: isShown(b, "phone"), email: isShown(b, "email"), address: isShown(b, "address"), hours: isShown(b, "hours"), instagram: isShown(b, "instagram") };
+  const wa = show.phone ? whatsappLink(b.phone) : null;
   const ig = `https://www.instagram.com/${tenant.instagram}/`;
-  const mail = isPlaceholder(b.email) ? null : `mailto:${b.email}`;
+  const mail = !show.email || isPlaceholder(b.email) ? null : `mailto:${b.email}`;
+  const anyData = Object.values(show).some(Boolean);
   const withForm = tenant.customOrder.enabled && isContactForm(tenant);
   return (
     <div className="wrap" style={{ paddingBlock: "48px 96px" }}>
@@ -29,15 +31,17 @@ export function ContactView({ bundle }: { bundle: TenantBundle }) {
             {wa && <a className="btn" href={wa} target="_blank" rel="noreferrer"><IconWhatsApp size="sm" /> Escríbenos por WhatsApp</a>}
             {mail && <a className="btn ghost" href={mail}><IconMail size="sm" /> Enviar un correo</a>}
           </div>
-          <div className="contact-card stack g4">
-            <ul className="contact-list">
-              <li><IconWhatsApp size="sm" /><div><span className="label">WhatsApp y teléfono</span>{wa ? <a className="link" href={wa} target="_blank" rel="noreferrer">{b.phone}</a> : <span>{b.phone}</span>}</div></li>
-              <li><IconMail size="sm" /><div><span className="label">Correo</span>{mail ? <a className="link" href={mail}>{b.email}</a> : <span>{b.email}</span>}</div></li>
-              <li><IconInstagram size="sm" /><div><span className="label">Instagram</span><a className="link" href={ig} target="_blank" rel="noreferrer">@{tenant.instagram}</a></div></li>
-              <li><IconPin size="sm" /><div><span className="label">Dirección</span><span>{b.address}</span></div></li>
-              <li><IconClock size="sm" /><div><span className="label">Horario de atención</span><span>{b.hours}</span></div></li>
-            </ul>
-          </div>
+          {anyData && (
+            <div className="contact-card stack g4">
+              <ul className="contact-list">
+                {show.phone && <li><IconWhatsApp size="sm" /><div><span className="label">WhatsApp y teléfono</span>{wa ? <a className="link" href={wa} target="_blank" rel="noreferrer">{b.phone}</a> : <span>{b.phone}</span>}</div></li>}
+                {show.email && <li><IconMail size="sm" /><div><span className="label">Correo</span>{mail ? <a className="link" href={mail}>{b.email}</a> : <span>{b.email}</span>}</div></li>}
+                {show.instagram && <li><IconInstagram size="sm" /><div><span className="label">Instagram</span><a className="link" href={ig} target="_blank" rel="noreferrer">@{tenant.instagram}</a></div></li>}
+                {show.address && <li><IconPin size="sm" /><div><span className="label">Dirección</span><span>{b.address}</span></div></li>}
+                {show.hours && <li><IconClock size="sm" /><div><span className="label">Horario de atención</span><span>{b.hours}</span></div></li>}
+              </ul>
+            </div>
+          )}
         </div>
         {withForm && <ContactForm />}
       </div>

@@ -13,6 +13,14 @@ export const CONTACT_ROUTE = "/contacto";
 /** Un dato sin completar: vacío, entre corchetes o con XX (p. ej. "[N.º de RUC]", "+51 9XX…"). */
 export const isPlaceholder = (v: string | undefined | null) => !v || !v.trim() || /^\[.*\]$/.test(v.trim()) || /X{2,}/.test(v);
 
+/**
+ * Datos que se pueden ocultar en Contacto y en el pie (Admin › Textos › Contacto y empresa).
+ * Razón social y RUC no: los exigen Culqi e INDECOPI. Las páginas legales y el Libro de reclamaciones muestran todo igual.
+ */
+export const BUSINESS_TOGGLES = ["phone", "email", "address", "hours", "instagram"] as const;
+export type BusinessToggle = (typeof BUSINESS_TOGGLES)[number];
+export const isShown = (b: Pick<Business, "hidden">, key: BusinessToggle) => !(b.hidden ?? []).includes(key);
+
 /** Datos de la empresa con el WhatsApp del tenant como teléfono si no se puso otro. */
 export function businessOf(tenant: Tenant, sf: Storefront): Business {
   const b = sf.business;
@@ -21,7 +29,9 @@ export function businessOf(tenant: Tenant, sf: Storefront): Business {
 
 /** Reemplaza {name}, {legalName}, {ruc}, {address}, {email}, {phone} en los textos legales. */
 export function fillLegal(text: string, tenant: Tenant, b: Business): string {
-  const vars: Record<string, string> = { name: tenant.name, ...b };
+  const { hidden: _hidden, ...data } = b;
+  void _hidden;
+  const vars: Record<string, string> = { name: tenant.name, ...data };
   return text.replace(/\{(\w+)\}/g, (m, k: string) => vars[k] ?? m);
 }
 
