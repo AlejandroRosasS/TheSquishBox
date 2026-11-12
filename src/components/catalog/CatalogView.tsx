@@ -1,5 +1,6 @@
 "use client";
 
+import { customOrderHref, isContactForm } from "@/lib/customOrder";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useStore } from "@/components/StoreContext";
@@ -18,7 +19,7 @@ export function CatalogView({ initialLine }: { initialLine: string }) {
   const all = useMemo(() => visibleProducts(catalog), [catalog]);
   const lines = [...catalog.lines].sort((a, b) => a.order - b.order);
   const options = [{ id: "all", name: sf.catalog.allLabel }, ...lines];
-  const soldOutSuffix = tenant.customOrder.enabled ? `pídela ${tenant.customOrder.label.toLowerCase()}` : undefined;
+  const soldOutSuffix = tenant.customOrder.enabled && !isContactForm(tenant) ? `pídela ${tenant.customOrder.label.toLowerCase()}` : undefined;
 
   const pickLine = (id: string) => {
     setLine(id);
@@ -129,7 +130,7 @@ export function CatalogView({ initialLine }: { initialLine: string }) {
                 <p className="h3">{sf.catalog.partyCta.title}</p>
                 <p className="small">{sf.catalog.partyCta.text}</p>
               </div>
-              <Link className="btn light" href="/fiesta">{sf.catalog.partyCta.cta}</Link>
+              <Link className="btn light" href={customOrderHref(tenant)}>{sf.catalog.partyCta.cta}</Link>
             </div>
           )}
         </div>

@@ -12,6 +12,8 @@ export type TextSection = {
   note?: string;
   /** Solo si la marca tiene pedido especial (fiesta / a medida). */
   needsCustomOrder?: boolean;
+  /** Solo para marcas con ese tipo de formulario (customOrder.form). */
+  form?: "party" | "contact";
 };
 
 export const TEXT_SECTIONS: TextSection[] = [
@@ -24,7 +26,8 @@ export const TEXT_SECTIONS: TextSection[] = [
   { id: "models", title: "Modelos", where: "Inicio", onHome: true, keys: ["models"], note: "Las fotos del recuadro se cambian aquí abajo, en «Fotos del recuadro». Puedes agregar, quitar y ordenar fotos." },
   { id: "tips", title: "Tips", where: "Inicio", onHome: true, keys: ["tips"] },
   { id: "footer", title: "Pie de página", where: "Todas las páginas", onHome: true, keys: ["footer"] },
-  { id: "business", title: "Empresa y contacto", where: "Pie de página, Contacto (/contacto), páginas legales y Libro de reclamaciones", onHome: true, keys: ["business", "contact"] },
+  { id: "business", title: "Datos de la empresa", where: "Pie de página, Contacto (/contacto), páginas legales y Libro de reclamaciones", onHome: true, keys: ["business"] },
+  { id: "contactForm", title: "Contacto", where: "Contacto (/contacto)", onHome: false, keys: ["contact", "contactForm"], note: "WhatsApp, correo, dirección y horario se cambian en «Datos de la empresa». Los mensajes del formulario llegan a Pedidos con la etiqueta «Contacto» y avisan por los canales prendidos en Notificaciones. «Motivos para elegir» son las opciones del selector «Motivo»." },
   { id: "legalPages", title: "Términos y políticas", where: "Términos, Cambios y devoluciones, Entregas y Privacidad", onHome: false, keys: ["legalPages"] },
   { id: "complaints", title: "Libro de reclamaciones", where: "Libro de reclamaciones (/libro-de-reclamaciones)", onHome: false, keys: ["complaints"] },
   { id: "catalog", title: "Catálogo", where: "Tienda (/tienda)", onHome: false, keys: ["catalog"] },
@@ -32,7 +35,7 @@ export const TEXT_SECTIONS: TextSection[] = [
   { id: "cart", title: "Carrito", where: "Carrito", onHome: false, keys: ["cart"] },
   { id: "checkout", title: "Checkout", where: "Finalizar compra", onHome: false, keys: ["checkout"] },
   { id: "confirmation", title: "Confirmación", where: "Pedido confirmado", onHome: false, keys: ["confirmation"] },
-  { id: "party", title: "Formulario del pedido especial", where: "Pedido especial", onHome: false, keys: ["party"], needsCustomOrder: true },
+  { id: "party", title: "Formulario del pedido especial", where: "Pedido especial", onHome: false, keys: ["party"], needsCustomOrder: true, form: "party" },
   { id: "notFound", title: "Página 404", where: "Página no encontrada", onHome: false, keys: ["notFound"] },
 ];
 
@@ -84,7 +87,7 @@ const LABELS: Record<string, string> = {
   email: "Correo de atención",
   phone: "Teléfono / WhatsApp",
   hours: "Horario de atención",
-  contact: "Página de contacto",
+  contact: "Encabezado de la página",
   legalPages: "Páginas legales",
   terms: "Términos y condiciones",
   returns: "Cambios y devoluciones",
@@ -140,10 +143,17 @@ const LABELS: Record<string, string> = {
   sentTitle: "Título al enviar",
   sentLead: "Texto al enviar",
   notFound: "Página 404",
+  contactForm: "Formulario",
+  formTitle: "Título del formulario",
+  reasonLabel: "Pregunta del motivo",
+  reasons: "Motivos para elegir",
+  messageLabel: "Campo del mensaje",
+  messagePlaceholder: "Ejemplo en el campo del mensaje",
+  submitLabel: "Botón de enviar",
 };
 
 /** Nombre de cada elemento de una lista (si no está, se usa el de la lista). */
-const ITEM_LABELS: Record<string, string> = { boxes: "Caja", sizes: "Opción", sections: "Sección", photos: "Foto", highlights: "Círculo", tiles: "Acceso", items: "Tip", steps: "Paso" };
+const ITEM_LABELS: Record<string, string> = { boxes: "Caja", sizes: "Opción", sections: "Sección", photos: "Foto", highlights: "Círculo", tiles: "Acceso", items: "Tip", steps: "Paso", reasons: "Motivo" };
 export const itemLabelFor = (key: string) => ITEM_LABELS[key] ?? labelFor(key);
 
 export function labelFor(key: string): string {
@@ -152,7 +162,7 @@ export function labelFor(key: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-const LONG_KEYS = new Set(["lead", "body", "text", "about", "footnote", "deliveryNote", "partyHint", "soldOutAllText", "soldOutVariantText", "emptyLead", "collectNote", "sentLead", "commentsPlaceholder", "giftHint"]);
+const LONG_KEYS = new Set(["lead", "body", "text", "about", "footnote", "deliveryNote", "partyHint", "soldOutAllText", "soldOutVariantText", "emptyLead", "collectNote", "sentLead", "commentsPlaceholder", "messagePlaceholder", "giftHint"]);
 
 export function isLong(key: string, value: string) {
   return LONG_KEYS.has(key) || value.length > 70;

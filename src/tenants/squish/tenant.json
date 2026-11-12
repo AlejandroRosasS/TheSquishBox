@@ -107,10 +107,11 @@
   ],
   "customOrder": {
     "enabled": true,
-    "label": "Para tu fiesta",
-    "description": "Cotiza Mini Box Sorpresa de Cumple para los invitados",
-    "adminLabel": "Pedidos para fiestas",
-    "adminShort": "Fiestas"
+    "form": "contact",
+    "label": "Contacto",
+    "description": "Mensajes que llegan desde la página Contacto",
+    "adminLabel": "Mensajes de contacto",
+    "adminShort": "Contacto"
   },
   "payments": {
     "provider": "culqi",

@@ -14,7 +14,7 @@
   container-type: inline-size; container-name: page;
   background: var(--a-bg); color: var(--a-text); font-family: var(--sans); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased;
 }
-.adm a { color: inherit; }
+:where(.adm) a { color: inherit; }
 .adm .ico { width: 20px; height: 20px; }
 .adm .ico.sm { width: 16px; height: 16px; }
 .a-shell { display: flex; flex-wrap: wrap; min-height: 100%; align-items: stretch; }

@@ -3,7 +3,24 @@
   "contact": {
     "eyebrow": "Contacto",
     "title": "¿Tienes una *pregunta*?",
-    "lead": "Escríbenos por WhatsApp, Instagram o correo. Te respondemos en nuestro horario de atención."
+    "lead": "Escríbenos por WhatsApp, Instagram o correo, o déjanos tu mensaje aquí. Te respondemos en nuestro horario de atención."
+  },
+  "contactForm": {
+    "formTitle": "Escríbenos",
+    "reasonLabel": "Motivo",
+    "reasons": [
+      "Consulta sobre un producto",
+      "Pedido a medida",
+      "Estado de mi pedido",
+      "Reclamo o cambio",
+      "Otro"
+    ],
+    "messageLabel": "Mensaje",
+    "messagePlaceholder": "Cuéntanos en qué te podemos ayudar.",
+    "submitLabel": "Enviar mensaje",
+    "footnote": "Respondemos en horario de atención.",
+    "sentTitle": "¡Recibimos *tu mensaje*!",
+    "sentLead": "Gracias, {name}. Te escribimos por WhatsApp al {phone}."
   },
   "legalPages": {
     "terms": {

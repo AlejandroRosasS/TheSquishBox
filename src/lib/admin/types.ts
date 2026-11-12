@@ -52,6 +52,9 @@ export type PartyRequest = {
   price: string;
   deliveryFee: string;
   proposal: string;
+  /** Mensaje del formulario de Contacto (no es una cotización): motivo + mensaje (en `idea`). */
+  contact?: boolean;
+  reason?: string;
 };
 
 export type IgPost = {

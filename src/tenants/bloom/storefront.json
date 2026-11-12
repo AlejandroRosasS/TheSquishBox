@@ -29,10 +29,6 @@
       "href": "/tienda"
     },
     {
-      "label": "A medida",
-      "href": "/fiesta"
-    },
-    {
       "label": "Contacto",
       "href": "/contacto"
     }
@@ -49,7 +45,7 @@
     },
     "secondaryCta": {
       "label": "Pedir a medida",
-      "href": "/fiesta"
+      "href": "/contacto"
     }
   },
   "highlights": [
@@ -59,7 +55,7 @@
     },
     {
       "label": "A medida",
-      "href": "/fiesta"
+      "href": "/contacto"
     },
     {
       "label": "Clientes",
@@ -83,7 +79,7 @@
       "alt": "Foto por definir",
       "eyebrow": "Para tu espacio",
       "title": "A medida",
-      "href": "/fiesta"
+      "href": "/contacto"
     },
     {
       "image": "img/por-definir.svg",
@@ -159,7 +155,7 @@
       },
       {
         "label": "A medida",
-        "href": "/fiesta"
+        "href": "/contacto"
       }
     ],
     "help": [
@@ -216,7 +212,7 @@
   },
   "product": {
     "variantQuestion": "Presentación",
-    "partyHint": "¿Lo quieres en otros colores? [Pídelo a medida](/fiesta).",
+    "partyHint": "¿Lo quieres en otros colores? [Pídelo a medida](/contacto).",
     "deliveryNote": "**Entrega coordinada.** Después de tu compra te escribimos por WhatsApp para acordar fecha y hora. El delivery se calcula según tu distrito.",
     "tipsTitle": "Cuidados",
     "soldOutAllText": "Déjanos tu correo y te avisamos cuando vuelva. O pídelo a medida con los colores que prefieras.",
@@ -232,7 +228,7 @@
     },
     "emptySecondary": {
       "label": "Pedir a medida",
-      "href": "/fiesta"
+      "href": "/contacto"
     },
     "popularTitle": "Los más pedidos",
     "popularIds": [],

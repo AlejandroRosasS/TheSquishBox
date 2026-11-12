@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { DemoOrder, PartyRequest } from "@/lib/admin/types";
 import { dataKey, usePersisted } from "@/lib/admin/storage";
-import { PARTY_STATUS } from "@/lib/admin/format";
+import { partyStatus } from "@/lib/admin/format";
 import {
   ORDER_COLUMNS, PARTY_TO_DB, kickAlerts, STATUS_TO_DB, toAdminOrder, toAdminParty, orderCode, partyCode,
   type DbOrder, type DbParty, type EventRow, type OrderRow,
@@ -162,7 +162,7 @@ function OrdersProviderInner({ children }: { children: ReactNode }) {
 
   const updateParty = useCallback(
     (id: string, patch: Partial<PartyRequest>) => {
-      const row = rowsRef.current.find((r) => r.kind === "party" && partyCode(r.number) === id);
+      const row = rowsRef.current.find((r) => r.kind === "party" && partyCode(r.number, r.party) === id);
       if (!row) return;
       const cur = toAdminParty(row);
       const cols: Partial<OrderRow> = {};
@@ -179,7 +179,7 @@ function OrdersProviderInner({ children }: { children: ReactNode }) {
       }
       if (patch.proposal !== undefined) cols.proposal = patch.proposal;
       if (Object.keys(cols).length) patchRow(row.id, cols, !!cols.status);
-      if (cols.status) void addEvent(row.id, "status", `Estado cambiado a «${PARTY_STATUS[patch.status!][0]}»`);
+      if (cols.status) void addEvent(row.id, "status", `Estado cambiado a «${partyStatus({ status: patch.status!, contact: cur.contact })[0]}»`);
     },
     [addEvent, patchRow],
   );

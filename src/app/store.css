@@ -51,7 +51,8 @@
 }
 .store *, .adm * { box-sizing: border-box; }
 .store img { display: block; max-width: 100%; }
-.store a { color: inherit; }
+/* :where() deja la especificidad en 0: así .btn y las demás clases mandan sobre este color (antes los <a class="btn"> salían con el color del texto). */
+:where(.store) a { color: inherit; }
 
 /* ---------- Utilidades responsive (container queries) ---------- */
 .only-m { display: none !important; }
