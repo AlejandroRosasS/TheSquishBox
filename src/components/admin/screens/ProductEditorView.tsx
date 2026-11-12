@@ -62,7 +62,7 @@ export function ProductEditorView({ params }: { params: Promise<{ id: string }> 
   const [stash, setStash] = useState<Variant[]>([]);
   const base = draft ?? saved;
   // Un producto nuevo sin precio todavía: se edita como «Precio único» con una variante vacía.
-  const p = base && !base.variants.length ? { ...base, variants: [{ id: "unica", label: "Precio único", price: 0, priceIsReference: true, stock: 0 }] } : base;
+  const p = base && !base.variants.length ? { ...base, variants: [{ id: "unica", label: "Precio único", price: 0, priceIsReference: false, stock: 0 }] } : base;
   const c = costs ?? savedCosts;
 
   if (!p) {
@@ -109,7 +109,7 @@ export function ProductEditorView({ params }: { params: Promise<{ id: string }> 
     toast(msg);
   };
 
-  const newVariant = (label = ""): Variant => ({ id: `v${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`, label, price: 0, priceIsReference: true, stock: 0 });
+  const newVariant = (label = ""): Variant => ({ id: `v${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`, label, price: 0, priceIsReference: false, stock: 0 });
   const addVariant = () => edit({ kind: "options", variants: [...p.variants, newVariant()] });
   const removeVariant = (i: number) => edit({ variants: p.variants.filter((_, j) => j !== i) });
   const moveVariant = (i: number, d: -1 | 1) => {
@@ -219,13 +219,11 @@ export function ProductEditorView({ params }: { params: Promise<{ id: string }> 
                       <span className="a-cap">Al elegir esta opción en la tienda, la galería muestra esta foto y el carrito la usa de miniatura.</span>
                     </div>
                   )}
-                  <div className="row between wrap-row g2">
-                    <label className="row g2" style={{ minHeight: 44, cursor: "pointer" }}>
-                      <input type="checkbox" checked={v.priceIsReference} style={{ width: 20, height: 20 }} onChange={(e) => editVar(i, { priceIsReference: e.target.checked })} />
-                      <span className="a-cap">Precio referencial (falta confirmar)</span>
-                    </label>
-                    {v.price > 0 && <span className={`marg ${contrib < 0 ? "bad" : ""}`}>Contribución {formatPrice(contrib)} · margen {margin}%</span>}
-                  </div>
+                  {v.price > 0 && (
+                    <div className="row g2" style={{ justifyContent: "flex-end" }}>
+                      <span className={`marg ${contrib < 0 ? "bad" : ""}`}>Contribución {formatPrice(contrib)} · margen {margin}%</span>
+                    </div>
+                  )}
                 </div>
               );
             })}
