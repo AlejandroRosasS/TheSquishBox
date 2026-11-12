@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Storefront } from "@/lib/types";
 import { useStoredDoc } from "@/lib/admin/useStoredDoc";
 import { STATUS_LABEL, useDoc } from "@/lib/admin/useDoc";
@@ -64,6 +64,14 @@ export function TextsView() {
   /** Campo con foco en el editor (ej. "tiles.1.title"): la vista previa lo resalta. */
   const [fieldPath, setFieldPath] = useState<string | null>(null);
   const setSecId = (id: string) => { setSecIdRaw(id); setFieldPath(null); };
+  // Links desde otras pantallas: /admin/textos?seccion=<id> abre esa sección.
+  useEffect(() => {
+    const sync = () => {
+      const want = new URLSearchParams(window.location.search).get("seccion");
+      if (want && TEXT_SECTIONS.some((s) => s.id === want)) setSecIdRaw(want);
+    };
+    sync();
+  }, []);
   const [mode, setMode] = useState<"m" | "d">("m");
   const sec = sections.find((s) => s.id === secId) ?? sections[0];
   const sf = doc.value;

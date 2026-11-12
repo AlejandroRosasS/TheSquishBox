@@ -108,6 +108,10 @@ export function previewPage(secId: string, path: string | null, bundle: TenantBu
       return { where: "Inicio · cabecera (se ve en todas las páginas)", node: null, chrome: true, scope: [".announce", ".header"] };
     case "footer":
       return { where: "Inicio · pie de página (se ve en todas las páginas)", node: null, chrome: true, scope: [".footer"] };
+    case "contactForm":
+      if (parts[0] === "business" && /^(legalName|ruc)$/.test(parts[1] ?? ""))
+        return { where: "Inicio · pie de página (también en páginas legales)", node: null, chrome: true, scope: [".footer"] };
+      return { where: "Contacto", node: <ContactView bundle={bundle} />, chrome: true, scope: ["main"] };
     case "business":
       if (parts[0] === "contact") return { where: "Contacto", node: <ContactView bundle={bundle} />, chrome: true, scope: ["main"] };
       return { where: "Inicio · pie de página (también en Contacto y páginas legales)", node: null, chrome: true, scope: [".footer"] };
@@ -139,8 +143,6 @@ export function previewPage(secId: string, path: string | null, bundle: TenantBu
     }
     case "party":
       return { where: "Pedido especial", node: <PartyForm />, chrome: true, scope: ["main"] };
-    case "contactForm":
-      return { where: "Contacto", node: <ContactView bundle={bundle} />, chrome: true, scope: ["main"] };
     case "notFound":
       return {
         where: "Página no encontrada (404)",

@@ -100,7 +100,7 @@ export function SettingsView() {
           {([["Razón social", biz.legalName], ["RUC", biz.ruc], ["Dirección", biz.address], ["Correo", biz.email], ["WhatsApp", biz.phone]] as const).map(([k, v]) => (
             <div key={k} className="row between g3"><span className="a-cap">{k}</span>{isPlaceholder(v) ? <span className="st pend">Falta</span> : <b style={{ textAlign: "right", overflowWrap: "anywhere" }}>{v}</b>}</div>
           ))}
-          <Link className="a-btn" href="/admin/textos" style={{ alignSelf: "flex-start" }}>Editar en Textos › Empresa y contacto</Link>
+          <Link className="a-btn" href="/admin/textos?seccion=contactForm" style={{ alignSelf: "flex-start" }}>Editar en Textos › Contacto y empresa</Link>
         </section>
       </div>
       <div role="tabpanel" id="aj-panel-conexiones" aria-labelledby="aj-tab-conexiones" hidden={tab !== "conexiones"}>

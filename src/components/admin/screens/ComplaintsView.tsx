@@ -108,7 +108,7 @@ export function ComplaintsView() {
 
       {missingBiz && (
         <p className="a-banner warn">
-          <span>Faltan datos de la empresa (razón social, RUC, dirección o correo). Aparecen en cada hoja: complétalos en <Link href="/admin/textos">Textos › Empresa y contacto</Link> y publica.</span>
+          <span>Faltan datos de la empresa (razón social, RUC, dirección o correo). Aparecen en cada hoja: complétalos en <Link href="/admin/textos?seccion=contactForm">Textos › Contacto y empresa</Link> y publica.</span>
         </p>
       )}
       {state === "missing" && <p className="a-banner err">El libro aún no está activado en la base de datos (falta aplicar la migración 0006). Hasta entonces, la tienda no puede guardar hojas.</p>}
