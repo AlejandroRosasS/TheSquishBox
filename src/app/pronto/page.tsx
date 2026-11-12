@@ -19,6 +19,8 @@ export function generateMetadata(): Metadata {
   return {
     title: { absolute: `${tenant.name} · Muy pronto` },
     description: (storefront.comingSoon ?? FALLBACK).metaDescription,
+    // Mientras la tienda está en construcción, todas las rutas muestran esta página: la oficial es la portada.
+    alternates: { canonical: "/" },
   };
 }
 

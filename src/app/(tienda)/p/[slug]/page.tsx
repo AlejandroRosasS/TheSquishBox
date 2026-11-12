@@ -4,6 +4,8 @@ import { getTenantBundle } from "@/lib/tenant";
 import { productMetadata } from "@/lib/seo";
 import { visibleProducts } from "@/lib/catalog";
 import { ProductPageView } from "@/components/product/ProductPageView";
+import { JsonLd } from "@/components/JsonLd";
+import { productLd } from "@/lib/structuredData";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -25,5 +27,10 @@ export default async function ProductPage({ params }: Props) {
   const bundle = await getTenantBundle();
   const product = visibleProducts(bundle.catalog).find((p) => p.id === slug);
   if (!product) notFound();
-  return <ProductPageView bundle={bundle} product={product} />;
+  return (
+    <>
+      <JsonLd data={productLd(bundle, product)} />
+      <ProductPageView bundle={bundle} product={product} />
+    </>
+  );
 }
