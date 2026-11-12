@@ -56,12 +56,25 @@ export function SalesView() {
   // eslint-disable-next-line react-hooks/set-state-in-effect -- la hora es solo del navegador
   useEffect(() => setNow(Date.now()), []);
   const scale = period === "mes" ? 1 : period === "tri" ? 2.6 : 7.4;
+  // Con la base: solo ventas reales, filtradas por el periodo (mes, trimestre o año en curso, hora de Perú).
+  // Sin base (demo): las ventas de ejemplo, escaladas por periodo.
+  const tday = now === null ? null : new Date(now - 5 * 3600_000).toISOString().slice(0, 10);
+  const yy = tday?.slice(0, 4) ?? "";
+  const mm = tday ? Number(tday.slice(5, 7)) : 1;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const from = period === "mes" ? `${yy}-${pad(mm)}-01` : period === "tri" ? `${yy}-${pad(Math.floor((mm - 1) / 3) * 3 + 1)}-01` : `${yy}-01-01`;
+  const inPeriod = (day: string | undefined) => !fromDb || !tday || !day || (day >= from && day <= tday);
+  const isoDay = (iso: string | undefined) => (iso ? new Date(Date.parse(iso) - 5 * 3600_000).toISOString().slice(0, 10) : undefined);
+  const monthName = tday ? new Intl.DateTimeFormat("es-PE", { month: "long", timeZone: "UTC" }).format(new Date(`${tday}T12:00:00Z`)) : "";
+  const periods: [typeof period, string][] = fromDb
+    ? [["mes", monthName ? monthName.charAt(0).toUpperCase() + monthName.slice(1) : "Este mes"], ["tri", "Trimestre"], ["ano", yy || "Este año"]]
+    : [["mes", "Octubre"], ["tri", "Trimestre"], ["ano", "2026"]];
   const prod = (id: string) => catalog.products.find((p) => p.id === id);
   const sum = <K extends "rev" | "listRev" | "cost" | "units" | "orders" | "dIn" | "dOut" | "igv" | "fee" | "dCut">(arr: { [k in K]: number }[], k: K) => arr.reduce((a, r) => a + r[k], 0);
   const price = (pid: string, vid: string) => prod(pid)?.variants.find((v) => v.id === vid)?.price ?? 0;
   const cost = (pid: string, vid: string) => catalog.costs[pid]?.[vid] ?? 0;
 
-  const base = demo.sales.lines.map(([pid, vid, ch, u, dIn, dOut, o]) => {
+  const base = (fromDb ? [] : demo.sales.lines).map(([pid, vid, ch, u, dIn, dOut, o]) => {
     const units = Math.max(1, Math.round(u * scale));
     const rev = price(pid, vid) * units;
     return { pid, ch, line: prod(pid)?.line ?? "", units, rev, listRev: rev, cost: cost(pid, vid) * units, dIn: dIn * scale, dOut: dOut * scale, orders: Math.max(1, Math.round(o * scale)), camp: "", campName: "", igv: 0, fee: 0, dCut: 0, card: false, fair: "" as string | null };
@@ -83,11 +96,11 @@ export function SalesView() {
   };
   // Ventas de feria: se cargan en la feria vigente ese día (misma regla que la base). "" = ninguna.
   const fairOf = (s: ManualSale) => (s.channel === "feria" ? fairOn(fairs, s.day)?.id ?? "" : null);
-  const extra = manual.flatMap((s) => s.lines.map((l, i) => ({ ...saleLine(l, s.channel, !i, s.dIn, s.dOut, s.pay), fair: fairOf(s) })));
+  const extra = manual.filter((s) => inPeriod(s.day)).flatMap((s) => s.lines.map((l, i) => ({ ...saleLine(l, s.channel, !i, s.dIn, s.dOut, s.pay), fair: fairOf(s) })));
   // Pedidos reales de la web (con la base): los cancelados, fallidos o devueltos no cuentan.
   const web = fromDb
     ? dbOrders
-        .filter((o) => o.status !== "cancelado" && !["failed", "refunded"].includes(o.paymentStatus ?? ""))
+        .filter((o) => o.status !== "cancelado" && !["failed", "refunded"].includes(o.paymentStatus ?? "") && inPeriod(isoDay(o.createdIso)))
         .flatMap((o) => o.lines.map((l, i) => saleLine(l, "web", !i, o.deliveryFee, o.deliveryReal ?? o.deliveryFee, o.payMethod)))
     : [];
   const rows = [...base, ...extra, ...web];
@@ -138,7 +151,7 @@ export function SalesView() {
       const camps = [...new Set(s.lines.filter((l) => l.campaignId).map((l) => campName(l.campaignId!, l.campaign)))];
       return { date: s.date, detail: s.lines.map((l) => `${prod(l.productId)?.name ?? (l.name ? `A medida: ${l.name}` : l.productId)} x${l.qty}`).join(" + "), note: camps.length ? `${saleCaption(s, money)} · campaña ${camps.join(", ")}` : saleCaption(s, money), channel: s.channel, revenue: r + s.dIn, contribution: r - c + s.dIn - s.dOut - cutS };
     }),
-    ...demo.sales.recent,
+    ...(fromDb ? [] : demo.sales.recent),
   ];
 
   const exportCsv = () => {
@@ -162,7 +175,7 @@ export function SalesView() {
       </div>
       <div className="row g3 wrap-row">
         <div className="a-seg" role="group" aria-label="Período">
-          {([["mes", "Octubre"], ["tri", "Trimestre"], ["ano", "2026"]] as const).map(([k, l]) => <button key={k} className={period === k ? "on" : ""} type="button" aria-pressed={period === k} onClick={() => setPeriod(k)}>{l}</button>)}
+          {periods.map(([k, l]) => <button key={k} className={period === k ? "on" : ""} type="button" aria-pressed={period === k} onClick={() => setPeriod(k)}>{l}</button>)}
         </div>
         <select className="a-select" style={{ width: "auto", minWidth: 200 }} value={line} onChange={(e) => setLine(e.target.value)} aria-label="Línea">
           <option value="all">Todas las líneas</option>
@@ -225,6 +238,7 @@ export function SalesView() {
                 <span className="money" style={{ textAlign: "right" }}><b>{rank === "c" ? moneyShort(x.contrib) : `${x.units} u.`}</b><br /><span className="a-cap">{rank === "c" ? `${x.units} u.` : moneyShort(x.contrib)}</span></span>
               </div>
             ))}
+            {!top.length && <p className="a-cap">Todavía no hay ventas en este periodo.</p>}
           </div>
         </section>
       </div>
@@ -267,9 +281,10 @@ export function SalesView() {
               <span className="c-d money delta-zero">{money(r.contribution)}</span>
             </div>
           ))}
+          {!recent.length && <p className="a-cap" style={{ padding: 20 }}>Todavía no hay ventas registradas. Regístralas con «+ Venta», importando un CSV o con /vta en Telegram.</p>}
         </div>
       </section>
-      <DemoNote>Ventas de ejemplo. Los precios con «referencial» aún no están confirmados por la marca.</DemoNote>
+      <DemoNote untilDb>Ventas de ejemplo. Los precios con «referencial» aún no están confirmados por la marca.</DemoNote>
     </AdminPage>
   );
 }
