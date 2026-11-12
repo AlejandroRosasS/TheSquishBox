@@ -141,7 +141,7 @@ export function HomeView({ bundle }: { bundle: TenantBundle }) {
                 </div>
               ))}
             </div>
-            <p className="small muted">{sf.models.footnote}</p>
+            <p className="small muted"><Rich text={sf.models.footnote} /></p>
           </div>
         </section>
       )}
