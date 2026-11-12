@@ -6,6 +6,8 @@ import { NextResponse, type NextRequest } from "next/server";
  * - demo.<dominio>, los *.vercel.app y localhost muestran la tienda completa, sin indexar.
  * Sirve para cualquier marca: cada una se despliega en su propio proyecto de Vercel.
  * Para lanzar la tienda en el dominio principal, pon STORE_LIVE=1 en las variables del proyecto.
+ * Con la tienda lanzada, demo.<dominio> y *.vercel.app siguen sin indexar para que Google
+ * solo vea el dominio principal (sin contenido duplicado).
  */
 const PREVIEW_HOSTS = /^(demo\.|localhost$|127\.0\.0\.1$)|\.vercel\.app$/i;
 
@@ -13,9 +15,11 @@ export function proxy(request: NextRequest) {
   const host = (request.headers.get("host") ?? "").split(":")[0];
   const { pathname } = request.nextUrl;
 
-  if (process.env.STORE_LIVE === "1") return NextResponse.next();
+  const preview = !host || PREVIEW_HOSTS.test(host);
 
-  if (host && !PREVIEW_HOSTS.test(host)) {
+  if (process.env.STORE_LIVE === "1" && !preview) return NextResponse.next();
+
+  if (!preview) {
     // /pronto y las rutas del servidor (cron de Instagram, webhooks) siguen funcionando.
     if (pathname === "/pronto" || pathname.startsWith("/api/")) return NextResponse.next();
     return NextResponse.rewrite(new URL("/pronto", request.url));
