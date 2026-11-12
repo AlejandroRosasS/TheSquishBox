@@ -3,13 +3,14 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { asset } from "@/lib/assets";
 import { money } from "@/lib/admin/format";
 import { useAdmin, useAdminCatalog } from "../AdminContext";
 import { AdminPage, BackLink, Switch } from "../AdminPage";
 import { AIPlus, AITrash } from "../AdminIcons";
-import { newRef, useManualSales, type ManualSale } from "../AdminSales";
+import { limaToday, newRef, useManualSales, type ManualSale } from "../AdminSales";
+import { useDb } from "../DbContext";
 import { useCampaigns } from "../AdminCampaigns";
 import { bestCampaign, limaToIso } from "@/lib/campaigns";
 import { PAY_METHODS } from "@/lib/sales/csv";
@@ -28,6 +29,10 @@ export function NewSaleView() {
   const products = catalog.products.filter((p) => p.status !== "draft" || p.variants.length);
   const [chan, setChan] = useState("feria");
   const [date, setDate] = useState(demo.today);
+  // Con la base, la fecha por defecto es hoy (hora de Perú); la de ejemplo es solo para la demo.
+  const live = !!useDb();
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- la fecha es solo del navegador
+  useEffect(() => { if (live) setDate(limaToday()); }, [live]);
   const [client, setClient] = useState("");
   const { campaigns } = useCampaigns();
   const { fairs } = useFairs();

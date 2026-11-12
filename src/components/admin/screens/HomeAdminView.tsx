@@ -11,8 +11,8 @@ import { useAdminCounts } from "../AdminShell";
 import { AIBell, AIChevron, AIInstagram, AIPlus } from "../AdminIcons";
 import { useInventory } from "../AdminInventory";
 import { useToday } from "@/lib/useToday";
-
-const DAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+import { useWeekSales } from "../useWeekSales";
+import { useOrdersFromDb } from "../AdminOrders";
 
 export function HomeAdminView() {
   const { bundle, demo } = useAdmin();
@@ -36,7 +36,10 @@ export function HomeAdminView() {
     })
     .filter(Boolean)
     .slice(0, 4) as { p: (typeof catalog.products)[number]; label: string; cls: string; cap: string }[];
-  const maxBar = Math.max(...demo.weekSales.bars);
+  const week = useWeekSales();
+  const fromDb = useOrdersFromDb();
+  const today = useToday();
+  const peak = week?.days.reduce((a, d) => (d.amount > a.amount ? d : a), week.days[0]);
   const partyLabel = tenant.customOrder.adminLabel ?? tenant.customOrder.label;
   // Con el inventario prendido, el cotizador queda a un toque (se conoce recién en el navegador).
   const mounted = !!useToday();
@@ -51,7 +54,7 @@ export function HomeAdminView() {
       <div className="a-head">
         <div className="stack g1">
           <h1 className="a-h1">Hola, equipo</h1>
-          <p className="a-sub">{todayLabel(demo.today)} · esto es lo que necesita atención hoy.</p>
+          <p className="a-sub">{fromDb ? (today ? todayLabel(today) : "Hoy") : todayLabel(demo.today)} · esto es lo que necesita atención hoy.</p>
         </div>
         <div className="row g2" style={{ flexWrap: "wrap" }}>
           {quotesOn && <Link className="a-btn primary" href="/admin/inventario#cotizador"><AIPlus size="sm" />Nueva cotización</Link>}
@@ -69,7 +72,7 @@ export function HomeAdminView() {
           <Link className="kpi" href="/admin/pedidos"><span className="l"><span className="st nuevo">{tenant.customOrder.adminShort ?? partyLabel}</span></span><span className="v">{c.newParty}</span><span className="a-cap">{partyLabel.toLowerCase()} por cotizar</span><span className="go">Responder <AIChevron size="sm" /></span></Link>
         )}
         <Link className="kpi" href="/admin/productos"><span className="l"><span className="st bajo">Inventario</span></span><span className="v">{c.lowStock}</span><span className="a-cap">productos con stock bajo o agotados</span><span className="go">Revisar <AIChevron size="sm" /></span></Link>
-        <Link className="kpi" href="/admin/ventas"><span className="l">Ventas de la semana · todos los canales</span><span className="v money">{moneyShort(demo.weekSales.total)}</span><span className="a-cap">{demo.weekSales.count} ventas · contribución {moneyShort(demo.weekSales.contribution)}</span><span className="go">Ver ventas y márgenes <AIChevron size="sm" /></span></Link>
+        <Link className="kpi" href="/admin/ventas"><span className="l">Ventas de la semana · todos los canales</span><span className="v money">{week ? moneyShort(week.total) : "…"}</span><span className="a-cap">{week ? `${week.count} ${week.count === 1 ? "venta" : "ventas"} · contribución ${moneyShort(week.contribution)}` : "Cargando…"}</span><span className="go">Ver ventas y márgenes <AIChevron size="sm" /></span></Link>
       </div>
 
       <div className="a-cols">
@@ -95,11 +98,14 @@ export function HomeAdminView() {
         <div className="stack g5">
           <section className="a-card" aria-labelledby="h-ven">
             <div className="a-card-h"><h2 className="a-h2" id="h-ven">Ventas · últimos 7 días</h2></div>
-            <div className="bars" role="img" aria-label={`Ventas diarias de domingo a sábado (datos de ejemplo). El día más alto es ${DAYS[demo.weekSales.bars.indexOf(maxBar)]}.`}>
-              {demo.weekSales.bars.map((b, i) => (
-                <div key={i}><i className={i === demo.weekSales.bars.length - 1 ? "on" : ""} style={{ height: `${b}%` }} /><span>{DAYS[i]}</span></div>
-              ))}
-            </div>
+            {week && (
+              <div className="bars" role="img" aria-label={week.total || week.demo ? `Ventas diarias de los últimos 7 días${week.demo ? " (datos de ejemplo)" : ""}. El día más alto es ${peak?.label}${week.demo ? "" : `, con ${money(peak?.amount ?? 0)}`}.` : "Sin ventas en los últimos 7 días."}>
+                {week.days.map((d, i) => (
+                  <div key={i}><i className={i === week.days.length - 1 ? "on" : ""} style={{ height: `${d.pct}%` }} title={week.demo ? undefined : money(d.amount)} /><span>{d.label}</span></div>
+                ))}
+              </div>
+            )}
+            {week && !week.demo && !week.total && <p className="a-cap">Todavía no hay ventas en los últimos 7 días.</p>}
           </section>
           <section className="a-card" aria-labelledby="h-inv">
             <div className="a-card-h"><h2 className="a-h2" id="h-inv">Inventario</h2><Link className="a-btn sm ghost" href="/admin/productos">Ver</Link></div>
