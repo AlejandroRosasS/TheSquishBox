@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import type { TenantBundle } from "@/tenants";
 import { visibleProducts } from "./catalog";
 import { asset } from "./assets";
+import { productPath } from "./seo";
 import { COMPLAINTS_ROUTE, CONTACT_ROUTE, LEGAL_ROUTES } from "./legal";
 import { PARTY_ROUTE, isContactForm } from "./customOrder";
 import { isPreviewHost, storeLive, validDomain } from "./hosts";
@@ -43,7 +44,7 @@ export function sitemapEntries(bundle: TenantBundle, origin: string, mode: Expos
       const a = asset(tenant.slug, src);
       return a.startsWith("/") && !a.startsWith("//") ? `${origin}${a}` : a;
     });
-    entries.push({ url: url(`/p/${encodeURIComponent(p.id)}`), changeFrequency: "weekly", priority: 0.8, images: images.length ? images : undefined });
+    entries.push({ url: url(productPath(p)), changeFrequency: "weekly", priority: 0.8, images: images.length ? images : undefined });
   }
   entries.push({ url: url(CONTACT_ROUTE), changeFrequency: "monthly", priority: 0.6 });
   if (tenant.customOrder.enabled && !isContactForm(tenant)) entries.push({ url: url(PARTY_ROUTE), changeFrequency: "monthly", priority: 0.6 });
