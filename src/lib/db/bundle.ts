@@ -73,6 +73,7 @@ export async function loadBundleFromDb(slug: string): Promise<DbBundle | null> {
       images: p.images,
       // Sin stock en ninguna variante = la marca vende sin contar unidades.
       ...(p.product_variants.length && p.product_variants.every((v) => v.stock === null) ? { trackStock: false } : {}),
+      ...(Number(p.extra?.minQty) > 1 ? { minQty: Number(p.extra.minQty) } : {}),
       variants: [...p.product_variants]
         .sort((a, b) => a.position - b.position)
         .map((v) => ({

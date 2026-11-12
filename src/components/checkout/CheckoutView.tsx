@@ -128,7 +128,7 @@ export function CheckoutView() {
   const docData = () => (doc === "boleta" ? { type: "boleta" as const, dni: digits(f.dni) } : { type: "factura" as const, ruc: digits(f.ruc), razon: f.razon.trim() });
 
   const orderErrorText = (msg: string) =>
-    /stock|disponible/i.test(msg)
+    /stock|disponible|mínimo/i.test(msg)
       ? `${msg}. Revisa tu carrito: puede que alguien se haya llevado las últimas unidades.`
       : "No pudimos registrar tu pedido. Revisa tu conexión e inténtalo otra vez. No se realizó ningún cobro.";
 

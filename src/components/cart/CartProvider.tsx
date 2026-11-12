@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Product, Variant } from "@/lib/types";
 import { useStore } from "@/components/StoreContext";
+import { minQty } from "@/lib/catalog";
 
 export type CartItem = { productId: string; variantId: string; qty: number };
 export type CartLine = CartItem & { product: Product; variant: Variant; lineTotal: number };
@@ -58,7 +59,9 @@ export function CartProvider({ children, demo }: { children: ReactNode; demo?: C
         const product = catalog.products.find((p) => p.id === it.productId);
         const variant = product?.variants.find((v) => v.id === it.variantId);
         if (!product || !variant) return [];
-        return [{ ...it, product, variant, lineTotal: variant.price * it.qty }];
+        // Un carrito guardado antes de que la marca pusiera un pedido mínimo se sube al mínimo.
+        const qty = Math.max(minQty(product), it.qty);
+        return [{ ...it, qty, product, variant, lineTotal: variant.price * qty }];
       }),
     [items, catalog],
   );
@@ -68,33 +71,42 @@ export function CartProvider({ children, demo }: { children: ReactNode; demo?: C
       catalog.products.find((p) => p.id === productId)?.variants.find((v) => v.id === variantId)?.stock ?? 0,
     [catalog],
   );
+  const minOf = useCallback(
+    (productId: string) => {
+      const p = catalog.products.find((x) => x.id === productId);
+      return p ? minQty(p) : 1;
+    },
+    [catalog],
+  );
 
   const add = useCallback(
     (productId: string, variantId: string, qty = 1) => {
       const max = maxQty(productId, variantId);
-      if (max <= 0) return;
+      const min = minOf(productId);
+      if (max < min) return;
       setItems((prev) => {
         const found = prev.find((x) => x.productId === productId && x.variantId === variantId);
         if (found)
-          return prev.map((x) => (x === found ? { ...x, qty: Math.min(max, x.qty + qty) } : x));
-        return [...prev, { productId, variantId, qty: Math.min(max, qty) }];
+          return prev.map((x) => (x === found ? { ...x, qty: Math.min(max, Math.max(min, x.qty + qty)) } : x));
+        return [...prev, { productId, variantId, qty: Math.min(max, Math.max(min, qty)) }];
       });
       setLastKey(`${productId}/${variantId}`);
       setDrawerOpen(true);
     },
-    [maxQty],
+    [maxQty, minOf],
   );
 
   const setQty = useCallback(
     (productId: string, variantId: string, qty: number) => {
       const max = maxQty(productId, variantId);
+      const min = minOf(productId);
       setItems((prev) =>
         prev.map((x) =>
-          x.productId === productId && x.variantId === variantId ? { ...x, qty: Math.max(1, Math.min(max, qty)) } : x,
+          x.productId === productId && x.variantId === variantId ? { ...x, qty: Math.max(min, Math.min(max, qty)) } : x,
         ),
       );
     },
-    [maxQty],
+    [maxQty, minOf],
   );
 
   const setVariant = useCallback((productId: string, fromVariant: string, toVariant: string) => {

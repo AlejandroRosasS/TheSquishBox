@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AdminCatalog, AdminProduct } from "./types";
 import type { Line, Variant } from "@/lib/types";
+import { minQty } from "@/lib/catalog";
 
 /**
  * Catálogo del admin ↔ Supabase.
@@ -17,7 +18,7 @@ type ProductRow = {
   product_variants: VariantRow[];
 };
 
-type Extra = { lowAlert?: boolean; igSynced?: boolean };
+type Extra = { lowAlert?: boolean; igSynced?: boolean; minQty?: number };
 
 /** Fila de la base → producto editable. Sin stock en ninguna variante = «Sin control de stock». */
 export function productFromRow(r: ProductRow): AdminProduct {
@@ -49,6 +50,7 @@ export function productFromRow(r: ProductRow): AdminProduct {
     available: r.status !== "sold_out",
     lowAlert: extra.lowAlert !== false,
     igSynced: extra.igSynced ?? false,
+    ...(Number(extra.minQty) > 1 ? { minQty: Number(extra.minQty) } : {}),
     ...(r.ig_post_id ? { igPostId: r.ig_post_id } : {}),
     igImages: r.ig_images ?? [],
     photosSynced: r.photos_synced,
@@ -62,7 +64,7 @@ function storeStatus(p: AdminProduct): AdminProduct["status"] {
 }
 
 function productRow(tenantId: string, p: AdminProduct, position: number) {
-  const extra: Extra = { lowAlert: p.lowAlert !== false, igSynced: !!p.igSynced };
+  const extra: Extra = { lowAlert: p.lowAlert !== false, igSynced: !!p.igSynced, ...(minQty(p) > 1 ? { minQty: minQty(p) } : {}) };
   return {
     tenant_id: tenantId,
     slug: p.id,

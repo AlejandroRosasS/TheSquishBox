@@ -10,25 +10,27 @@ import { Photo } from "@/components/Photo";
 import { SLOTS } from "@/lib/media";
 import { formatPrice } from "@/lib/format";
 import { campaignDate } from "@/lib/campaigns";
-import { hasOptions, isSoldOut, LOW_STOCK, unitsLeft, variantStockLabel } from "@/lib/catalog";
+import { hasOptions, isSoldOut, LOW_STOCK, minQty, unitsLeft, variantStockLabel } from "@/lib/catalog";
 import { IconInstagram, IconMinus, IconPlus, IconTruck } from "@/components/Icons";
 
 export function ProductView({ product: p, lineLabel }: { product: Product; lineLabel: string }) {
   const { tenant, catalog, storefront: sf } = useStore();
   const cart = useCart();
   const cur = tenant.currency;
-  const allOut = isSoldOut(p);
-  const firstAvailable = p.variants.find((v) => unitsLeft(p, v) > 0) ?? p.variants[0];
+  const min = minQty(p);
+  // Con pedido mínimo, una opción con menos unidades que el mínimo no se puede pedir.
+  const allOut = isSoldOut(p) || p.variants.every((v) => unitsLeft(p, v) < min);
+  const firstAvailable = p.variants.find((v) => unitsLeft(p, v) >= min) ?? p.variants[0];
   const [vid, setVid] = useState(firstAvailable.id);
   const [img, setImg] = useState(0);
-  const [qty, setQty] = useState(1);
+  const [qty, setQty] = useState(min);
   const [notify, setNotify] = useState<"idle" | "error" | "done">("idle");
   const [email, setEmail] = useState("");
   const slider = useRef<HTMLDivElement>(null);
 
   const v = p.variants.find((x) => x.id === vid) ?? firstAvailable;
   const left = unitsLeft(p, v);
-  const curOut = allOut || left <= 0;
+  const curOut = allOut || left < min;
   const stockBadge = curOut ? "Agotado" : left <= LOW_STOCK ? `Últimas ${left}` : "";
   const images = p.images;
   const ig = `https://www.instagram.com/${tenant.instagram}/`;
@@ -43,7 +45,7 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
 
   const pickVariant = (id: string) => {
     setVid(id);
-    setQty(1);
+    setQty(min);
     // Si la opción tiene su propia foto, la galería salta a ella.
     const next = p.variants.find((x) => x.id === id);
     const i = next?.image ? p.images.indexOf(next.image) : -1;
@@ -130,7 +132,7 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
               <span className="label" id="variant-q">{p.optionsLabel || sf.product.variantQuestion}</span>
               <div className="seg" role="radiogroup" aria-labelledby="variant-q">
                 {p.variants.map((x) => {
-                  const out = unitsLeft(p, x) <= 0;
+                  const out = unitsLeft(p, x) < min;
                   const s = variantStockLabel(x, p);
                   return (
                     <button
@@ -154,7 +156,7 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
             <div className="stack g3">
               <div className="row g3">
                 <div className="qty">
-                  <button type="button" aria-label="Quitar uno" onClick={() => setQty(Math.max(1, qty - 1))} disabled={qty <= 1}>
+                  <button type="button" aria-label="Quitar uno" onClick={() => setQty(Math.max(min, qty - 1))} disabled={qty <= min}>
                     <IconMinus size="sm" />
                   </button>
                   <span aria-live="polite">{qty}</span>
@@ -166,6 +168,9 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
                   Agregar al carrito · {formatPrice(v.price * qty, cur)}
                 </button>
               </div>
+              {min > 1 && (
+                <p className="small muted">Pedido mínimo: {min} unidades{options ? " por opción" : ""}.</p>
+              )}
               {tenant.customOrder.enabled && (
                 <p className="small muted"><Rich text={sf.product.partyHint} /></p>
               )}

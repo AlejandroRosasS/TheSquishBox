@@ -34,6 +34,15 @@ export function unitsLeft(p: Product, v: Variant): number {
   return tracksStock(p) ? v.stock : UNTRACKED_STOCK;
 }
 
+/** Tope de unidades por línea que acepta la base al crear el pedido. */
+export const MAX_LINE_QTY = 50;
+
+/** Pedido mínimo del producto (unidades por opción): entero entre 1 y MAX_LINE_QTY. */
+export function minQty(p: Pick<Product, "minQty">): number {
+  const n = Math.floor(Number(p.minQty ?? 1));
+  return Number.isFinite(n) ? Math.min(MAX_LINE_QTY, Math.max(1, n)) : 1;
+}
+
 export function minPrice(p: Product): number {
   return Math.min(...p.variants.map((v) => v.price));
 }
