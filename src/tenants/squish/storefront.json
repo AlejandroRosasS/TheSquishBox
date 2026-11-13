@@ -180,7 +180,7 @@
     "pickupLabel": "En punto de entrega acordado · Gratis",
     "pickupNote": "**Recojo en punto acordado**\nTe escribimos por WhatsApp para coordinar el lugar y la hora en Lima.",
     "giftHint": "Lo escribimos a mano en una tarjeta. 120 caracteres máx.",
-    "deliveryRatesAreExample": true,
+    "deliveryRatesAreExample": false,
     "deliveryRates": {
       "Barranco": 15, "Jesús María": 15, "La Molina": 25, "Lince": 12, "Magdalena del Mar": 15,
       "Miraflores": 15, "Pueblo Libre": 18, "San Borja": 18, "San Isidro": 15, "San Miguel": 18,
@@ -188,6 +188,7 @@
     },
     "defaultDistrict": "Miraflores"
   },
+  "policies": { "shipRegion": "LMA" },
   "confirmation": {
     "title": "¡Gracias, {name}! *Tus sorpresas ya están en camino*",
     "lead": "Te enviamos el resumen a {email}. ¿Cuáles te tocarán?",

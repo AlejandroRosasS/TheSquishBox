@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, type ReactNode } from "react";
-import { HIDDEN_KEYS, PRODUCT_LIST_KEYS, isImageKey, isLong, isRichCandidate, itemLabelFor, labelFor, seoTagFor, seoWarning } from "@/lib/admin/textSchema";
+import { BOOL_KEYS, HIDDEN_KEYS, PRODUCT_LIST_KEYS, isImageKey, isLong, isRichCandidate, itemLabelFor, labelFor, seoTagFor, seoWarning } from "@/lib/admin/textSchema";
 import { plainText } from "@/lib/format";
 import { AIDown, AIPlus, AITrash, AIUp } from "./AdminIcons";
 import { Switch } from "./AdminPage";
@@ -162,15 +162,15 @@ export function FieldEditor({ k, value, onChange, ctx, depth = 0, path = k, inLi
       </div>
     );
   }
-  if (typeof value === "boolean") {
+  if (typeof value === "boolean" && BOOL_KEYS.has(k)) {
     return (
-      <div className="row g3 between" data-path={path} style={{ alignItems: "center" }}>
-        <span className="a-label" id={id}>{labelFor(k)}</span>
+      <div className="row between g3" data-path={path}>
+        <span id={id}>{labelFor(k)}</span>
         <Switch on={value} onChange={onChange} label={labelFor(k)} />
       </div>
     );
   }
-  if (value === null) return null;
+  if (value === null || typeof value === "boolean") return null;
 
   if (Array.isArray(value)) {
     const items = value;

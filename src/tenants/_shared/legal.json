@@ -1,5 +1,5 @@
 {
-  "_note": "Textos legales generales para todas las marcas. Una marca puede sobrescribir cualquier clave en su storefront.json o desde Admin › Textos. Variables: {name}, {legalName}, {ruc}, {address}, {email}, {phone}.",
+  "_note": "Textos legales generales para todas las marcas. Una marca puede sobrescribir cualquier clave en su storefront.json o desde Admin › Textos. Variables: {name}, {legalName}, {ruc}, {address}, {email}, {phone}; y de Envíos y cambios: {deliveryDaysMin}, {deliveryDaysMax}, {returnDays}.",
   "contact": {
     "eyebrow": "Contacto",
     "title": "¿Tienes una *pregunta*?",
@@ -67,11 +67,15 @@
     },
     "returns": {
       "title": "Cambios y devoluciones",
-      "lead": "Si algo salió mal con tu pedido, lo solucionamos.",
+      "lead": "Si algo salió mal con tu pedido, escríbenos y lo solucionamos contigo.",
       "sections": [
         {
           "title": "Producto con fallas o equivocado",
-          "text": "Si tu producto llegó dañado, con fallas de fábrica o no es el que compraste, escríbenos por WhatsApp al {phone} o a {email} dentro de los **7 días calendario** desde que lo recibiste, con fotos del producto y tu número de pedido. Te lo cambiamos por uno igual o, si no hay stock, te devolvemos tu dinero."
+          "text": "Si tu producto llegó dañado, con fallas de fábrica o no es el que compraste, escríbenos por WhatsApp al {phone}, por Instagram o a {email} dentro de los **{returnDays} días calendario** desde que lo recibiste, con fotos del producto y tu número de pedido. Te lo cambiamos por uno igual o, si no hay stock, te devolvemos tu dinero."
+        },
+        {
+          "title": "Atención personalizada",
+          "text": "Cada caso es distinto: nuestro equipo te responde por WhatsApp o Instagram y busca contigo la solución que mejor te funcione."
         },
         {
           "title": "Condiciones",
@@ -83,7 +87,7 @@
         },
         {
           "title": "Costo del envío",
-          "text": "Si el cambio es por falla o error nuestro, nosotros cubrimos el envío."
+          "text": "El envío del cambio corre por tu cuenta. Te ayudamos a coordinar la forma más práctica de hacerlo."
         }
       ]
     },
@@ -97,7 +101,7 @@
         },
         {
           "title": "Cuándo llega",
-          "text": "Después de tu compra te escribimos por WhatsApp para acordar el día y la hora de entrega. La fecha que eliges al comprar es tentativa hasta que la confirmamos contigo."
+          "text": "Normalmente entregamos entre {deliveryDaysMin} y {deliveryDaysMax} días hábiles después de tu compra. Te escribimos por WhatsApp para acordar el día y la hora; la fecha que eliges al comprar es tentativa hasta que la confirmamos contigo."
         },
         {
           "title": "Recojo",
@@ -131,5 +135,15 @@
   "complaints": {
     "title": "Libro de reclamaciones",
     "lead": "Conforme a lo establecido en el Código de Protección y Defensa del Consumidor, contamos con un Libro de reclamaciones virtual a tu disposición. Completa la hoja: al enviarla verás tu constancia con su número para guardarla o imprimirla."
+  },
+  "policies": {
+    "handlingDaysMin": 0,
+    "handlingDaysMax": 1,
+    "transitDaysMin": 1,
+    "transitDaysMax": 2,
+    "shipRegion": "",
+    "returnsAccepted": true,
+    "returnDays": 7,
+    "customerPaysReturnShipping": true
   }
 }

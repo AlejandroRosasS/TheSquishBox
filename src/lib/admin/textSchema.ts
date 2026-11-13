@@ -28,6 +28,7 @@ export const TEXT_SECTIONS: TextSection[] = [
   { id: "footer", title: "Pie de página", where: "Todas las páginas", onHome: true, keys: ["footer"] },
   { id: "contactForm", title: "Contacto y empresa", where: "Contacto (/contacto); los datos de la empresa también en el pie, páginas legales y Libro de reclamaciones", onHome: false, keys: ["business", "contact", "contactForm"], note: "Datos de la empresa: WhatsApp, correo, dirección y horario se ven en Contacto; razón social, RUC y dirección también en el pie de página (lo que piden Culqi e INDECOPI). Los mensajes del formulario llegan a Pedidos con la etiqueta «Contacto» y avisan por los canales prendidos en Notificaciones. «Motivos para elegir» son las opciones del selector «Motivo»." },
   { id: "legalPages", title: "Términos y políticas", where: "Términos, Cambios y devoluciones, Entregas y Privacidad", onHome: false, keys: ["legalPages"] },
+  { id: "policies", title: "Envíos y cambios", where: "Lo que Google muestra de cada producto (envío y cambios) y las páginas Entregas y Cambios y devoluciones", onHome: false, keys: ["policies"], note: "Google lee estos datos en cada producto. El costo del envío que ve Google es la tarifa más baja de tus distritos activos. Los días se usan en los textos de Entregas ({deliveryDaysMin} y {deliveryDaysMax}, en días hábiles) y de Cambios ({returnDays}, en días calendario). Si cambias quién paga el envío del cambio, revisa también el texto de Términos y políticas › Cambios y devoluciones." },
   { id: "complaints", title: "Libro de reclamaciones", where: "Libro de reclamaciones (/libro-de-reclamaciones)", onHome: false, keys: ["complaints"] },
   { id: "catalog", title: "Catálogo", where: "Tienda (/tienda)", onHome: false, keys: ["catalog"] },
   { id: "product", title: "Página de producto", where: "Cada producto", onHome: false, keys: ["product"] },
@@ -40,7 +41,10 @@ export const TEXT_SECTIONS: TextSection[] = [
 ];
 
 /** Claves que no son texto (o se editan en otra pantalla): no se muestran en Textos. */
-export const HIDDEN_KEYS = new Set(["_note", "legal", "legalLinks", "brand", "deliveryRates", "deliveryRatesAreExample", "defaultDistrict", "productId", "max", "hidden"]);
+export const HIDDEN_KEYS = new Set(["_note", "legal", "legalLinks", "brand", "deliveryRates", "deliveryRatesAreExample", "defaultDistrict", "productId", "max", "hidden", "shipRegion"]);
+
+/** Claves sí/no que se editan con un interruptor (el resto de booleanos no se muestra). */
+export const BOOL_KEYS = new Set(["returnsAccepted", "customerPaysReturnShipping", "showOnHome"]);
 
 /** Claves que guardan ids de productos: se editan con casillas. */
 export const PRODUCT_LIST_KEYS = new Set(["productIds", "popularIds"]);
@@ -168,6 +172,14 @@ const LABELS: Record<string, string> = {
   emailSubject: "Asunto del correo",
   emailText: "Texto del correo",
   emailButton: "Botón del correo",
+  policies: "Envíos y cambios",
+  handlingDaysMin: "Preparación del pedido: mínimo (días hábiles)",
+  handlingDaysMax: "Preparación del pedido: máximo (días hábiles)",
+  transitDaysMin: "Traslado del delivery: mínimo (días hábiles)",
+  transitDaysMax: "Traslado del delivery: máximo (días hábiles)",
+  returnsAccepted: "Aceptamos cambios",
+  returnDays: "Plazo para pedir un cambio (días calendario)",
+  customerPaysReturnShipping: "El cliente paga el envío del cambio",
 };
 
 /** Nombre de cada elemento de una lista (si no está, se usa el de la lista). */
