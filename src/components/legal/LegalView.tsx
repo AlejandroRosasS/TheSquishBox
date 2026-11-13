@@ -12,7 +12,7 @@ export function LegalView({ bundle, page }: { bundle: TenantBundle; page: LegalP
   const { tenant, storefront: sf } = bundle;
   const doc = sf.legalPages[page];
   const b = businessOf(tenant, sf);
-  const fill = (t: string) => fillLegal(t, tenant, b);
+  const fill = (t: string) => fillLegal(t, tenant, b, sf);
   const others = (Object.keys(LEGAL_ROUTES) as LegalPageKey[]).filter((k) => k !== page);
   return (
     <div className="wrap legal-page">

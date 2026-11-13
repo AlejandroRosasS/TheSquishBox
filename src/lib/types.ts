@@ -191,6 +191,8 @@ export type Storefront = {
     deliveryRatesAreExample: boolean;
     defaultDistrict: string;
   };
+  /** Envíos y cambios para Google y las páginas legales (ver src/lib/policies.ts). */
+  policies?: Partial<import("./policies").Policies>;
   confirmation: { title: string; lead: string; collectNote: string };
   party: {
     productId: string;

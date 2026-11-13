@@ -240,7 +240,7 @@
     "pickupLabel": "Recojo en taller · Gratis",
     "pickupNote": "**Taller The Bloom Studio**\n[Dirección del taller], Lima · [Horario de recojo]",
     "giftHint": "La escribimos a mano en una tarjeta. 120 caracteres máx.",
-    "deliveryRatesAreExample": true,
+    "deliveryRatesAreExample": false,
     "deliveryRates": {
       "Barranco": 15,
       "Jesús María": 15,
@@ -261,6 +261,7 @@
     },
     "defaultDistrict": "Miraflores"
   },
+  "policies": { "shipRegion": "LMA" },
   "confirmation": {
     "title": "¡Gracias, {name}! *Tu pedido está confirmado*",
     "lead": "Te enviamos el resumen a {email}.",

@@ -1,4 +1,5 @@
 import type { Business, LegalPageKey, Storefront, Tenant } from "./types";
+import { policiesOf, policyVars } from "./policies";
 
 /** Rutas fijas de las páginas legales (iguales en todas las marcas). */
 export const LEGAL_ROUTES: Record<LegalPageKey, string> = {
@@ -27,11 +28,14 @@ export function businessOf(tenant: Tenant, sf: Storefront): Business {
   return { ...b, phone: isPlaceholder(b.phone) ? tenant.whatsapp : b.phone };
 }
 
-/** Reemplaza {name}, {legalName}, {ruc}, {address}, {email}, {phone} en los textos legales. */
-export function fillLegal(text: string, tenant: Tenant, b: Business): string {
+/**
+ * Reemplaza {name}, {legalName}, {ruc}, {address}, {email}, {phone} en los textos legales y, si se pasa
+ * `sf`, también {deliveryDaysMin}, {deliveryDaysMax} y {returnDays} (Textos › Envíos y cambios).
+ */
+export function fillLegal(text: string, tenant: Tenant, b: Business, sf?: Pick<Storefront, "policies">): string {
   const { hidden: _hidden, ...data } = b;
   void _hidden;
-  const vars: Record<string, string> = { name: tenant.name, ...data };
+  const vars: Record<string, string> = { name: tenant.name, ...data, ...(sf ? policyVars(policiesOf(sf)) : {}) };
   return text.replace(/\{(\w+)\}/g, (m, k: string) => vars[k] ?? m);
 }
 
