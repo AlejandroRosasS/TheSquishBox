@@ -119,6 +119,11 @@ export function previewPage(secId: string, path: string | null, bundle: TenantBu
       const key = (parts[1] in sf.legalPages ? parts[1] : "terms") as LegalPageKey;
       return { where: LEGAL_NAMES[key], node: <LegalView bundle={bundle} page={key} />, chrome: true, scope: ["main"] };
     }
+    case "policies": {
+      // Los días de entrega salen en Entregas; lo demás, en Cambios y devoluciones.
+      const key: LegalPageKey = /^(handling|transit)/.test(parts[1] ?? "") ? "shipping" : "returns";
+      return { where: LEGAL_NAMES[key], node: <LegalView bundle={bundle} page={key} />, chrome: true, scope: ["main"] };
+    }
     case "complaints":
       return { where: "Libro de reclamaciones", node: <ComplaintForm />, chrome: true, scope: ["main"] };
     case "catalog":

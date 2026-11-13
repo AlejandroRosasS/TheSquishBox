@@ -9,7 +9,7 @@ export async function legalMetadata(key: LegalPageKey): Promise<Metadata> {
   const bundle = await getTenantBundle();
   const doc = bundle.storefront.legalPages[key];
   const b = businessOf(bundle.tenant, bundle.storefront);
-  return plainMetadata(bundle, { title: doc.title, description: fillLegal(doc.lead, bundle.tenant, b) }, LEGAL_ROUTES[key]);
+  return plainMetadata(bundle, { title: doc.title, description: fillLegal(doc.lead, bundle.tenant, b, bundle.storefront) }, LEGAL_ROUTES[key]);
 }
 
 /** Página legal (Términos, Cambios y devoluciones, Entregas, Privacidad): textos editables en Admin › Textos. */
