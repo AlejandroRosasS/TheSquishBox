@@ -271,6 +271,7 @@ export function NotificationsLive() {
 
   const evDefs: { key: AlertEvent | null; label: string; desc: string }[] = [
     { key: "order_new", label: "Nuevo pedido", desc: "Apenas el cliente confirma su compra (con tarjeta, cuando se aprueba el pago)" },
+    { key: "review_new", label: "Nueva reseña", desc: "Cuando un cliente deja una reseña: la revisas y la publicas en Reseñas" },
     { key: null, label: "Pago de diferencia de delivery", desc: "Pronto" },
     { key: null, label: "Stock bajo", desc: "Pronto" },
   ];

@@ -70,3 +70,19 @@ export function testMessage(brand: string, origin: string): AlertMessage {
     url: `${origin}/admin/pedidos`,
   };
 }
+
+export type ReviewAlertRow = { rating: number; body: string | null; author_name: string; products: { name: string } | null };
+
+/** Aviso de reseña nueva (una por link: puede traer varios productos). */
+export function reviewMessage(reviews: ReviewAlertRow[], origin: string): AlertMessage {
+  const stars = (n: number) => "★".repeat(n) + "☆".repeat(5 - n);
+  const who = reviews[0]?.author_name ?? "";
+  const lines = reviews.flatMap((r) => [`${stars(r.rating)} ${r.products?.name ?? ""}`.trim(), r.body ? `“${str(r.body).replace(/\s+/g, " ").slice(0, 300)}”` : ""]).filter(Boolean);
+  const first = reviews[0];
+  return {
+    title: `Nueva reseña de ${who}${reviews.length > 1 ? ` (${reviews.length} productos)` : ""}`,
+    lines: [...lines, "Revísala y publícala en el panel."],
+    oneLine: [who, ...reviews.map((r) => `${r.rating}/5 ${r.products?.name ?? ""}`.trim()), first?.body ? str(first.body).replace(/\s+/g, " ").slice(0, 120) : ""].filter(Boolean).join(" · "),
+    url: `${origin}/admin/resenas`,
+  };
+}

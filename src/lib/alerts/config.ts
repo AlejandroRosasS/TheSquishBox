@@ -7,7 +7,7 @@
 export const CHANNELS = ["telegram", "email", "whatsapp"] as const;
 export type ChannelKey = (typeof CHANNELS)[number];
 
-export const EVENTS = ["order_new", "party_new"] as const;
+export const EVENTS = ["order_new", "party_new", "review_new"] as const;
 export type AlertEvent = (typeof EVENTS)[number];
 
 export type Recipient = { to: string; label: string };
@@ -18,7 +18,7 @@ export const CHANNEL_NAMES: Record<ChannelKey, string> = { telegram: "Telegram",
 
 export const EMPTY_CONFIG: AlertConfig = {
   channels: { telegram: { on: false, recipients: [] }, email: { on: false, recipients: [] }, whatsapp: { on: false, recipients: [] } },
-  events: { order_new: true, party_new: true },
+  events: { order_new: true, party_new: true, review_new: true },
 };
 
 /** Completa lo que falte (documentos viejos o vacíos). */

@@ -8,7 +8,7 @@ import { PARTY_ROUTE, isContactForm } from "./customOrder";
 import { isPreviewHost, storeLive, validDomain } from "./hosts";
 
 /** Rutas que nunca se indexan: admin, servidor y pasos de compra. */
-export const PRIVATE_PATHS = ["/admin", "/api/", "/carrito", "/checkout", "/pedido/"];
+export const PRIVATE_PATHS = ["/admin", "/api/", "/carrito", "/checkout", "/pedido/", "/resena/"];
 
 export type Exposure =
   /** demo.*, *.vercel.app, localhost o SEO con «indexar» apagado: nada se indexa. */

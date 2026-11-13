@@ -6,6 +6,7 @@ import { SLOTS } from "@/lib/media";
 import { Rich } from "@/components/Rich";
 import { ProductCard } from "@/components/ProductCard";
 import { IconChevronRight, IconInstagram, IconStar } from "@/components/Icons";
+import { HomeReviews } from "@/components/reviews/HomeReviews";
 
 
 /** Home de la tienda. Es isomórfica: la usa la página pública y la vista previa del admin. */
@@ -145,6 +146,8 @@ export function HomeView({ bundle }: { bundle: TenantBundle }) {
           </div>
         </section>
       )}
+
+      <HomeReviews bundle={bundle} />
 
       <section className="section" id="tips" data-edit="tips">
         <div className="wrap stack g6">

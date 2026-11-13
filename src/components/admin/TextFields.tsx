@@ -162,7 +162,15 @@ export function FieldEditor({ k, value, onChange, ctx, depth = 0, path = k, inLi
       </div>
     );
   }
-  if (value === null || typeof value === "boolean") return null;
+  if (typeof value === "boolean") {
+    return (
+      <div className="row g3 between" data-path={path} style={{ alignItems: "center" }}>
+        <span className="a-label" id={id}>{labelFor(k)}</span>
+        <Switch on={value} onChange={onChange} label={labelFor(k)} />
+      </div>
+    );
+  }
+  if (value === null) return null;
 
   if (Array.isArray(value)) {
     const items = value;

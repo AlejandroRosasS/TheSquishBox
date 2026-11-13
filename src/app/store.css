@@ -585,3 +585,37 @@ body.no-scroll { overflow: hidden; }
   .hoja { border: 0; padding: 0; }
 }
 .footer .legal { align-items: center; }
+
+/* ───────── Reseñas ───────── */
+.stars { position: relative; display: inline-block; line-height: 0; vertical-align: middle; flex: none; }
+.stars-row { display: inline-flex; gap: 2px; white-space: nowrap; }
+.stars-row svg { fill: color-mix(in oklab, var(--text) 18%, transparent); flex: none; }
+.stars-row.on { position: absolute; inset: 0 auto 0 0; overflow: hidden; }
+.stars-row.on svg { fill: var(--accent); }
+.pcard .rate { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-2); }
+.pdp-rate { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-2); text-decoration: none; min-height: 44px; }
+.pdp-rate:hover { color: var(--text); }
+.reviews { padding: 24px 0 56px; border-top: 1px solid var(--border); margin-top: 24px; }
+.rgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.rcard { display: flex; flex-direction: column; gap: 10px; padding: 20px; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--surface); }
+.rcard .body { margin: 0; white-space: pre-line; }
+.rcard-prod { font-size: 13px; font-weight: 700; color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+.rcard-who { margin: auto 0 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.rcard-ok { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--primary-soft); color: var(--text); }
+.rcard-reply { border-left: 3px solid var(--border-strong); padding-left: 12px; display: flex; flex-direction: column; gap: 4px; }
+.rcard-reply p { margin: 0; }
+.rv-form { max-width: 640px; margin: 0 auto; padding: 48px 0 96px; }
+.rv-item { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 16px; padding: 20px; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--surface); }
+.rv-item .ph { border-radius: var(--r-sm, 12px); overflow: hidden; }
+.rv-stars { display: flex; gap: 4px; border: 0; padding: 0; margin: 0; }
+.rv-stars label { position: relative; display: grid; place-items: center; width: 44px; height: 44px; cursor: pointer; border-radius: 10px; }
+.rv-stars input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.rv-stars svg { width: 32px; height: 32px; fill: color-mix(in oklab, var(--text) 18%, transparent); transition: fill .12s; }
+.rv-stars label.on svg { fill: var(--accent); }
+.rv-stars input:focus-visible + svg { outline: 2px solid var(--text); outline-offset: 4px; border-radius: 6px; }
+@media (max-width: 980px) { .rgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) {
+  .rgrid { grid-template-columns: minmax(0, 1fr); }
+  .rv-form { padding: 28px 0 72px; }
+  .rv-item { grid-template-columns: 56px minmax(0, 1fr); padding: 16px; gap: 12px; }
+}

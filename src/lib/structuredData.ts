@@ -47,6 +47,26 @@ export function productLd(bundle: TenantBundle, p: Product): Ld | null {
     url,
     brand: { "@type": "Brand", name: tenant.name },
     offers,
+    ...reviewLd(bundle, p),
+  };
+}
+
+/**
+ * Estrellas para Google: solo con reseñas APROBADAS de clientes reales (link único por compra).
+ * Sin reseñas no se manda nada (el producto sigue siendo válido). Se mandan las 5 más nuevas.
+ */
+function reviewLd(bundle: TenantBundle, p: Product): Ld {
+  const mine = (bundle.reviews ?? []).filter((r) => r.productId === p.id);
+  if (!p.rating || !mine.length) return {};
+  return {
+    aggregateRating: { "@type": "AggregateRating", ratingValue: p.rating.avg.toFixed(1), reviewCount: p.rating.count, bestRating: 5, worstRating: 1 },
+    review: mine.slice(0, 5).map((r) => ({
+      "@type": "Review",
+      reviewRating: { "@type": "Rating", ratingValue: r.rating, bestRating: 5, worstRating: 1 },
+      author: { "@type": "Person", name: r.author },
+      datePublished: r.createdAt.slice(0, 10),
+      ...(r.body ? { reviewBody: r.body } : {}),
+    })),
   };
 }
 

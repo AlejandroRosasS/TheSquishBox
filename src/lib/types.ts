@@ -96,6 +96,10 @@ export type Product = {
   trackStock?: boolean;
   /** Pedido mínimo por línea del carrito (unidades de una misma opción). Si falta, 1. */
   minQty?: number;
+  /** Promedio y cantidad de reseñas APROBADAS (solo con Supabase). Sin reseñas, no viene. */
+  rating?: { avg: number; count: number };
+  /** Id en la base (uuid), solo con Supabase. */
+  dbId?: string;
 };
 
 export type Line = { id: string; name: string; order: number };
@@ -172,6 +176,29 @@ export type Storefront = {
     soldOutAllText: string;
     soldOutVariantText: string;
     moreTitle: string;
+  };
+  /** Reseñas: bloque del producto, sección de Inicio y la página del link que recibe el cliente. */
+  reviews: {
+    showOnHome: boolean;
+    eyebrow: string;
+    title: string;
+    productTitle: string;
+    verifiedLabel: string;
+    replyLabel: string;
+    formTitle: string;
+    formLead: string;
+    nameHelp: string;
+    commentPlaceholder: string;
+    submit: string;
+    thanksTitle: string;
+    thanksText: string;
+    invalidTitle: string;
+    invalidText: string;
+    /** {nombre}, {marca} y {link} se reemplazan al enviar. */
+    whatsappMessage: string;
+    emailSubject: string;
+    emailText: string;
+    emailButton: string;
   };
   cart: {
     emptyTitle: string;

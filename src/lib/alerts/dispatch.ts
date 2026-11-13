@@ -2,13 +2,14 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { ORDER_COLUMNS, type OrderRow } from "@/lib/db/orders";
 import { CHANNEL_NAMES, type ChannelKey } from "./config";
 import { sendAlert } from "./channels";
-import { orderMessage } from "./message";
+import { orderMessage, reviewMessage, type AlertMessage, type ReviewAlertRow } from "./message";
 import { tenantSlug } from "@/lib/tenant";
 
 type OutboxRow = {
   id: number;
   tenant_id: string;
   order_id: string | null;
+  request_id: string | null;
   event: string;
   channel: ChannelKey;
   recipient: string;
@@ -22,7 +23,7 @@ export const MAX_ATTEMPTS = BACKOFF_MIN.length + 1;
 
 export type DispatchResult = { sent: number; retried: number; failed: number };
 
-const CLAIM_COLUMNS = "id, tenant_id, order_id, event, channel, recipient, label, attempts, status";
+const CLAIM_COLUMNS = "id, tenant_id, order_id, request_id, event, channel, recipient, label, attempts, status";
 
 /**
  * Toma hasta `max` avisos vencidos que este despliegue puede enviar: correo y WhatsApp de cualquier marca
@@ -71,9 +72,15 @@ export async function dispatchAlerts(db: SupabaseClient, origin: string, budgetM
     const batch = await claimOwn(db, ownTenantId, 20);
     if (!batch.length) break;
 
-    const orderIds = [...new Set(batch.map((r) => r.order_id).filter(Boolean))] as string[];
-    const { data: orders } = await db.from("orders").select(ORDER_COLUMNS).in("id", orderIds);
+    const isReview = (r: OutboxRow) => r.event === "review_new";
+    const orderIds = [...new Set(batch.filter((r) => !isReview(r)).map((r) => r.order_id).filter(Boolean))] as string[];
+    const { data: orders } = orderIds.length ? await db.from("orders").select(ORDER_COLUMNS).in("id", orderIds) : { data: [] };
     const byId = new Map(((orders ?? []) as OrderRow[]).map((o) => [o.id, o]));
+    const requestIds = [...new Set(batch.filter(isReview).map((r) => r.request_id).filter(Boolean))] as string[];
+    const { data: revs } = requestIds.length
+      ? await db.from("reviews").select("request_id, rating, body, author_name, products(name)").in("request_id", requestIds)
+      : { data: [] };
+    const reviewsOf = (id: string | null) => ((revs ?? []) as unknown as (ReviewAlertRow & { request_id: string })[]).filter((r) => r.request_id === id);
     const missing = [...new Set(batch.map((r) => r.tenant_id))].filter((t) => !brands.has(t));
     if (missing.length) {
       const { data: ts } = await db.from("tenants").select("id, name").in("id", missing);
@@ -82,15 +89,26 @@ export async function dispatchAlerts(db: SupabaseClient, origin: string, budgetM
 
     await Promise.all(
       batch.map(async (row) => {
-        const order = row.order_id ? byId.get(row.order_id) : undefined;
         const channel = CHANNEL_NAMES[row.channel];
-        if (!order) {
-          // El pedido se borró: ya no hay nada que avisar.
-          await db.from("alert_outbox").update({ status: "failed", last_error: "El pedido ya no existe" }).eq("id", row.id);
-          return;
+        let message: AlertMessage;
+        if (isReview(row)) {
+          const list = reviewsOf(row.request_id);
+          if (!list.length) {
+            await db.from("alert_outbox").update({ status: "failed", last_error: "La reseña ya no existe" }).eq("id", row.id);
+            return;
+          }
+          message = reviewMessage(list, origin);
+        } else {
+          const order = row.order_id ? byId.get(row.order_id) : undefined;
+          if (!order) {
+            // El pedido se borró: ya no hay nada que avisar.
+            await db.from("alert_outbox").update({ status: "failed", last_error: "El pedido ya no existe" }).eq("id", row.id);
+            return;
+          }
+          message = orderMessage(order, origin);
         }
         const brand = brands.get(row.tenant_id) ?? "";
-        const r = await sendAlert(row.channel, row.recipient, orderMessage(order, origin), brand, `alert-${row.id}`);
+        const r = await sendAlert(row.channel, row.recipient, message, brand, `alert-${row.id}`);
         if (r.ok) {
           out.sent++;
           await db.from("alert_outbox").update({ status: "sent", sent_at: new Date().toISOString(), last_error: null }).eq("id", row.id);
@@ -119,6 +137,7 @@ export async function dispatchAlerts(db: SupabaseClient, origin: string, budgetM
 }
 
 async function logEvent(db: SupabaseClient, row: OutboxRow, text: string) {
-  if (!row.order_id) return;
+  // Los avisos de reseñas no se anotan en la actividad del pedido.
+  if (!row.order_id || row.event === "review_new") return;
   await db.from("order_events").insert({ tenant_id: row.tenant_id, order_id: row.order_id, kind: "alert", text });
 }

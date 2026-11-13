@@ -19,7 +19,7 @@ export const ROLES: { id: Role; label: string; summary: string; can: string[]; c
   {
     id: "staff",
     label: "Ventas",
-    summary: "El día a día: pedidos, productos, inventario, ventas, Instagram y reclamaciones.",
+    summary: "El día a día: pedidos, productos, inventario, ventas, Instagram, reseñas y reclamaciones.",
     can: ["Pedidos y pedidos especiales", "Productos, precios e inventario", "Ventas, Instagram y reclamaciones"],
     cannot: ["Cambiar la tienda (apariencia, textos, fotos, SEO)", "Notificaciones, ajustes y usuarios"],
   },
@@ -32,7 +32,7 @@ export const roleLabel = (r: Role) => ROLES.find((x) => x.id === r)?.label ?? r;
 export const isManager = (r: Role) => r === "owner" || r === "admin";
 
 /** Secciones que ve el perfil Ventas. El resto del panel es para Dueño y Administrador. */
-const STAFF_SECTIONS = ["/admin/pedidos", "/admin/fiestas", "/admin/productos", "/admin/inventario", "/admin/instagram", "/admin/ventas", "/admin/reclamaciones", "/admin/perfil"];
+const STAFF_SECTIONS = ["/admin/pedidos", "/admin/fiestas", "/admin/productos", "/admin/inventario", "/admin/instagram", "/admin/ventas", "/admin/reclamaciones", "/admin/resenas", "/admin/perfil"];
 
 export function canSee(role: Role, path: string): boolean {
   if (isManager(role)) return true;

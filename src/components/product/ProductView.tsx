@@ -13,6 +13,8 @@ import { formatPrice } from "@/lib/format";
 import { campaignDate } from "@/lib/campaigns";
 import { hasOptions, isSoldOut, LOW_STOCK, minQty, unitsLeft, variantStockLabel } from "@/lib/catalog";
 import { IconInstagram, IconMinus, IconPlus, IconTruck } from "@/components/Icons";
+import { Stars } from "@/components/reviews/Stars";
+import { countText, ratingText } from "@/lib/reviews";
 
 export function ProductView({ product: p, lineLabel }: { product: Product; lineLabel: string }) {
   const { tenant, catalog, storefront: sf } = useStore();
@@ -113,6 +115,12 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
           <div className="stack g2">
             <p className="eyebrow">Línea {lineLabel}</p>
             <h1 className="h1">{p.name}</h1>
+            {p.rating && (
+              <a className="pdp-rate" href="#resenas">
+                <Stars value={p.rating.avg} />
+                <span><b>{ratingText(p.rating.avg)}</b> · {countText(p.rating.count)}</span>
+              </a>
+            )}
             <div className="row g3" style={{ marginTop: 6 }}>
               <span className="price-lg">{formatPrice(v.price, cur)}</span>
               {v.listPrice !== undefined && v.listPrice > v.price && (

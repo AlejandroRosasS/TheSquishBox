@@ -1,4 +1,5 @@
 import type { Catalog, Seo, Storefront, Tenant } from "@/lib/types";
+import type { Review } from "@/lib/reviews";
 import squishTenant from "./squish/tenant.json";
 import squishCatalog from "./squish/catalog.json";
 import squishStorefront from "./squish/storefront.json";
@@ -30,6 +31,8 @@ export type TenantBundle = {
   media?: MediaMap;
   /** Llave pública de Culqi de la marca, si el cobro con tarjeta está activo (solo con Supabase). */
   culqiKey?: string | null;
+  /** Reseñas aprobadas, las más nuevas primero (solo con Supabase). */
+  reviews?: Review[];
 };
 
 /**
