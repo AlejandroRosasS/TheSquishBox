@@ -145,6 +145,27 @@
     "soldOutVariantText": "Déjanos tu correo y te avisamos cuando vuelva. Mientras tanto, elige otra opción disponible.",
     "moreTitle": "Más *sorpresas*"
   },
+  "reviews": {
+    "showOnHome": true,
+    "eyebrow": "Reseñas",
+    "title": "Lo que dicen nuestros *clientes*",
+    "productTitle": "Reseñas",
+    "verifiedLabel": "Compra verificada",
+    "replyLabel": "Respuesta de la tienda",
+    "formTitle": "¿Qué te pareció tu pedido?",
+    "formLead": "Califica cada producto. Tu reseña ayuda a otras personas a elegir y nos ayuda a mejorar.",
+    "nameHelp": "Así aparecerá tu nombre en la tienda. Por ejemplo: Ana R.",
+    "commentPlaceholder": "Cuéntanos qué te gustó, cómo llegó, para quién era…",
+    "submit": "Enviar mi reseña",
+    "thanksTitle": "¡Gracias por tu *reseña*!",
+    "thanksText": "La revisamos y la publicamos en la tienda en unos días.",
+    "invalidTitle": "Este link ya no está disponible",
+    "invalidText": "Puede que haya vencido o que esté incompleto. Escríbenos por WhatsApp y te mandamos uno nuevo.",
+    "whatsappMessage": "Hola {nombre}, gracias por tu compra en {marca}. ¿Nos cuentas qué te pareció? Te toma un minuto: {link}",
+    "emailSubject": "¿Qué te pareció tu pedido?",
+    "emailText": "Hola {nombre}, gracias por tu compra en {marca}. Nos encantaría saber qué te pareció. Te toma un minuto.",
+    "emailButton": "Dejar mi reseña"
+  },
   "cart": {
     "emptyTitle": "Tu carrito está *vacío*",
     "emptyLead": "¿Listo para descubrir cuál te toca? Elige tu caja sorpresa o arma las sorpresas de tu fiesta.",

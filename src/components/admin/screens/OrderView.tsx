@@ -12,6 +12,7 @@ import { useOrdersFromDb } from "../AdminOrders";
 import { AdminPage, BackLink, DemoNote } from "../AdminPage";
 import { AIAlert, AICheck, AIInfo, AILink, AIWhatsApp } from "../AdminIcons";
 import { deliveryState, orderTotal } from "./OrdersView";
+import { OrderReview } from "../OrderReview";
 
 const FLOW: OrderStatus[] = ["nuevo", "prep", "listo", "entregado"];
 
@@ -95,11 +96,15 @@ export function OrderView({ id }: { id: string }) {
             </button>
           ))}
         </div>
-        {o.status === "entregado" && (
+        {o.status === "entregado" && !fromDb && (
           <div className="a-banner ok"><AICheck size="sm" /><span><b>Pedido entregado.</b> Le enviamos a {first} un mensaje de agradecimiento con el link para compartir su unboxing y etiquetar a @{tenant.instagram}.</span></div>
         )}
         {o.status === "cancelado" && <div className="a-banner warn"><AIAlert size="sm" /><span>Pedido cancelado. Si ya estaba pagado, registra la devolución al cliente.</span></div>}
       </section>
+
+      {o.status === "entregado" && fromDb && "dbId" in o && typeof o.dbId === "string" && (
+        <OrderReview orderId={o.dbId} client={o.client} phone={o.phone} email={o.email ?? ""} productSlugs={o.lines.map((l) => l.productId).filter(Boolean)} />
+      )}
 
       <div className="a-cols">
         <div className="stack g5">

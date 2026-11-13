@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { serviceClient, serviceConfigured } from "@/lib/db/service";
 import { dispatchAlerts } from "@/lib/alerts/dispatch";
 import { siteOrigin } from "@/lib/alerts/origin";
+import { sendReviewEmails } from "@/lib/reviewEmails";
 
 export const maxDuration = 60;
 
@@ -26,8 +27,11 @@ export async function GET(req: NextRequest) {
   if (!secret || req.headers.get("authorization") !== `Bearer ${secret}`) return NextResponse.json({ ok: false }, { status: 401 });
   if (!serviceConfigured()) return NextResponse.json({ ok: false, message: "Falta SUPABASE_SECRET_KEY." }, { status: 503 });
   try {
-    const r = await dispatchAlerts(serviceClient(), siteOrigin(req), 45_000);
-    return NextResponse.json({ ok: true, ...r });
+    const db = serviceClient();
+    const r = await dispatchAlerts(db, siteOrigin(req), 40_000);
+    // Correos pidiendo reseña (a los 3 días de entregado). Un problema aquí no afecta los avisos de pedidos.
+    const reviews = await sendReviewEmails(db, siteOrigin(req)).catch(() => ({ sent: 0, failed: 0 }));
+    return NextResponse.json({ ok: true, ...r, reviewEmails: reviews });
   } catch (e) {
     return NextResponse.json({ ok: false, message: e instanceof Error ? e.message : "" }, { status: 500 });
   }

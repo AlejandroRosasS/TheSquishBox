@@ -18,6 +18,7 @@ const SECTIONS = [
   { href: "/admin/inventario", label: "Inventario" },
   { href: "/admin/instagram", label: "Instagram" },
   { href: "/admin/ventas", label: "Ventas y márgenes" },
+  { href: "/admin/resenas", label: "Reseñas" },
   { href: "/admin/reclamaciones", label: "Reclamaciones" },
   { href: "/admin/usuarios", label: "Usuarios" },
   { href: "/admin/ajustes", label: "Ajustes" },

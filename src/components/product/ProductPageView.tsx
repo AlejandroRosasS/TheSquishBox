@@ -5,6 +5,7 @@ import { lineName, visibleProducts } from "@/lib/catalog";
 import { Rich } from "@/components/Rich";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductView } from "./ProductView";
+import { ProductReviews } from "@/components/reviews/ProductReviews";
 
 /** Página de un producto (ruta, ficha y «más productos»). La usan la tienda y la vista previa del admin. */
 export function ProductPageView({ bundle, product }: { bundle: TenantBundle; product: Product }) {
@@ -22,6 +23,7 @@ export function ProductPageView({ bundle, product }: { bundle: TenantBundle; pro
         <span aria-current="page">{product.name}</span>
       </nav>
       <ProductView product={product} lineLabel={line} />
+      {sf.reviews && <ProductReviews product={product} reviews={bundle.reviews ?? []} sf={sf.reviews} />}
       {more.length > 0 && (
         <section className="stack g5" style={{ paddingBottom: 96 }}>
           <h2 className="h2"><Rich text={sf.product.moreTitle} /></h2>

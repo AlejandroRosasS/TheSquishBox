@@ -11,6 +11,7 @@ function Svg({ size = "", className = "", children, ...rest }: P) {
 }
 
 /* Íconos del panel (tomados de las pantallas A-*). */
+export const AIStar = (p: P) => <Svg {...p}><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z" /></Svg>;
 export const AIHome = (p: P) => <Svg {...p}><path d="M4 11 12 4l8 7v9H4z" /><path d="M10 20v-6h4v6" /></Svg>;
 export const AIOrders = (p: P) => <Svg {...p}><path d="M4 4h16v16H4z" /><path d="M4 14h5l1 2h4l1-2h5" /></Svg>;
 export const AIGift = (p: P) => <Svg {...p}><path d="M4 11h16v9H4zM3 7h18v4H3zM12 7v13" /><path d="M12 7C10 3 6.5 4 7.5 7M12 7c2-4 5.5-3 4.5 0" /></Svg>;

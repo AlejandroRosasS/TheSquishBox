@@ -32,6 +32,7 @@ export const TEXT_SECTIONS: TextSection[] = [
   { id: "complaints", title: "Libro de reclamaciones", where: "Libro de reclamaciones (/libro-de-reclamaciones)", onHome: false, keys: ["complaints"] },
   { id: "catalog", title: "Catálogo", where: "Tienda (/tienda)", onHome: false, keys: ["catalog"] },
   { id: "product", title: "Página de producto", where: "Cada producto", onHome: false, keys: ["product"] },
+  { id: "reviews", title: "Reseñas", where: "Inicio, cada producto, el catálogo y el link que recibe el cliente", onHome: true, keys: ["reviews"], note: "Las reseñas se aprueban en Admin › Reseñas; sin reseñas aprobadas no se muestra nada. En los mensajes, {nombre}, {marca} y {link} se reemplazan solos. Las estrellas del catálogo salen siempre que haya reseñas aprobadas." },
   { id: "cart", title: "Carrito", where: "Carrito", onHome: false, keys: ["cart"] },
   { id: "checkout", title: "Checkout", where: "Finalizar compra", onHome: false, keys: ["checkout"] },
   { id: "confirmation", title: "Confirmación", where: "Pedido confirmado", onHome: false, keys: ["confirmation"] },
@@ -43,7 +44,7 @@ export const TEXT_SECTIONS: TextSection[] = [
 export const HIDDEN_KEYS = new Set(["_note", "legal", "legalLinks", "brand", "deliveryRates", "deliveryRatesAreExample", "defaultDistrict", "productId", "max", "hidden", "shipRegion"]);
 
 /** Claves sí/no que se editan con un interruptor (el resto de booleanos no se muestra). */
-export const BOOL_KEYS = new Set(["returnsAccepted", "customerPaysReturnShipping"]);
+export const BOOL_KEYS = new Set(["returnsAccepted", "customerPaysReturnShipping", "showOnHome"]);
 
 /** Claves que guardan ids de productos: se editan con casillas. */
 export const PRODUCT_LIST_KEYS = new Set(["productIds", "popularIds"]);
@@ -154,6 +155,23 @@ const LABELS: Record<string, string> = {
   messageLabel: "Campo del mensaje",
   messagePlaceholder: "Ejemplo en el campo del mensaje",
   submitLabel: "Botón de enviar",
+  reviews: "Reseñas",
+  showOnHome: "Mostrar la sección en Inicio",
+  productTitle: "Título del bloque en cada producto",
+  verifiedLabel: "Etiqueta «compra verificada»",
+  replyLabel: "Título de la respuesta de la tienda",
+  formLead: "Bajada del formulario",
+  nameHelp: "Ayuda del campo nombre",
+  commentPlaceholder: "Ejemplo dentro del comentario",
+  submit: "Botón enviar",
+  thanksTitle: "Título de gracias",
+  thanksText: "Texto de gracias",
+  invalidTitle: "Título si el link no sirve",
+  invalidText: "Texto si el link no sirve",
+  whatsappMessage: "Mensaje de WhatsApp para pedir la reseña",
+  emailSubject: "Asunto del correo",
+  emailText: "Texto del correo",
+  emailButton: "Botón del correo",
   policies: "Envíos y cambios",
   handlingDaysMin: "Preparación del pedido: mínimo (días hábiles)",
   handlingDaysMax: "Preparación del pedido: máximo (días hábiles)",
@@ -246,6 +264,12 @@ const SEO_TAGS: Record<string, SeoTag> = {
   "contact.eyebrow": { tags: ["p", "title"], hint: `Texto chico arriba del título. ${TITLE_TAG}` },
   "contact.title": h(1, H1),
   "contact.lead": { tags: ["p", "meta description"], hint: META },
+  "reviews.eyebrow": eyebrow,
+  "reviews.title": h(2, H2),
+  "reviews.productTitle": h(2, H2),
+  "reviews.formTitle": h(1),
+  "reviews.thanksTitle": h(1),
+  "reviews.invalidTitle": h(1),
   "contactForm.formTitle": h(2),
   "contactForm.sentTitle": h(2),
   "contactForm.sentLead": p(),

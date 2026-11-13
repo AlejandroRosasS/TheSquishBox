@@ -13,7 +13,7 @@ import { useToday } from "@/lib/useToday";
 import { useRole } from "./useRole";
 import { useDb } from "./DbContext";
 import { canSee, isManager } from "@/lib/team/roles";
-import { AIUsers, AIBell, AIBox, AILayers, AIChart, AIGlobe, AIHome, AIInstagram, AIMore, AIOrders, AIPalette, AISettings, AIText, AIImage, AIBook } from "./AdminIcons";
+import { AIUsers, AIBell, AIBox, AILayers, AIChart, AIGlobe, AIHome, AIInstagram, AIMore, AIOrders, AIPalette, AISettings, AIText, AIImage, AIBook, AIStar } from "./AdminIcons";
 import { isSoldOut, totalStock, LOW_STOCK } from "@/lib/catalog";
 
 type Item = { href: string; label: string; icon: ReactNode; count?: number; exact?: boolean };
@@ -70,6 +70,7 @@ function ShellInner({ children, path }: { children: ReactNode; path: string }) {
     { href: "/admin/productos", label: "Productos", icon: <AIBox /> },
     ...(inventory ? [{ href: "/admin/inventario", label: "Inventario", icon: <AILayers /> }] : []),
     { href: "/admin/instagram", label: "Instagram", icon: <AIInstagram />, count: c.newPosts },
+    { href: "/admin/resenas", label: "Reseñas", icon: <AIStar /> },
     { href: "/admin/ventas", label: "Ventas y márgenes", icon: <AIChart /> },
   ];
   const store: Item[] = [
