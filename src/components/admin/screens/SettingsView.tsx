@@ -75,6 +75,7 @@ export function SettingsView() {
     { href: "/admin/textos", label: "Textos de la tienda" },
     { href: "/admin/seo", label: "SEO y redes" },
     { href: "/admin/notificaciones", label: "Notificaciones" },
+    { href: "/admin/resenas", label: "Reseñas de clientes" },
     { href: "/admin/reclamaciones", label: "Libro de reclamaciones" },
     { href: "/admin/ventas", label: "Ventas y márgenes" },
     { href: "/admin/usuarios", label: "Usuarios y accesos" },

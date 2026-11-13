@@ -604,7 +604,7 @@ body.no-scroll { overflow: hidden; }
 .rcard-ok { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--primary-soft); color: var(--text); }
 .rcard-reply { border-left: 3px solid var(--border-strong); padding-left: 12px; display: flex; flex-direction: column; gap: 4px; }
 .rcard-reply p { margin: 0; }
-.rv-form { max-width: 640px; margin: 0 auto; padding: 48px 0 96px; }
+.rv-form { max-width: 640px; margin: 0 auto; padding-block: 48px 96px; }
 .rv-item { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 16px; padding: 20px; border: 1px solid var(--border); border-radius: var(--r-md); background: var(--surface); }
 .rv-item .ph { border-radius: var(--r-sm, 12px); overflow: hidden; }
 .rv-stars { display: flex; gap: 4px; border: 0; padding: 0; margin: 0; }
@@ -613,9 +613,9 @@ body.no-scroll { overflow: hidden; }
 .rv-stars svg { width: 32px; height: 32px; fill: color-mix(in oklab, var(--text) 18%, transparent); transition: fill .12s; }
 .rv-stars label.on svg { fill: var(--accent); }
 .rv-stars input:focus-visible + svg { outline: 2px solid var(--text); outline-offset: 4px; border-radius: 6px; }
-@media (max-width: 980px) { .rgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 760px) {
+@container page (max-width: 980px) { .rgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@container page (max-width: 760px) {
   .rgrid { grid-template-columns: minmax(0, 1fr); }
-  .rv-form { padding: 28px 0 72px; }
+  .rv-form { padding-block: 28px 72px; }
   .rv-item { grid-template-columns: 56px minmax(0, 1fr); padding: 16px; gap: 12px; }
 }

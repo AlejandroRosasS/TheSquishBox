@@ -226,7 +226,7 @@ export function ReviewsView() {
           <h1 className="a-h1">Reseñas</h1>
           <p className="a-sub">Lo que opinan tus clientes de cada producto. Solo se publican las que apruebas, y solo esas ve Google.</p>
         </div>
-        {counts.approved > 0 && <span className="a-cap">{counts.approved} publicadas · promedio {avg.toFixed(1)} de 5</span>}
+        {counts.approved > 0 && <span className="a-cap">{counts.approved === 1 ? "1 publicada" : `${counts.approved} publicadas`} · promedio {avg.toFixed(1)} de 5</span>}
       </div>
 
       {state === "missing" && <p className="a-banner err">Las reseñas aún no están activadas en la base de datos (falta aplicar la migración 0017).</p>}
