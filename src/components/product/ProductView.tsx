@@ -16,6 +16,8 @@ import { IconInstagram, IconMinus, IconPlus, IconTruck } from "@/components/Icon
 
 export function ProductView({ product: p, lineLabel }: { product: Product; lineLabel: string }) {
   const { tenant, catalog, storefront: sf } = useStore();
+  // Texto de los tips: el de Textos manda; si una marca no lo tiene, se usan los del catálogo.
+  const tipsText = (sf.product.tipsText ?? (catalog.tips ?? []).join(" ")).trim();
   const cart = useCart();
   const cur = tenant.currency;
   const min = minQty(p);
@@ -210,10 +212,10 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
               <h3>Descripción</h3>
               <p className="body muted">{p.description}</p>
             </div>
-            {catalog.tips && catalog.tips.length > 0 && (
+            {tipsText && (
               <div className="info-item">
                 <h3>{sf.product.tipsTitle}</h3>
-                <p className="body muted">{catalog.tips.join(" ")}</p>
+                <p className="body muted"><Rich text={tipsText} /></p>
               </div>
             )}
           </div>
