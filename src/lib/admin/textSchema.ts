@@ -105,6 +105,7 @@ const LABELS: Record<string, string> = {
   partyHint: "Sugerencia del pedido especial",
   deliveryNote: "Nota de entrega",
   tipsTitle: "Título de los tips",
+  tipsText: "Texto de los tips",
   soldOutAllText: "Texto cuando está agotado",
   soldOutVariantText: "Texto cuando una variante está agotada",
   moreTitle: "Título «más productos»",
@@ -161,7 +162,7 @@ export function labelFor(key: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-const LONG_KEYS = new Set(["lead", "body", "text", "about", "footnote", "deliveryNote", "partyHint", "soldOutAllText", "soldOutVariantText", "emptyLead", "collectNote", "sentLead", "commentsPlaceholder", "messagePlaceholder", "giftHint"]);
+const LONG_KEYS = new Set(["lead", "body", "text", "about", "footnote", "deliveryNote", "partyHint", "soldOutAllText", "soldOutVariantText", "emptyLead", "collectNote", "sentLead", "commentsPlaceholder", "messagePlaceholder", "giftHint", "tipsText"]);
 
 export function isLong(key: string, value: string) {
   return LONG_KEYS.has(key) || value.length > 70;
@@ -249,7 +250,9 @@ const SEO_TAGS: Record<string, SeoTag> = {
   "catalog.partyCta.text": p(),
   "catalog.partyCta.cta": a,
   "product.moreTitle": h(2),
+  "product.deliveryNote": p("Recuadro con el camión, debajo del botón de compra. Sale igual en todos los productos."),
   "product.tipsTitle": h(3),
+  "product.tipsText": p("Sale igual en todos los productos. Déjalo vacío para no mostrar el recuadro de tips."),
   "cart.emptyTitle": { tags: ["h1"], hint: "Título del carrito vacío. El carrito no aparece en Google (noindex)." },
   "cart.emptyLead": p(),
   "cart.popularTitle": h(2),

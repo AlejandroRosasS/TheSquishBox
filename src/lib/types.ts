@@ -167,6 +167,8 @@ export type Storefront = {
     partyHint: string;
     deliveryNote: string;
     tipsTitle: string;
+    /** Texto de los tips (cuidados) en cada producto; vacío = no se muestra el recuadro. */
+    tipsText?: string;
     soldOutAllText: string;
     soldOutVariantText: string;
     moreTitle: string;
