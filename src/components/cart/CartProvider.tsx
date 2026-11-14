@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { Product, Variant } from "@/lib/types";
 import { useStore } from "@/components/StoreContext";
 import { minQty } from "@/lib/catalog";
+import { gaItem, gaValue, track } from "@/lib/analytics";
 
 export type CartItem = { productId: string; variantId: string; qty: number };
 export type CartLine = CartItem & { product: Product; variant: Variant; lineTotal: number };
@@ -84,6 +85,14 @@ export function CartProvider({ children, demo }: { children: ReactNode; demo?: C
       const max = maxQty(productId, variantId);
       const min = minOf(productId);
       if (max < min) return;
+      if (!demo) {
+        const product = catalog.products.find((p) => p.id === productId);
+        const variant = product?.variants.find((v) => v.id === variantId);
+        if (product && variant) {
+          const units = Math.min(max, Math.max(min, qty));
+          track("add_to_cart", { currency: tenant.currency, value: gaValue(variant.price * units), items: [gaItem(product, variant, units, catalog.lines)] });
+        }
+      }
       setItems((prev) => {
         const found = prev.find((x) => x.productId === productId && x.variantId === variantId);
         if (found)
@@ -93,7 +102,7 @@ export function CartProvider({ children, demo }: { children: ReactNode; demo?: C
       setLastKey(`${productId}/${variantId}`);
       setDrawerOpen(true);
     },
-    [maxQty, minOf],
+    [maxQty, minOf, demo, catalog, tenant.currency],
   );
 
   const setQty = useCallback(

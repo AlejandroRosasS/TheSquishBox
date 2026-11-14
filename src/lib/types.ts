@@ -292,4 +292,6 @@ export type Seo = {
   products: Record<string, Partial<SeoPage>>;
   indexing: boolean;
   googleVerification: string;
+  /** ID de medición de Google Analytics 4 («G-…»). Vacío = la tienda no carga Analytics. */
+  analyticsId?: string;
 };

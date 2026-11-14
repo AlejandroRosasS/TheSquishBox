@@ -11,6 +11,7 @@ import { useAdmin } from "../AdminContext";
 import { AdminPage, DemoNote, Switch } from "../AdminPage";
 import { ImagePicker, type FieldCtx } from "../TextFields";
 import { AIAlert } from "../AdminIcons";
+import { analyticsIdOf } from "@/lib/analytics";
 
 function Counted({ label, value, onChange, max, placeholder, long, hint }: { label: string; value: string; onChange: (v: string) => void; max: number; placeholder?: string; long?: boolean; hint?: string }) {
   const id = useId();
@@ -50,6 +51,7 @@ export function SeoView() {
   const [stLabel, stCls] = STATUS_LABEL[doc.status];
   const set = (patch: Partial<Seo>) => doc.edit((p) => ({ ...p, ...patch }));
   const host = tenant.domain;
+  const gaBad = !!seo.analyticsId && !analyticsIdOf(seo.analyticsId);
   const favicon = tenant.logo.image ? asset(tenant.slug, tenant.logo.image) : undefined;
   const ctx: FieldCtx = useMemo(() => {
     const imgs = new Set<string>([seo.shareImage, bundle.storefront.hero.image, ...catalog.products.flatMap((p) => p.images)].filter(Boolean));
@@ -154,6 +156,12 @@ export function SeoView() {
               <input id="seo-gv" className="a-input" value={seo.googleVerification} placeholder="Ej.: AbC123…" onChange={(e) => set({ googleVerification: e.target.value.trim() })} />
               <span className="a-cap">Pega solo el código del meta tag «google-site-verification». Sirve para ver cómo te encuentran en Google.</span>
             </div>
+            <div className="a-field">
+              <label htmlFor="seo-ga">ID de medición de Google Analytics</label>
+              <input id="seo-ga" className="a-input" value={seo.analyticsId ?? ""} placeholder="Ej.: G-AB12CD34EF" autoCapitalize="characters" spellCheck={false} aria-describedby="seo-ga-h" aria-invalid={gaBad || undefined} onChange={(e) => set({ analyticsId: e.target.value.trim().toUpperCase() })} />
+              {gaBad && <span className="a-err">El ID empieza con «G-» seguido de letras y números (ej.: G-AB12CD34EF).</span>}
+              <span className="a-cap" id="seo-ga-h">Lo encuentras en analytics.google.com › Administrar › Flujos de datos › tu web. Mide visitas, de dónde llegan (Instagram, Google, WhatsApp), productos vistos, carritos, checkouts y pedidos en soles. Vacío = no se carga Analytics. El panel de admin nunca se mide.</span>
+            </div>
             <div className="row between g3">
               <div>
                 <b>Mapa del sitio (sitemap.xml)</b>
@@ -186,7 +194,7 @@ export function SeoView() {
         <span className="a-cap">{doc.status === "live" ? "Publicado." : "Los cambios se aplican al publicar."}</span>
         <div className="row g2">
           <button className="a-btn" type="button" disabled={!doc.dirty} onClick={async () => { if (await doc.saveDraft()) toast("Borrador guardado"); }}>Guardar borrador</button>
-          <button className="a-btn primary" type="button" disabled={doc.status === "live" || !templateOk} onClick={async () => { if (await doc.publish()) toast("SEO publicado"); }}>Publicar</button>
+          <button className="a-btn primary" type="button" disabled={doc.status === "live" || !templateOk || gaBad} onClick={async () => { if (await doc.publish()) toast("SEO publicado"); }}>Publicar</button>
         </div>
       </div>
     </AdminPage>
