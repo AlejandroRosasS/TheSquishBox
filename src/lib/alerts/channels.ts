@@ -6,7 +6,8 @@ import type { AlertMessage } from "./message";
  * variables del servidor; el nombre de la marca va dentro del mensaje. Ver docs/ALERTAS.md.
  */
 
-export type SendResult = { ok: true } | { ok: false; error: string; permanent?: boolean; retryAfterSec?: number };
+/** migratedTo: el grupo de Telegram pasó a supergrupo y cambió de id; el aviso salió al id nuevo. */
+export type SendResult = { ok: true; migratedTo?: string } | { ok: false; error: string; permanent?: boolean; retryAfterSec?: number; migratedTo?: string };
 
 const env = (k: string) => process.env[k]?.trim() ?? "";
 
@@ -44,13 +45,21 @@ export async function telegram(method: string, body: Record<string, unknown>) {
   return { status: res.status, json: await readJson(res) };
 }
 
-async function sendTelegram(chatId: string, m: AlertMessage): Promise<SendResult> {
+async function sendTelegram(chatId: string, m: AlertMessage, migrated = false): Promise<SendResult> {
   const text = [m.title, "", ...m.lines].join("\n");
   const button = m.url.startsWith("https://") ? { reply_markup: { inline_keyboard: [[{ text: "Ver en el panel", url: m.url }]] } } : {};
   const { status, json } = await telegram("sendMessage", { chat_id: chatId, text: m.url.startsWith("https://") ? text : `${text}\n\n${m.url}`, ...button });
   if (json.ok) return { ok: true };
+  const params = (json.parameters ?? {}) as Record<string, unknown>;
+  // Un grupo que pasa a supergrupo (al hacer admin a alguien, activar el historial, etc.) cambia de id:
+  // Telegram avisa el id nuevo y se reenvía ahí. Quien llama guarda el id nuevo (ver migrateTelegramChat).
+  if (params.migrate_to_chat_id && !migrated) {
+    const newId = String(params.migrate_to_chat_id);
+    const r = await sendTelegram(newId, m, true);
+    return { ...r, migratedTo: newId };
+  }
   const error = `Telegram: ${String(json.description ?? `error ${status}`)}`;
-  const retry = Number((json.parameters as Record<string, unknown> | undefined)?.retry_after ?? 0);
+  const retry = Number(params.retry_after ?? 0);
   // 400 (chat no existe) y 403 (sacaron al bot del grupo) no se arreglan reintentando.
   return { ok: false, error, permanent: status === 400 || status === 403, retryAfterSec: retry || undefined };
 }

@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { serviceClient, serviceConfigured } from "@/lib/db/service";
 import { telegram } from "@/lib/alerts/channels";
+import { migrateTelegramChat } from "@/lib/alerts/server";
 import { formatPrice } from "@/lib/format";
 import { MANUAL_CHANNELS, readSalesCsv, type SaleDraft } from "@/lib/sales/csv";
 import { limaToday, makePricer } from "@/lib/sales/pricer";
@@ -28,6 +29,8 @@ type Message = {
   reply_to_message?: { message_id: number };
   caption?: string;
   document?: { file_id: string; file_name?: string; mime_type?: string; file_size?: number };
+  migrate_to_chat_id?: number;
+  migrate_from_chat_id?: number;
 };
 type Update = { update_id: number; message?: Message; callback_query?: { id: string; from: { first_name?: string }; data?: string; message?: Message } };
 
@@ -76,6 +79,9 @@ const looksLikeCsv = (t: string) => {
 
 async function onMessage(m: Message) {
   const db = serviceClient();
+  // El grupo pasó a supergrupo y cambió de id: el destinatario de las alertas sigue al id nuevo.
+  if (m.migrate_to_chat_id) return void (await migrateTelegramChat(db, String(m.chat.id), String(m.migrate_to_chat_id)));
+  if (m.migrate_from_chat_id) return void (await migrateTelegramChat(db, String(m.migrate_from_chat_id), String(m.chat.id)));
   const text = (m.text ?? "").trim();
   const cmd = text.match(/^\/(\w+)(?:@\w+)?(?:\s+([\s\S]*))?$/);
 
