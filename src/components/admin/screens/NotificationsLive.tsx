@@ -271,6 +271,7 @@ export function NotificationsLive() {
 
   const evDefs: { key: AlertEvent | null; label: string; desc: string }[] = [
     { key: "order_new", label: "Nuevo pedido", desc: "Apenas el cliente confirma su compra (con tarjeta, cuando se aprueba el pago)" },
+    { key: "party_new", label: "Nuevo mensaje de contacto", desc: "Cuando alguien te escribe desde el formulario de Contacto" },
     { key: "review_new", label: "Nueva reseña", desc: "Cuando un cliente deja una reseña: la revisas y la publicas en Reseñas" },
     { key: null, label: "Pago de diferencia de delivery", desc: "Pronto" },
     { key: null, label: "Stock bajo", desc: "Pronto" },
@@ -280,7 +281,7 @@ export function NotificationsLive() {
 
   return (
     <AdminPage title="Notificaciones" back={{ href: "/admin/ajustes", label: "Ajustes" }}>
-      <div className="a-head"><div className="stack g1"><h1 className="a-h1">Notificaciones</h1><p className="a-sub">Cómo y a quién del equipo avisamos cuando entra un pedido.</p></div></div>
+      <div className="a-head"><div className="stack g1"><h1 className="a-h1">Notificaciones</h1><p className="a-sub">Cómo y a quién del equipo avisamos cuando entra un pedido o un mensaje.</p></div></div>
       {!activeChannels.length && (
         <div className="a-banner err" role="alert"><AIAlert size="sm" /><span><b>Ningún canal está avisando.</b> Los pedidos igual quedan guardados en Pedidos, pero nadie del equipo recibirá el aviso. Activa al menos un canal con destinatarios.</span></div>
       )}
