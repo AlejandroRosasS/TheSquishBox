@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { track } from "@/lib/analytics";
 import { useStore } from "@/components/StoreContext";
 import { Rich } from "@/components/Rich";
 import { fill } from "@/lib/format";
@@ -64,6 +65,8 @@ export function ContactForm() {
       localStorage.setItem(`contact:${tenant.slug}`, String(n));
       code = partyCode(n, party);
     }
+    // Google Analytics: un contacto enviado cuenta como «lead» (sin datos personales, solo el motivo).
+    track("generate_lead", { lead_source: "contacto", reason: reason || undefined });
     setSent({ id: code, name: name.trim().split(" ")[0], phone: phone.trim(), reason });
     document.getElementById("c-form-title")?.scrollIntoView?.({ behavior: "smooth", block: "center" });
   };
