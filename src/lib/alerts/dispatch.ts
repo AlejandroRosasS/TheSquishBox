@@ -4,6 +4,7 @@ import { CHANNEL_NAMES, type ChannelKey } from "./config";
 import { sendAlert } from "./channels";
 import { orderMessage, reviewMessage, type AlertMessage, type ReviewAlertRow } from "./message";
 import { tenantSlug } from "@/lib/tenant";
+import { migrateTelegramChat } from "./server";
 
 type OutboxRow = {
   id: number;
@@ -109,6 +110,10 @@ export async function dispatchAlerts(db: SupabaseClient, origin: string, budgetM
         }
         const brand = brands.get(row.tenant_id) ?? "";
         const r = await sendAlert(row.channel, row.recipient, message, brand, `alert-${row.id}`);
+        if (r.migratedTo) {
+          await migrateTelegramChat(db, row.recipient, r.migratedTo);
+          await db.from("alert_outbox").update({ recipient: r.migratedTo }).eq("id", row.id);
+        }
         if (r.ok) {
           out.sent++;
           await db.from("alert_outbox").update({ status: "sent", sent_at: new Date().toISOString(), last_error: null }).eq("id", row.id);
