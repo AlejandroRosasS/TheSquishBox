@@ -2,7 +2,7 @@
 
 import { customOrderHref, isContactForm } from "@/lib/customOrder";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Product } from "@/lib/types";
 import { useStore } from "@/components/StoreContext";
 import { useCart } from "@/components/cart/CartProvider";
@@ -15,6 +15,7 @@ import { hasOptions, isSoldOut, LOW_STOCK, minQty, unitsLeft, variantStockLabel 
 import { IconInstagram, IconMinus, IconPlus, IconTruck } from "@/components/Icons";
 import { Stars } from "@/components/reviews/Stars";
 import { countText, ratingText } from "@/lib/reviews";
+import { gaItem, track } from "@/lib/analytics";
 
 export function ProductView({ product: p, lineLabel }: { product: Product; lineLabel: string }) {
   const { tenant, catalog, storefront: sf } = useStore();
@@ -34,6 +35,12 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
   const slider = useRef<HTMLDivElement>(null);
 
   const v = p.variants.find((x) => x.id === vid) ?? firstAvailable;
+
+  // Google Analytics: una vista por producto abierto (con la opción que se muestra primero).
+  useEffect(() => {
+    track("view_item", { currency: tenant.currency, value: firstAvailable.price, items: [gaItem(p, firstAvailable, 1, catalog.lines)] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- solo al abrir otro producto
+  }, [p.id]);
   const left = unitsLeft(p, v);
   const curOut = allOut || left < min;
   const stockBadge = curOut ? "Agotado" : left <= LOW_STOCK ? `Últimas ${left}` : "";

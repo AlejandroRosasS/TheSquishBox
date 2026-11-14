@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useStore } from "@/components/StoreContext";
 import { useCart } from "@/components/cart/CartProvider";
 import { Rich } from "@/components/Rich";
@@ -11,6 +11,7 @@ import { hasOptions, variantImage } from "@/lib/catalog";
 import { formatPrice, plural } from "@/lib/format";
 import { saveOrder } from "@/lib/orders";
 import { kickAlerts, orderCode, placeOrder } from "@/lib/db/orders";
+import { gaItem, gaValue, track } from "@/lib/analytics";
 import { useToday } from "@/lib/useToday";
 import { authenticate3DS, chargeOrder, deviceFingerprint, openCulqiCheckout, preloadCulqi } from "@/lib/culqi/client";
 import { IconAlert, IconBag, IconChevronLeft, IconLock, IconPin, IconTruck } from "@/components/Icons";
@@ -25,7 +26,7 @@ const digits = (s: string) => s.replace(/\D/g, "");
 
 
 export function CheckoutView() {
-  const { tenant, storefront: sf, source, culqiKey } = useStore();
+  const { tenant, catalog, storefront: sf, source, culqiKey } = useStore();
   const cart = useCart();
   const router = useRouter();
   const cur = tenant.currency;
@@ -66,6 +67,14 @@ export function CheckoutView() {
   useEffect(() => {
     if (cardLive && pay === "tarjeta") preloadCulqi();
   }, [cardLive, pay]);
+
+  // Google Analytics: «inició el checkout», una vez por visita a esta página y con carrito lleno.
+  const checkoutTracked = useRef(false);
+  useEffect(() => {
+    if (!cart.ready || cart.lines.length === 0 || checkoutTracked.current) return;
+    checkoutTracked.current = true;
+    track("begin_checkout", { currency: tenant.currency, value: gaValue(cart.subtotal), items: cart.lines.map((l, i) => gaItem(l.product, l.variant, l.qty, catalog.lines, i)) });
+  }, [cart.ready, cart.lines, cart.subtotal, tenant.currency, catalog.lines]);
 
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setF((prev) => ({ ...prev, [k]: e.target.value }));
@@ -135,6 +144,15 @@ export function CheckoutView() {
   /** Copia local para la página de confirmación y vuelta a empezar. */
   const finish = (id: string | undefined, finalTotal: number) => {
     const shipping = shippingInfo();
+    // Google Analytics: pedido registrado (Yape: por confirmar; tarjeta: cobrado). En soles, con el total de la base.
+    track("purchase", {
+      transaction_id: id ?? `local-${Date.now()}`,
+      currency: tenant.currency,
+      value: gaValue(finalTotal),
+      shipping: isDelivery ? gaValue(rate || 0) : 0,
+      payment_type: pay,
+      items: cart.lines.map((l, i) => gaItem(l.product, l.variant, l.qty, catalog.lines, i)),
+    });
     const order = saveOrder(tenant.slug, {
       customer: customerInfo(),
       shipping,
