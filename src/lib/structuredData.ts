@@ -145,7 +145,9 @@ export function storeLd(bundle: TenantBundle): Ld | null {
     hasOfferCatalog: {
       "@type": "OfferCatalog",
       name: tenant.name,
-      itemListElement: visibleProducts(bundle.catalog).map((p) => ({ "@type": "Offer", itemOffered: { "@id": `${abs(bundle, productPath(p))}#product`, "@type": "Product", name: p.name } })),
+      // Solo links (ListItem), sin nodos Product: Google lee cualquier Product como ficha de producto y exige
+      // offers/review/aggregateRating. El Product completo (con precio) vive en la página de cada producto.
+      itemListElement: visibleProducts(bundle.catalog).map((p, i) => ({ "@type": "ListItem", position: i + 1, name: p.name, url: abs(bundle, productPath(p)) })),
     },
   };
   return JSON.parse(JSON.stringify(ld)) as Ld; // quita los campos vacíos
