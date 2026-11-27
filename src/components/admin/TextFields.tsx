@@ -9,6 +9,8 @@ import { BUSINESS_TOGGLES } from "@/lib/legal";
 import { SlotImage } from "./SlotImage";
 import { useAdminMedia } from "./AdminMedia";
 import { OriginTag, Thumb, UploadButton } from "./PhotoPicker";
+import { NewsItemsEditor } from "./NewsItems";
+import type { NewsItem } from "@/lib/types";
 
 type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
 
@@ -140,6 +142,9 @@ export function FieldEditor({ k, value, onChange, ctx, depth = 0, path = k, inLi
   if (HIDDEN_KEYS.has(k)) return null;
   const at = (sub: string | number) => `${path}.${sub}`;
 
+  if (path === "news.items" && Array.isArray(value)) {
+    return <NewsItemsEditor items={value as unknown as NewsItem[]} onChange={(v) => onChange(v as unknown as Json)} />;
+  }
   if (PRODUCT_LIST_KEYS.has(k) && Array.isArray(value)) {
     return <div data-path={path}><ProductChecks k={k} value={value as string[]} onChange={onChange} ctx={ctx} /></div>;
   }
