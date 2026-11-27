@@ -1,6 +1,6 @@
 import type { Line, Product } from "@/lib/types";
 
-export type OrderStatus = "nuevo" | "prep" | "listo" | "entregado" | "cancelado";
+export type OrderStatus = "nuevo" | "prep" | "listo" | "espera" | "transito" | "entregado" | "cancelado";
 /** `name` y `variantLabel`: copia guardada al comprar (pedidos de la base), por si el producto cambia o se borra. */
 /** `campaignId`/`campaign`/`listPrice`: si se vendió con precio de una campaña de oferta (nombre y precio regular del momento). */
 export type DemoOrderLine = { productId: string; variantId: string; qty: number; price: number; name?: string; variantLabel?: string; campaignId?: string; campaign?: string; listPrice?: number };

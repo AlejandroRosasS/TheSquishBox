@@ -15,8 +15,42 @@ export type AlertMessage = {
 const str = (v: unknown) => (typeof v === "string" ? v.trim() : v == null ? "" : String(v));
 const PAY: Record<string, string> = { yape: "Yape", plin: "Plin", tarjeta: "tarjeta" };
 
-/** Arma el aviso de un pedido nuevo con lo que se guardó en la base. Sin textos de marca: el nombre viene de la base. */
-export function orderMessage(o: OrderRow, origin: string): AlertMessage {
+/** Títulos de los avisos de cambios (el evento dice a qué estado pasó, aunque luego haya cambiado otra vez). */
+const CHANGE_TITLE: Record<string, string> = {
+  order_paid: "Pago confirmado",
+  order_preparing: "En preparación",
+  order_ready: "Listo",
+  order_awaiting_courier: "Esperando delivery",
+  order_in_transit: "En tránsito",
+  order_delivered: "Entregado",
+  order_cancelled: "Cancelado",
+};
+
+/** Aviso de un cambio en un pedido de la tienda: pago confirmado o nuevo estado. Más corto que el de pedido nuevo. */
+function changeMessage(o: OrderRow, origin: string, event: string): AlertMessage {
+  const c = (o.customer ?? {}) as Record<string, unknown>;
+  const d = (o.delivery ?? {}) as Record<string, unknown>;
+  const code = orderCode(o.number);
+  const total = formatPrice(Number(o.total));
+  const what = CHANGE_TITLE[event] ?? event;
+  const who = [str(c.name), str(c.phone)].filter(Boolean).join(" · ");
+  const where = d.mode === "pickup" ? "Recojo" : [str(d.district), str(d.address)].filter(Boolean).join(" · ");
+  const method = PAY[o.payment_method ?? ""] ?? o.payment_method ?? "";
+  const pay = event === "order_paid" ? `${total} con ${method}` : o.payment_status === "paid" ? `Pagado · ${total}` : `Pago por confirmar · ${total}`;
+  return {
+    title: event === "order_paid" ? `Pago confirmado · pedido #${code}` : `Pedido #${code} · ${what}`,
+    lines: [who, where, pay].filter(Boolean),
+    oneLine: [`#${code}`, what, str(c.name), total].filter(Boolean).join(" · "),
+    url: `${origin}/admin/pedidos/${code}`,
+  };
+}
+
+/**
+ * Arma el aviso de un pedido con lo que se guardó en la base. Sin textos de marca: el nombre viene de la base.
+ * `event`: order_new / party_new (pedido o mensaje nuevo) o un cambio (order_paid, order_preparing, …).
+ */
+export function orderMessage(o: OrderRow, origin: string, event = "order_new"): AlertMessage {
+  if (event in CHANGE_TITLE && o.kind === "store") return changeMessage(o, origin, event);
   const c = (o.customer ?? {}) as Record<string, unknown>;
   const d = (o.delivery ?? {}) as Record<string, unknown>;
   const who = [str(c.name), str(c.phone)].filter(Boolean).join(" · ");

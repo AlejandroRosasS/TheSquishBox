@@ -8,6 +8,8 @@ export const ORDER_STATUS: Record<string, [string, string]> = {
   nuevo: ["Nuevo", "nuevo"],
   prep: ["En preparación", "prep"],
   listo: ["Listo", "listo"],
+  espera: ["Esperando delivery", "espera"],
+  transito: ["En tránsito", "transito"],
   entregado: ["Entregado", "entregado"],
   cancelado: ["Cancelado", "cancelado"],
 };

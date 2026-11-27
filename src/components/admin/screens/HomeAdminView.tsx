@@ -24,7 +24,7 @@ export function HomeAdminView() {
   const pname = (id: string) => catalog.products.find((p) => p.id === id);
 
   const pending = orders.filter((o) => o.status === "nuevo" || o.delivery === "pend").slice(0, 4);
-  const toDeliver = orders.filter((o) => o.status === "listo" || o.status === "prep").length;
+  const toDeliver = orders.filter((o) => ["prep", "listo", "espera", "transito"].includes(o.status)).length;
   const diffs = orders.filter((o) => o.delivery === "pend" || o.delivery === "dev").length;
   const stock = catalog.products
     .filter((p) => p.status !== "draft")

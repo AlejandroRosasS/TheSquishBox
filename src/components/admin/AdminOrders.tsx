@@ -97,7 +97,10 @@ function OrdersProviderInner({ children }: { children: ReactNode }) {
       if (error) {
         toast(`No se pudo guardar el pedido: ${error.message}`);
         void load();
+        return;
       }
+      // Un cambio de estado o de pago deja avisos en la cola (los crea la base): se envían ya, sin esperar al cron.
+      if ("status" in patch || "payment_status" in patch) kickAlerts();
     },
     [client, load, toast],
   );

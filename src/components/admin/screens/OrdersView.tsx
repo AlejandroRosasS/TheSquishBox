@@ -23,7 +23,7 @@ export function deliveryState(o: DemoOrder & { link?: string; refund?: string })
 }
 
 /** Filtros: estado del pedido; «fiestas» muestra solo los pedidos para fiestas. Las fiestas «nueva» cuentan como nuevos. */
-type Filter = "all" | "nuevo" | "prep" | "listo" | "entregado" | "cancelado" | "fiestas";
+type Filter = "all" | "nuevo" | "prep" | "listo" | "espera" | "transito" | "entregado" | "cancelado" | "fiestas";
 const PARTY_AS: Record<string, Filter> = { nueva: "nuevo", cotizada: "prep", aceptada: "prep", descartada: "cancelado" };
 
 export function OrdersView() {
@@ -38,7 +38,7 @@ export function OrdersView() {
   const [q, setQ] = useState("");
   const items = (o: DemoOrder) => o.lines.map((l) => `${catalog.products.find((p) => p.id === l.productId)?.name ?? l.name ?? l.productId}${l.qty > 1 ? ` ×${l.qty}` : ""}`).join(" + ");
   const defs: [Filter, string][] = [
-    ["all", "Todos"], ["nuevo", "Nuevo"], ["prep", "En preparación"], ["listo", "Listo"], ["entregado", "Entregado"], ["cancelado", "Cancelado"],
+    ["all", "Todos"], ["nuevo", "Nuevo"], ["prep", "En preparación"], ["listo", "Listo"], ["espera", "Esperando delivery"], ["transito", "En tránsito"], ["entregado", "Entregado"], ["cancelado", "Cancelado"],
     ...(parties.length ? ([["fiestas", partyLabel]] as [Filter, string][]) : []),
   ];
   const match = (text: string) => !q || text.toLowerCase().includes(q.toLowerCase().replace("#", ""));

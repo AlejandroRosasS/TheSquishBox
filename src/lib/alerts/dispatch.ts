@@ -106,7 +106,7 @@ export async function dispatchAlerts(db: SupabaseClient, origin: string, budgetM
             await db.from("alert_outbox").update({ status: "failed", last_error: "El pedido ya no existe" }).eq("id", row.id);
             return;
           }
-          message = orderMessage(order, origin);
+          message = orderMessage(order, origin, row.event);
         }
         const brand = brands.get(row.tenant_id) ?? "";
         const r = await sendAlert(row.channel, row.recipient, message, brand, `alert-${row.id}`);
