@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "@/components/StoreContext";
 import { useCart } from "@/components/cart/CartProvider";
+import { OfferSplitNote } from "@/components/cart/CartLineControls";
 import { Rich } from "@/components/Rich";
 import { asset } from "@/lib/assets";
 import { hasOptions, variantImage } from "@/lib/catalog";
@@ -163,7 +164,8 @@ export function CheckoutView() {
         name: l.product.name,
         variantLabel: hasOptions(l.product) ? l.variant.label : "",
         qty: l.qty,
-        price: l.variant.price,
+        // Con tope de oferta la línea mezcla precios: se guarda el promedio para que el total cuadre.
+        price: l.lineTotal / l.qty,
         image: variantImage(l.product, l.variant),
       })),
       subtotal: cart.subtotal,
@@ -446,7 +448,7 @@ export function CheckoutView() {
             {cart.lines.map((l) => (
               <div className="row g3" key={`${l.productId}/${l.variantId}`}>
                 <div className="ph r45" style={{ width: 56, flex: "none", borderRadius: 10 }}><img src={asset(tenant.slug, variantImage(l.product, l.variant))} alt={l.product.name} /></div>
-                <div className="grow"><b style={{ fontSize: 14 }}>{l.product.name}</b><p className="small muted">{hasOptions(l.product) ? `${l.variant.label} · ` : ""}x{l.qty}</p></div>
+                <div className="grow"><b style={{ fontSize: 14 }}>{l.product.name}</b><p className="small muted">{hasOptions(l.product) ? `${l.variant.label} · ` : ""}x{l.qty}</p><OfferSplitNote line={l} currency={cur} /></div>
                 <span className="small strong">{formatPrice(l.lineTotal, cur)}</span>
               </div>
             ))}

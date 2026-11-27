@@ -10,7 +10,7 @@ import { Rich } from "@/components/Rich";
 import { Photo } from "@/components/Photo";
 import { SLOTS } from "@/lib/media";
 import { formatPrice } from "@/lib/format";
-import { campaignDate } from "@/lib/campaigns";
+import { campaignDate, offerUnits, unitsTotal } from "@/lib/campaigns";
 import { hasOptions, isSoldOut, LOW_STOCK, minQty, unitsLeft, variantStockLabel } from "@/lib/catalog";
 import { IconInstagram, IconMinus, IconPlus, IconTruck } from "@/components/Icons";
 import { Stars } from "@/components/reviews/Stars";
@@ -141,7 +141,15 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
               )}
             </div>
             {v.campaign && v.listPrice !== undefined && (
-              <p className="small muted">{v.campaign.name} · precio de oferta hasta el {campaignDate(v.campaign.endsAt)}</p>
+              <p className="small muted">
+                {v.campaign.name} · precio de oferta hasta el {campaignDate(v.campaign.endsAt)}
+                {v.campaign.left !== undefined && <> · {v.campaign.left === 1 ? "queda 1 unidad" : `quedan ${v.campaign.left} unidades`} a este precio</>}
+              </p>
+            )}
+            {offerUnits(v, qty) !== null && v.listPrice !== undefined && (
+              <p className="small" aria-live="polite">
+                {offerUnits(v, qty)} a {formatPrice(v.price, cur)} y {qty - (offerUnits(v, qty) ?? 0)} a precio regular ({formatPrice(v.listPrice, cur)}).
+              </p>
             )}
           </div>
 
@@ -183,7 +191,7 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
                   </button>
                 </div>
                 <button className="btn grow" type="button" onClick={add}>
-                  Agregar al carrito · {formatPrice(v.price * qty, cur)}
+                  Agregar al carrito · {formatPrice(unitsTotal(v, qty), cur)}
                 </button>
               </div>
               {min > 1 && (
@@ -245,7 +253,7 @@ export function ProductView({ product: p, lineLabel }: { product: Product; lineL
         <div className="sticky-buy only-m flex">
           <div className="stack" style={{ lineHeight: 1.2 }}>
             {options && <span className="small muted">{v.label}</span>}
-            <span className="price">{formatPrice(v.price * qty, cur)}</span>
+            <span className="price">{formatPrice(unitsTotal(v, qty), cur)}</span>
           </div>
           <button className="btn grow" type="button" onClick={add}>Agregar al carrito</button>
         </div>

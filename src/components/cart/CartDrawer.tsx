@@ -6,7 +6,7 @@ import { SLOTS } from "@/lib/media";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useCart } from "./CartProvider";
-import { MinQtyNote, QtyControl, RemoveButton, VariantSelect } from "./CartLineControls";
+import { MinQtyNote, OfferSplitNote, QtyControl, RemoveButton, VariantSelect } from "./CartLineControls";
 import { useStore } from "@/components/StoreContext";
 import { hasOptions, variantImage } from "@/lib/catalog";
 import { formatPrice, plural } from "@/lib/format";
@@ -79,6 +79,7 @@ export function CartDrawer() {
                       <span className="price" style={{ fontSize: 14 }}>{formatPrice(it.lineTotal, cur)}</span>
                     </div>
                     <VariantSelect line={it} currency={cur} />
+                    <OfferSplitNote line={it} currency={cur} />
                     <div className="row between" style={{ marginTop: 4 }}>
                       <QtyControl line={it} compact />
                       <RemoveButton line={it} />

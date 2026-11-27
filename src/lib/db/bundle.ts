@@ -3,6 +3,7 @@ import type { AppearanceDoc } from "@/lib/brand";
 import type { MediaMap } from "@/lib/media";
 import { publicClient } from "./public";
 import { UNTRACKED_STOCK } from "@/lib/catalog";
+import { storeCampaignsFrom } from "@/lib/campaigns";
 import { PUBLIC_REVIEW_COLUMNS, type PublicReviewRow, type Review } from "@/lib/reviews";
 
 export type DbBundle = {
@@ -21,7 +22,6 @@ export type DbBundle = {
   reviews: Review[];
 };
 
-type CampaignRow = { id: string; name: string; starts_at: string; ends_at: string; prices: Campaign["prices"] };
 
 type ProductRow = {
   id: string; slug: string; name: string; line: string | null; badge: string | null;
@@ -55,7 +55,7 @@ export async function loadBundleFromDb(slug: string): Promise<DbBundle | null> {
     // Sin la migración 0017 no hay reseñas: la tienda sigue sin estrellas.
     db.from("reviews").select(PUBLIC_REVIEW_COLUMNS).eq("tenant_id", t.id).eq("status", "approved").order("created_at", { ascending: false }).limit(500),
   ]);
-  const campData = !camp.error && camp.data ? (camp.data as { campaigns?: CampaignRow[]; next_change?: string | null }) : null;
+  const campData = !camp.error && camp.data ? (camp.data as { campaigns?: unknown; next_change?: string | null }) : null;
   for (const r of [docs, lines, products, media]) if (r.error) throw new Error(`Supabase: ${r.error.message}`);
 
   const doc = Object.fromEntries((docs.data ?? []).map((d) => [d.kind, d.body])) as Record<string, unknown>;
@@ -120,7 +120,7 @@ export async function loadBundleFromDb(slug: string): Promise<DbBundle | null> {
     storefront: doc.storefront as Storefront,
     seo: doc.seo as Seo,
     appearance: (doc.appearance as DbBundle["appearance"]) ?? null,
-    campaigns: (campData?.campaigns ?? []).map((c) => ({ id: c.id, name: c.name, startsAt: c.starts_at, endsAt: c.ends_at, prices: c.prices ?? {} })),
+    campaigns: storeCampaignsFrom(campData),
     nextPriceChange: campData?.next_change ?? null,
     reviews,
     culqiKey: !culqi.error && typeof culqi.data === "string" && culqi.data ? culqi.data : null,

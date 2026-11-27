@@ -24,7 +24,7 @@ export async function StoreShell({ children }: { children: React.ReactNode }) {
       {/* Modo demo (sin base de datos): la paleta publicada vive en este navegador y se aplica antes de pintar. */}
       {demoTheme && <script dangerouslySetInnerHTML={{ __html: themeBootScript(tenant.slug) }} />}
       <div className="store" style={storeStyle(tenant, storefront, undefined, bundle.appearance?.tokens)}>
-        <StoreProvider value={bundle}>
+        <StoreProvider value={bundle} live>
         <MediaProvider slug={tenant.slug} media={bundle.media ?? {}}>
           <CartProvider>
             {children}

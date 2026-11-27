@@ -64,14 +64,25 @@ export type Variant = {
   /** Con una campaña vigente: `price` es el de oferta y este el regular (se muestra tachado). */
   listPrice?: number;
   /** Campaña vigente que da el precio de oferta. */
-  campaign?: { id: string; name: string; endsAt: string };
+  /** `left`: unidades que quedan a precio de oferta (solo si la campaña tiene tope para esta opción). */
+  campaign?: { id: string; name: string; endsAt: string; left?: number };
 };
 
 /**
  * Campaña de oferta: entre `startsAt` y `endsAt` (ISO) las opciones listadas se venden a su precio de campaña.
  * `prices`: {"<id del producto>": {"<id de la opción>": 59}}. Se editan en Admin › Productos › Precios.
+ * `limits` (opcional, mismo formato): máximo de unidades que se venden a ese precio; luego vuelve el regular.
+ * `left` (solo en la tienda): unidades que quedan de cada opción con tope.
  */
-export type Campaign = { id: string; name: string; startsAt: string; endsAt: string; prices: Record<string, Record<string, number>> };
+export type Campaign = {
+  id: string;
+  name: string;
+  startsAt: string;
+  endsAt: string;
+  prices: Record<string, Record<string, number>>;
+  limits?: Record<string, Record<string, number>>;
+  left?: Record<string, Record<string, number>>;
+};
 
 /**
  * simple: un solo precio (exactamente 1 variante, varias fotos).

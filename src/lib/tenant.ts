@@ -3,7 +3,7 @@ import { adminDemos, tenants, type TenantBundle } from "@/tenants";
 import { dbConfigured } from "@/lib/db/env";
 import { loadBundleFromDb } from "@/lib/db/bundle";
 import { withDefaults } from "@/lib/defaults";
-import { applyCampaigns } from "@/lib/campaigns";
+import { applyCampaigns, hasActiveLimits } from "@/lib/campaigns";
 import { withBrand } from "@/lib/brand";
 
 /** Marca activa del despliegue (variable TENANT, por defecto "squish"). */
@@ -34,7 +34,9 @@ export async function getTenantBundle(): Promise<TenantBundle> {
   const now = Date.now();
   // Si una campaña empieza o termina pronto, la tienda se vuelve a armar a esa hora (como mínimo cada minuto).
   const untilChange = nextPriceChange ? Math.ceil((Date.parse(nextPriceChange) - now) / 1000) : Infinity;
-  if (untilChange < 3600) cacheLife({ stale: 300, revalidate: Math.max(60, untilChange), expire: 86400 });
+  // Con tope de unidades, una oferta puede agotarse en cualquier momento: la tienda se refresca cada minuto.
+  if (hasActiveLimits(campaigns, now)) cacheLife({ stale: 60, revalidate: 60, expire: 86400 });
+  else if (untilChange < 3600) cacheLife({ stale: 300, revalidate: Math.max(60, untilChange), expire: 86400 });
   else cacheLife("hours");
   // Lo publicado manda; los archivos completan las claves nuevas que el código agregó después.
   const files = tenants[slug];

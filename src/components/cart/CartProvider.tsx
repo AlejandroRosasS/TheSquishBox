@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { Product, Variant } from "@/lib/types";
 import { useStore } from "@/components/StoreContext";
 import { minQty } from "@/lib/catalog";
+import { unitsTotal } from "@/lib/campaigns";
 import { gaItem, gaValue, track } from "@/lib/analytics";
 
 export type CartItem = { productId: string; variantId: string; qty: number };
@@ -62,7 +63,8 @@ export function CartProvider({ children, demo }: { children: ReactNode; demo?: C
         if (!product || !variant) return [];
         // Un carrito guardado antes de que la marca pusiera un pedido mínimo se sube al mínimo.
         const qty = Math.max(minQty(product), it.qty);
-        return [{ ...it, qty, product, variant, lineTotal: variant.price * qty }];
+        // Con tope de oferta, solo las unidades que quedan van a precio de oferta (igual que la base).
+        return [{ ...it, qty, product, variant, lineTotal: unitsTotal(variant, qty) }];
       }),
     [items, catalog],
   );
@@ -90,7 +92,7 @@ export function CartProvider({ children, demo }: { children: ReactNode; demo?: C
         const variant = product?.variants.find((v) => v.id === variantId);
         if (product && variant) {
           const units = Math.min(max, Math.max(min, qty));
-          track("add_to_cart", { currency: tenant.currency, value: gaValue(variant.price * units), items: [gaItem(product, variant, units, catalog.lines)] });
+          track("add_to_cart", { currency: tenant.currency, value: gaValue(unitsTotal(variant, units)), items: [gaItem(product, variant, units, catalog.lines)] });
         }
       }
       setItems((prev) => {
