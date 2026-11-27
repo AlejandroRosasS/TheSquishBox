@@ -48,6 +48,7 @@ export const SLOTS = {
   partyBand: { d: "4:5", m: "4:5", label: "Banda de pedido especial" },
   inside: { d: "4:5", m: "4:5", label: "¿Qué hay dentro?" },
   models: { d: "1:1", m: "1:1", label: "Modelo" },
+  news: { d: "4:5", m: "4:5", label: "Novedad" },
 } satisfies Record<string, Slot>;
 export type SlotId = keyof typeof SLOTS;
 

@@ -7,6 +7,7 @@ import { Rich } from "@/components/Rich";
 import { ProductCard } from "@/components/ProductCard";
 import { IconChevronRight, IconInstagram, IconStar } from "@/components/Icons";
 import { HomeReviews } from "@/components/reviews/HomeReviews";
+import { NewsStrip } from "@/components/home/NewsStrip";
 
 
 /** Home de la tienda. Es isomórfica: la usa la página pública y la vista previa del admin. */
@@ -50,6 +51,7 @@ export function HomeView({ bundle }: { bundle: TenantBundle }) {
               </Link>
             ))}
           </nav>
+          <NewsStrip news={sf.news} />
           <div className="tiles">
             {sf.tiles.map((t, i) => (
               <Link className="tile" href={t.href} key={i}>
