@@ -14,7 +14,9 @@ import { AIAlert, AICheck, AIInfo, AILink, AIWhatsApp } from "../AdminIcons";
 import { deliveryState, orderTotal } from "./OrdersView";
 import { OrderReview } from "../OrderReview";
 
-const FLOW: OrderStatus[] = ["nuevo", "prep", "listo", "entregado"];
+/** Pasos del pedido. «Esperando delivery» y «En tránsito» solo aplican cuando se envía (no en recojo). */
+const FLOW: OrderStatus[] = ["nuevo", "prep", "listo", "espera", "transito", "entregado"];
+const PICKUP_FLOW: OrderStatus[] = ["nuevo", "prep", "listo", "entregado"];
 
 export function waTo(phone: string, text?: string) {
   const digits = phone.replace(/\D/g, "");
@@ -42,7 +44,6 @@ export function OrderView({ id }: { id: string }) {
   const now = () => "Ahora";
   const addLog = (t: string) => [{ t, when: now() }, ...o.log];
   const [sl, sc] = ORDER_STATUS[o.status];
-  const idx = FLOW.indexOf(o.status);
   const subtotal = o.lines.reduce((s, l) => s + l.price * l.qty, 0);
   const has = o.deliveryReal !== null && o.deliveryReal !== undefined;
   const diff = has ? Math.round(((o.deliveryReal as number) - o.deliveryFee) * 100) / 100 : 0;
@@ -51,6 +52,9 @@ export function OrderView({ id }: { id: string }) {
   const first = o.client.split(" ")[0];
   const wa = waTo(o.phone, `Hola ${first}, te escribimos de ${tenant.name} por tu pedido #${o.id}.`);
   const isPickup = o.district.toLowerCase().includes("recojo");
+  // Un pedido de recojo que igual quedó en un paso de envío sigue mostrando todos los pasos.
+  const flow = isPickup && !["espera", "transito"].includes(o.status) ? PICKUP_FLOW : FLOW;
+  const idx = flow.indexOf(o.status);
   const payLink = `${tenant.domain}/pagar/${o.id}-dif`;
 
   const setReal = (v: string) => {
@@ -88,8 +92,8 @@ export function OrderView({ id }: { id: string }) {
             <button className="a-btn sm" type="button" onClick={() => update(o.id, { status: "nuevo", log: addLog("Pedido reactivado") })}>Reactivar</button>
           )}
         </div>
-        <div className="stepper" role="group" aria-label="Cambiar estado">
-          {FLOW.map((k, i) => (
+        <div className={`stepper n${flow.length}`} role="group" aria-label="Cambiar estado">
+          {flow.map((k, i) => (
             <button key={k} type="button" className={i === idx ? "on" : i < idx ? "done" : ""} aria-pressed={i === idx}
               onClick={() => { update(o.id, { status: k, log: addLog(`Estado cambiado a «${ORDER_STATUS[k][0]}»`) }); toast(`Pedido #${o.id}: ${ORDER_STATUS[k][0]}`); }}>
               {ORDER_STATUS[k][0]}

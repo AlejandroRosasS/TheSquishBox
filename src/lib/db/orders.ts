@@ -112,13 +112,13 @@ const str = (v: unknown) => (typeof v === "string" ? v : v == null ? "" : String
 const num = (v: unknown) => (v == null || v === "" ? null : Number(v));
 
 export const STATUS_FROM_DB: Record<string, OrderStatus> = {
-  new: "nuevo", quoted: "nuevo", accepted: "nuevo", preparing: "prep", ready: "listo", delivered: "entregado", cancelled: "cancelado",
+  new: "nuevo", quoted: "nuevo", accepted: "nuevo", preparing: "prep", ready: "listo", awaiting_courier: "espera", in_transit: "transito", delivered: "entregado", cancelled: "cancelado",
 };
 export const STATUS_TO_DB: Record<OrderStatus, string> = {
-  nuevo: "new", prep: "preparing", listo: "ready", entregado: "delivered", cancelado: "cancelled",
+  nuevo: "new", prep: "preparing", listo: "ready", espera: "awaiting_courier", transito: "in_transit", entregado: "delivered", cancelado: "cancelled",
 };
 export const PARTY_FROM_DB: Record<string, PartyStatus> = {
-  new: "nueva", quoted: "cotizada", accepted: "aceptada", cancelled: "descartada", preparing: "aceptada", ready: "aceptada", delivered: "aceptada",
+  new: "nueva", quoted: "cotizada", accepted: "aceptada", cancelled: "descartada", preparing: "aceptada", ready: "aceptada", awaiting_courier: "aceptada", in_transit: "aceptada", delivered: "aceptada",
 };
 export const PARTY_TO_DB: Record<PartyStatus, string> = { nueva: "new", cotizada: "quoted", aceptada: "accepted", descartada: "cancelled" };
 
