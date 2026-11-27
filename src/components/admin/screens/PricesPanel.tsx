@@ -19,7 +19,21 @@ const parse = (s: string): number | null => {
 };
 const show = (n: number | undefined | null) => (n === undefined || n === null ? "" : String(n));
 
-type Drafts = { regular: Record<string, string>; cost: Record<string, string>; offer: Record<string, Record<string, string>>; campaigns: Campaign[] };
+/** Tope escrito en un campo → entero (vacío = sin tope). */
+const parseLimit = (s: string): number | null => {
+  const t = s.trim();
+  if (!t) return null;
+  return /^\d+$/.test(t) && Number(t) >= 1 ? Number(t) : NaN;
+};
+
+type Drafts = {
+  regular: Record<string, string>;
+  cost: Record<string, string>;
+  offer: Record<string, Record<string, string>>;
+  /** Tope de unidades a precio de oferta, por campaña y opción. */
+  limit: Record<string, Record<string, string>>;
+  campaigns: Campaign[];
+};
 const k = (pid: string, vid: string) => `${pid}\u0000${vid}`;
 
 function newCampaign(): Campaign {
@@ -65,10 +79,11 @@ export function PricesPanel() {
     return [...campaigns].sort((a, b) => rank[campaignState(a, t)] - rank[campaignState(b, t)] || b.startsAt.localeCompare(a.startsAt));
   }, [campaigns, t]);
 
-  const edit = (fn: (d: Drafts) => Drafts) => setDrafts((d) => fn(d ?? { regular: {}, cost: {}, offer: {}, campaigns: camp.campaigns }));
+  const edit = (fn: (d: Drafts) => Drafts) => setDrafts((d) => fn(d ?? { regular: {}, cost: {}, offer: {}, limit: {}, campaigns: camp.campaigns }));
   const regularOf = (pid: string, vid: string, base: number) => drafts?.regular[k(pid, vid)] ?? show(base);
   const costOf = (pid: string, vid: string) => drafts?.cost[k(pid, vid)] ?? show(catalog.costs[pid]?.[vid]);
   const offerOf = (c: Campaign, pid: string, vid: string) => drafts?.offer[c.id]?.[k(pid, vid)] ?? show(c.prices[pid]?.[vid]);
+  const limitOf = (c: Campaign, pid: string, vid: string) => drafts?.limit[c.id]?.[k(pid, vid)] ?? show(c.limits?.[pid]?.[vid]);
   const patchCampaign = (id: string, patch: Partial<Campaign>) => edit((d) => ({ ...d, campaigns: d.campaigns.map((c) => (c.id === id ? { ...c, ...patch } : c)) }));
 
   const addCampaign = () => {
@@ -100,28 +115,42 @@ export function PricesPanel() {
     for (const c of campaigns) {
       const o = parse(offerOf(c, p.id, v.id));
       if (Number.isNaN(o)) errors.push(`Revisa el precio de oferta de ${p.name}`);
+      if (Number.isNaN(parseLimit(limitOf(c, p.id, v.id)))) errors.push(`El tope de ${p.name} debe ser un número entero de unidades`);
     }
   }
-  const dirty = !!drafts && (Object.keys(drafts.regular).length > 0 || Object.keys(drafts.cost).length > 0 || Object.keys(drafts.offer).length > 0 || JSON.stringify(drafts.campaigns) !== JSON.stringify(camp.campaigns));
+  const dirty = !!drafts && (Object.keys(drafts.regular).length > 0 || Object.keys(drafts.cost).length > 0 || Object.keys(drafts.offer).length > 0 || Object.keys(drafts.limit).length > 0 || JSON.stringify(drafts.campaigns) !== JSON.stringify(camp.campaigns));
 
   const saveAll = async () => {
     if (!drafts) return;
     if (errors.length) return toast(errors[0]);
     setBusy(true);
     // Campañas con sus precios de oferta (vacío = la opción no participa).
+    const merge = (base: Campaign["prices"] | undefined, ed: Record<string, string> | undefined, read: (s: string) => number | null) => {
+      const out: Campaign["prices"] = JSON.parse(JSON.stringify(base ?? {}));
+      for (const [key, val] of Object.entries(ed ?? {})) {
+        const [pid, vid] = key.split("\u0000");
+        const n = read(val);
+        if (n === null || Number.isNaN(n)) {
+          if (out[pid]) delete out[pid][vid];
+          if (out[pid] && !Object.keys(out[pid]).length) delete out[pid];
+        } else (out[pid] ??= {})[vid] = n;
+      }
+      return out;
+    };
     const nextCampaigns = drafts.campaigns.map((c) => {
       const ed = drafts.offer[c.id];
-      if (!ed) return c;
-      const prices: Campaign["prices"] = JSON.parse(JSON.stringify(c.prices));
-      for (const [key, val] of Object.entries(ed)) {
-        const [pid, vid] = key.split("\u0000");
-        const n = parse(val);
-        if (n === null || Number.isNaN(n)) {
-          if (prices[pid]) delete prices[pid][vid];
-          if (prices[pid] && !Object.keys(prices[pid]).length) delete prices[pid];
-        } else (prices[pid] ??= {})[vid] = n;
+      const lim = drafts.limit[c.id];
+      if (!ed && !lim) return c;
+      const prices = ed ? merge(c.prices, ed, parse) : c.prices;
+      // Un tope sin precio de oferta no sirve: se descarta.
+      const limits = merge(c.limits, lim, parseLimit);
+      for (const pid of Object.keys(limits)) {
+        for (const vid of Object.keys(limits[pid])) if (prices[pid]?.[vid] === undefined) delete limits[pid][vid];
+        if (!Object.keys(limits[pid]).length) delete limits[pid];
       }
-      return { ...c, name: c.name.trim(), prices };
+      const { limits: _old, ...rest } = c;
+      void _old;
+      return { ...rest, name: c.name.trim(), prices, ...(Object.keys(limits).length ? { limits } : {}) };
     });
     let ok = true;
     if (JSON.stringify(nextCampaigns) !== JSON.stringify(camp.campaigns)) ok = await camp.save(nextCampaigns);
@@ -153,7 +182,8 @@ export function PricesPanel() {
     }
   };
 
-  const cols = current ? "minmax(0, 1.6fr) 120px 130px 130px 90px 80px" : "minmax(0, 1.6fr) 120px 130px 80px";
+  const withLimits = !!current && camp.limitsAvailable;
+  const cols = current ? `minmax(0, 1.6fr) 120px 130px 130px ${withLimits ? "120px " : ""}90px 80px` : "minmax(0, 1.6fr) 120px 130px 80px";
   const st = current && now ? campaignState(current, now) : null;
   const overlap = current && now
     ? campaigns.filter((c) => c.id !== current.id && Date.parse(c.startsAt) < Date.parse(current.endsAt) && Date.parse(c.endsAt) > Date.parse(current.startsAt))
@@ -197,6 +227,7 @@ export function PricesPanel() {
               <p className="a-cap">
                 {st && <span className={`st ${CAMPAIGN_STATE[st][1]}`} style={{ marginRight: 8 }}>{CAMPAIGN_STATE[st][0]}</span>}
                 {campaignRange(current)} · hora de Perú · deja vacío el precio de oferta de lo que no participa.
+                {camp.limitsAvailable && " Con «Tope», solo esa cantidad se vende a precio de oferta; después vuelve sola al precio regular."}
               </p>
               <button className="a-btn sm danger" type="button" onClick={() => removeCampaign(current)}><AITrash size="sm" /> Borrar campaña</button>
             </div>
@@ -212,7 +243,7 @@ export function PricesPanel() {
         </div>
         <div className="a-table pt-table">
           <div className="a-tr head" style={{ gridTemplateColumns: cols }}>
-            <span>Producto</span><span>Costo</span><span>Precio regular</span>{current && <><span>Precio oferta</span><span>Descuento</span></>}<span>Margen</span>
+            <span>Producto</span><span>Costo</span><span>Precio regular</span>{current && <><span>Precio oferta</span>{withLimits && <span>Tope (unid.)</span>}<span>Descuento</span></>}<span>Margen</span>
           </div>
           {rows.map(({ p, v, first }) => {
             const reg = regularOf(p.id, v.id, v.price);
@@ -251,6 +282,22 @@ export function PricesPanel() {
                       <span className="c-m a-cap">Oferta</span>
                       <span className="a-prefix"><span>S/</span><input inputMode="decimal" placeholder="—" aria-label={`Precio de oferta de ${label} en ${current.name || "la campaña"}`} aria-invalid={Number.isNaN(offN) || !!high} value={off} onChange={(e) => { const val = e.target.value; edit((d) => ({ ...d, offer: { ...d.offer, [current.id]: { ...d.offer[current.id], [k(p.id, v.id)]: val } } })); }} /></span>
                     </label>
+                    {withLimits && (() => {
+                      const lim = limitOf(current, p.id, v.id);
+                      const limN = parseLimit(lim);
+                      const sold = camp.sold[current.id]?.[p.id]?.[v.id];
+                      const saved = current.limits?.[p.id]?.[v.id];
+                      const hint = saved !== undefined && sold !== undefined
+                        ? sold >= saved ? `Agotada (${sold} de ${saved})` : `${sold} de ${saved} vendidas`
+                        : offN === null ? "Pon precio de oferta" : "";
+                      return (
+                        <label className="pt-cell">
+                          <span className="c-m a-cap">Tope a precio de oferta</span>
+                          <span className="a-prefix"><input inputMode="numeric" placeholder="Sin tope" disabled={offN === null && !lim} aria-label={`Máximo de unidades de ${label} a precio de oferta en ${current.name || "la campaña"}`} aria-invalid={Number.isNaN(limN)} value={lim} onChange={(e) => { const val = e.target.value; edit((d) => ({ ...d, limit: { ...d.limit, [current.id]: { ...d.limit[current.id], [k(p.id, v.id)]: val } } })); }} /></span>
+                          {hint && <span className="a-cap" style={{ fontSize: 11 }}>{hint}</span>}
+                        </label>
+                      );
+                    })()}
                     <span className="c-d">{high ? <span className="bad-pill">No baja</span> : offN !== null && regN && !Number.isNaN(offN) ? <span className="ok-pill">−{discountPct(regN, offN)}%</span> : <span className="a-cap">—</span>}</span>
                   </>
                 )}

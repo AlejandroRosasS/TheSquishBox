@@ -5,7 +5,7 @@ import { SLOTS } from "@/lib/media";
 
 import Link from "next/link";
 import { useCart } from "./CartProvider";
-import { MinQtyNote, QtyControl, RemoveButton, VariantSelect } from "./CartLineControls";
+import { MinQtyNote, OfferSplitNote, QtyControl, RemoveButton, VariantSelect } from "./CartLineControls";
 import { useStore } from "@/components/StoreContext";
 import { Rich } from "@/components/Rich";
 import { ProductCard } from "@/components/ProductCard";
@@ -79,6 +79,7 @@ export function CartPageView() {
                   <RemoveButton line={it} />
                 </div>
                 <MinQtyNote line={it} />
+                <OfferSplitNote line={it} currency={cur} />
               </div>
               <span className="price line-price">{formatPrice(it.lineTotal, cur)}</span>
             </div>

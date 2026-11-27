@@ -4,6 +4,7 @@ import type { CartLine } from "./CartProvider";
 import { useCart } from "./CartProvider";
 import { formatPrice } from "@/lib/format";
 import { hasOptions, minQty } from "@/lib/catalog";
+import { offerUnits } from "@/lib/campaigns";
 import { IconMinus, IconPlus } from "@/components/Icons";
 
 /** Selector de variante + cantidad + quitar, compartido por el drawer y la página de carrito. */
@@ -64,6 +65,18 @@ export function MinQtyNote({ line }: { line: CartLine }) {
   const min = minQty(line.product);
   if (min <= 1) return null;
   return <p className="small muted" style={{ fontSize: 12 }}>Pedido mínimo: {min} unidades</p>;
+}
+
+/** Con tope de oferta: «3 a S/ 49.00 + 2 a S/ 69.00 (precio regular)». */
+export function OfferSplitNote({ line, currency }: { line: CartLine; currency: string }) {
+  const n = offerUnits(line.variant, line.qty);
+  if (n === null || line.variant.listPrice === undefined) return null;
+  return (
+    <p className="small muted" style={{ fontSize: 12 }}>
+      {n > 0 ? `${n} a ${formatPrice(line.variant.price, currency)} + ` : "Oferta agotada: "}
+      {line.qty - n} a {formatPrice(line.variant.listPrice, currency)} (precio regular)
+    </p>
+  );
 }
 
 export function RemoveButton({ line }: { line: CartLine }) {
