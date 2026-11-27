@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import {
-  CHANNEL_NAMES, EMPTY_CONFIG, normalizeConfig, parseRecipient,
+  CHANNEL_NAMES, EMPTY_CONFIG, EVENT_GROUPS, EVENT_LABEL, EVENTS, normalizeConfig, parseRecipient,
   type AlertConfig, type AlertEvent, type ChannelKey,
 } from "@/lib/alerts/config";
 import { orderMessage } from "@/lib/alerts/message";
@@ -11,7 +11,7 @@ import { ORDER_COLUMNS, orderCode, partyCode, whenShort, type OrderRow } from "@
 import { useAdmin } from "../AdminContext";
 import { useDb } from "../DbContext";
 import { AdminPage, Switch } from "../AdminPage";
-import { AIAlert, AIMail, AITelegram, AIWhatsApp } from "../AdminIcons";
+import { AIAlert, AIGear, AIMail, AITelegram, AIWhatsApp } from "../AdminIcons";
 
 type Status = { server: boolean; ready: Record<ChannelKey, boolean>; bot: string | null; whatsappTemplate: boolean };
 type OutRow = { id: number; channel: ChannelKey; label: string; status: string; last_error: string | null; created_at: string; event: string; orders: { number: number; kind: string; party?: unknown } | null };
@@ -46,6 +46,7 @@ export function NotificationsLive() {
   const [rcpError, setRcpError] = useState("");
   const [tg, setTg] = useState<TgLink | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [gear, setGear] = useState<ChannelKey | null>(null);
 
   const loadRecent = useCallback(async () => {
     const { data } = await db.client
@@ -188,6 +189,12 @@ export function NotificationsLive() {
     return ["Conectado", "pagado", ""];
   };
 
+  const onEvents = EVENTS.filter((e) => cfg.events[e]);
+  const channelSummary = (k: ChannelKey) => {
+    const n = onEvents.filter((e) => ch[k].events[e]).length;
+    return n === onEvents.length ? "Avisa todo lo de «¿Qué nos avisa?»" : `Avisa ${n} de ${onEvents.length}`;
+  };
+
   const card = (k: ChannelKey) => {
     const c = ch[k];
     const [st, stCls, stDetail] = pill(k);
@@ -264,17 +271,18 @@ export function NotificationsLive() {
           <button className="a-btn sm" type="button" disabled={!ready || !c.recipients.length || busy === `test-${k}`} onClick={() => void sendTest(k)}>
             {busy === `test-${k}` ? "Enviando…" : "Enviar prueba"}
           </button>
+          <button className="a-btn sm ghost" type="button" onClick={() => setGear(k)} aria-label={`Configurar qué avisa ${CHANNEL_NAMES[k]}`}>
+            <AIGear size="sm" />Configurar
+          </button>
+          <span className="a-cap">{channelSummary(k)}</span>
         </div>
       </section>
     );
   };
 
-  const evDefs: { key: AlertEvent | null; label: string; desc: string }[] = [
-    { key: "order_new", label: "Nuevo pedido", desc: "Apenas el cliente confirma su compra (con tarjeta, cuando se aprueba el pago)" },
-    { key: "party_new", label: "Nuevo mensaje de contacto", desc: "Cuando alguien te escribe desde el formulario de Contacto" },
-    { key: "review_new", label: "Nueva reseña", desc: "Cuando un cliente deja una reseña: la revisas y la publicas en Reseñas" },
-    { key: null, label: "Pago de diferencia de delivery", desc: "Pronto" },
-    { key: null, label: "Stock bajo", desc: "Pronto" },
+  const soon = [
+    { label: "Pago de diferencia de delivery", desc: "Pronto" },
+    { label: "Stock bajo", desc: "Pronto" },
   ];
 
   const preview = lastOrder ? orderMessage(lastOrder, "") : null;
@@ -296,15 +304,22 @@ export function NotificationsLive() {
         <div className="stack g5">
           <section className="a-card" aria-labelledby="n-ev">
             <h2 className="a-h2" id="n-ev">¿Qué nos avisa?</h2>
-            {evDefs.map((e) => (
-              <div className="ev" key={e.label}>
-                <div><b>{e.label}</b><p className="a-cap">{e.desc}</p></div>
-                <Switch
-                  on={e.key ? cfg.events[e.key] : false}
-                  disabled={!e.key}
-                  onChange={(v) => e.key && void save({ ...cfg, events: { ...cfg.events, [e.key]: v } })}
-                  label={e.label}
-                />
+            <p className="a-cap">Vale para todos los canales. Con «Configurar» en cada canal eliges qué le llega a ese canal.</p>
+            {EVENT_GROUPS.map((g) => (
+              <div key={g.title} className="ev-group">
+                <h3 className="a-label ev-title">{g.title}</h3>
+                {g.events.map((e) => (
+                  <div className="ev" key={e.key}>
+                    <div><b>{e.label}</b><p className="a-cap">{e.desc}</p></div>
+                    <Switch on={cfg.events[e.key]} onChange={(v) => void save({ ...cfg, events: { ...cfg.events, [e.key]: v } })} label={e.label} />
+                  </div>
+                ))}
+                {g.title === "Otros" && soon.map((e) => (
+                  <div className="ev" key={e.label}>
+                    <div><b>{e.label}</b><p className="a-cap">{e.desc}</p></div>
+                    <Switch on={false} disabled label={e.label} />
+                  </div>
+                ))}
               </div>
             ))}
           </section>
@@ -348,6 +363,74 @@ export function NotificationsLive() {
           </section>
         </div>
       </div>
+      {gear && <ChannelEventsDialog
+        key={gear}
+        channel={gear}
+        cfg={cfg}
+        onClose={() => setGear(null)}
+        onSave={(k, events) => {
+          setGear(null);
+          void save({ ...cfg, channels: { ...ch, [k]: { ...ch[k], events } } });
+          toast(`Guardado: qué avisa ${CHANNEL_NAMES[k]}`);
+        }}
+      />}
     </AdminPage>
+  );
+}
+
+/** Tuerca «Configurar» de un canal: casillas con los avisos que le llegan a ese canal. Se monta al abrir. */
+function ChannelEventsDialog({ channel, cfg, onClose, onSave }: {
+  channel: ChannelKey;
+  cfg: AlertConfig;
+  onClose: () => void;
+  onSave: (k: ChannelKey, events: Record<AlertEvent, boolean>) => void;
+}) {
+  const ref = useRef<HTMLDialogElement>(null);
+  const [draft, setDraft] = useState<Record<AlertEvent, boolean>>(() => ({ ...cfg.channels[channel].events }));
+
+  useEffect(() => {
+    const d = ref.current;
+    if (d && !d.open) d.showModal();
+  }, []);
+
+  const name = CHANNEL_NAMES[channel];
+  const set = (e: AlertEvent, v: boolean) => setDraft((d) => ({ ...d, [e]: v }));
+  const all = (v: boolean) => setDraft((d) => Object.fromEntries(EVENTS.map((e) => [e, cfg.events[e] ? v : d[e]])) as Record<AlertEvent, boolean>);
+
+  return (
+    <dialog ref={ref} className="a-dialog" style={{ width: "min(520px, calc(100vw - 24px))" }} aria-labelledby="gear-h" onCancel={onClose} onClose={onClose}>
+      <form className="stack g4" onSubmit={(e) => { e.preventDefault(); onSave(channel, draft); }}>
+          <div className="stack g1">
+            <h2 className="a-h2" id="gear-h">¿Qué avisa {name}?</h2>
+            <p className="a-sub">Marca lo que quieres recibir por {name}. Lo apagado en «¿Qué nos avisa?» no llega por ningún canal.</p>
+          </div>
+          <div className="row g2 wrap-row">
+            <button className="a-btn sm ghost" type="button" onClick={() => all(true)}>Marcar todo</button>
+            <button className="a-btn sm ghost" type="button" onClick={() => all(false)}>Desmarcar todo</button>
+          </div>
+          {EVENT_GROUPS.map((g) => (
+            <fieldset key={g.title} className="gear-set">
+              <legend className="a-label">{g.title}</legend>
+              {g.events.map((e) => {
+                const off = !cfg.events[e.key];
+                const id = `gear-${channel}-${e.key}`;
+                return (
+                  <label key={e.key} htmlFor={id} className={`gear-row ${off ? "disabled" : ""}`}>
+                    <input id={id} type="checkbox" checked={!off && draft[e.key]} disabled={off} onChange={(ev) => set(e.key, ev.target.checked)} />
+                    <span>
+                      <b>{EVENT_LABEL[e.key]}</b>
+                      {off && <span className="a-cap"> · Apagado en «¿Qué nos avisa?»</span>}
+                    </span>
+                  </label>
+                );
+              })}
+            </fieldset>
+          ))}
+          <div className="row g2" style={{ justifyContent: "flex-end" }}>
+            <button className="a-btn ghost" type="button" onClick={onClose}>Cancelar</button>
+            <button className="a-btn primary" type="submit">Guardar</button>
+          </div>
+        </form>
+    </dialog>
   );
 }

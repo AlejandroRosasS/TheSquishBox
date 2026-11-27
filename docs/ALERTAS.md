@@ -85,6 +85,12 @@ Aplica `supabase/migrations/0004_alerts.sql` después de 0001, 0002 y 0003, y `0
 
 La configuración vive en `site_docs` (kind `notifications`, stage `published`), que solo ve el equipo de la marca.
 
+### Qué avisa cada canal (0019)
+
+`0019_order_status_alerts.sql` agrega los avisos de cambios: `order_paid` (pago de Yape/Plin marcado como recibido; con tarjeta ya avisa «Nuevo pedido»), `order_preparing`, `order_ready`, `order_awaiting_courier`, `order_in_transit`, `order_delivered` y `order_cancelled` (trigger `orders_enqueue_change_alerts`). También suma los estados `awaiting_courier` («Esperando delivery») e `in_transit` («En tránsito»).
+
+Un aviso sale por un canal si: el canal está activo, `events.<evento>` está prendido («¿Qué nos avisa?», vale para todos los canales) y `channels.<canal>.events.<evento>` está prendido (tuerca «Configurar» del canal). Lo que no existe en el documento cuenta como prendido. Todos los eventos pasan por `enqueue_alert()`.
+
 ## Cron cada minuto (Supabase)
 
 El plan gratis de Vercel solo permite un cron diario (está en `vercel.json` como último respaldo). Para revisar cada minuto, usa el cron de Supabase (Database › Extensions: `pg_cron` y `pg_net`, los mismos de Instagram) y corre esto en el SQL Editor:
