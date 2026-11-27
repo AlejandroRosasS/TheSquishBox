@@ -22,6 +22,9 @@ function images(bundle: TenantBundle, list: string[]): string[] {
   return list.map((src) => abs(bundle, asset(bundle.tenant.slug, src))).filter((u): u is string => !!u);
 }
 
+/** Google Merchant Center solo acepta addressRegion en estos países; en el resto (ej. Perú) marca «Invalid region» y no muestra el producto. */
+const REGION_COUNTRIES = new Set(["US", "AU", "JP"]);
+
 const days = (min: number, max: number): Ld => ({ "@type": "QuantitativeValue", minValue: min, maxValue: max, unitCode: "DAY" });
 
 /**
@@ -37,7 +40,7 @@ export function shippingLd(bundle: TenantBundle): Ld | undefined {
   return {
     "@type": "OfferShippingDetails",
     shippingRate: { "@type": "MonetaryAmount", value: price(Math.min(...rates)), currency: tenant.currency },
-    shippingDestination: { "@type": "DefinedRegion", addressCountry: country, ...(p.shipRegion ? { addressRegion: [p.shipRegion] } : {}) },
+    shippingDestination: { "@type": "DefinedRegion", addressCountry: country, ...(p.shipRegion && REGION_COUNTRIES.has(country) ? { addressRegion: [p.shipRegion] } : {}) },
     deliveryTime: { "@type": "ShippingDeliveryTime", handlingTime: days(p.handlingDaysMin, p.handlingDaysMax), transitTime: days(p.transitDaysMin, p.transitDaysMax) },
   };
 }

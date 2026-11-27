@@ -11,7 +11,8 @@ export type Policies = {
   handlingDaysMax: number;
   transitDaysMin: number;
   transitDaysMax: number;
-  /** Código ISO 3166-2 (sin el país) de la zona de entrega, ej. "LMA" = Lima Metropolitana. Vacío = todo el país. */
+  /** Código ISO 3166-2 (sin el país) de la zona de entrega, ej. "LMA" = Lima Metropolitana. Vacío = todo el país.
+   *  Google solo lo acepta en EE. UU., Australia y Japón: en otros países no se envía en el JSON-LD. */
   shipRegion: string;
   /** false = la marca no acepta cambios ni devoluciones. */
   returnsAccepted: boolean;
