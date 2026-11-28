@@ -621,7 +621,8 @@ body.no-scroll { overflow: hidden; }
 }
 
 /* Novedades: tira tipo reel con fotos del momento */
-.news-track { display: grid; grid-auto-flow: column; grid-auto-columns: 260px; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; list-style: none; margin: 0; padding: 4px 0 8px; scrollbar-width: thin; overscroll-behavior-x: contain; }
+.news-track { display: grid; grid-auto-flow: column; grid-auto-columns: 260px; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; list-style: none; margin: 0; padding: 4px 0 8px; scrollbar-width: none; overscroll-behavior-x: contain; }
+.news-track::-webkit-scrollbar { display: none; }
 .news-track > li { scroll-snap-align: start; min-width: 0; }
 .news-card { display: flex; flex-direction: column; gap: 10px; color: var(--text); text-decoration: none; border-radius: var(--r-md); }
 .news-card:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
@@ -641,7 +642,23 @@ body.no-scroll { overflow: hidden; }
 /* Novedades centrada: título al medio y, si entran todas, las fotos también (si no, se desliza desde el inicio) */
 .news-head { text-align: center; align-items: center; }
 .news-track { justify-content: safe center; }
-.news-navs { justify-content: center; }
 .news-cap { text-align: center; }
 .news-sec + .section { padding-top: 40px; }
 @container page (max-width: 760px) { .news-sec + .section { padding-top: 28px; } }
+
+/* Controles del carrusel: ‹ puntitos › y pausa/play (chico, para que no resalte; el área táctil sigue en 44 px) */
+.news-ctrl { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.news-dots { display: flex; align-items: center; }
+.news-dot { width: 24px; height: 44px; padding: 0; border: 0; background: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: width .3s ease; }
+.news-dot span { display: block; width: 9px; height: 9px; border-radius: 5px; background: color-mix(in oklab, var(--primary) 30%, var(--bg)); transition: width .3s ease, background .3s ease; }
+.news-dot.on { width: 38px; }
+.news-dot.on span { width: 26px; background: var(--primary); }
+.news-dot:focus-visible { outline: 3px solid var(--primary); outline-offset: -6px; border-radius: 12px; }
+.news-pause { width: 44px; height: 44px; padding: 0; border: 0; background: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: var(--text-2); }
+.news-pause span { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border); display: inline-flex; align-items: center; justify-content: center; background: var(--surface); }
+.news-pause svg { width: 11px; height: 11px; fill: currentColor; }
+.news-pause:hover { color: var(--primary); }
+.news-pause:focus-visible { outline: 3px solid var(--primary); outline-offset: -4px; border-radius: 50%; }
+@container page (max-width: 760px) { .news-ctrl { gap: 4px; } .news-dot { width: 20px; } .news-dot.on { width: 34px; } }
+@media (prefers-reduced-motion: reduce) { .news-dot, .news-dot span { transition: none; } }
+.news-dots.many .news-dot { width: 16px; } .news-dots.many .news-dot.on { width: 30px; } .news-dots.many .news-dot span { width: 7px; height: 7px; } .news-dots.many .news-dot.on span { width: 20px; }
