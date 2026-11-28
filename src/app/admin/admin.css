@@ -601,3 +601,11 @@ button.a-tr.inv-row:focus-visible { outline: 3px solid var(--a-focus); outline-o
 .a-seo { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; font-weight: 600; line-height: 1; padding: 3px 6px; border-radius: 6px; background: var(--a-blue-bg); color: var(--a-blue); }
 .a-seo-warn { color: var(--a-amber); font-weight: 600; }
 .ig-cell .news-tag { position: absolute; right: 8px; bottom: 8px; background: var(--a-ink); color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 10px; }
+
+/* «¿Qué es esto?» junto al título de un campo (HelpLink). El margen negativo mantiene la fila baja con un área táctil de 44 px. */
+.a-label-row { display: flex; align-items: center; flex-wrap: wrap; column-gap: 10px; }
+.a-help { display: inline-flex; align-items: center; min-height: 44px; margin-block: -12px; padding: 0 4px; border: 0; background: none; color: var(--a-text-2); font: inherit; font-size: 12px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.a-help:hover { color: var(--a-text); }
+.a-help-body p, .a-help-body ol { margin: 0; font-size: 14px; line-height: 1.55; color: var(--a-text); }
+.a-help-body ol { padding-left: 20px; display: grid; gap: 6px; }
+.a-help-body code { font-size: 13px; background: var(--a-sunken); border-radius: 6px; padding: 1px 5px; word-break: break-all; }
