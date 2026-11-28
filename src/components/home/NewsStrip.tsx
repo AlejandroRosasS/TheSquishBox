@@ -22,18 +22,12 @@ export function NewsStrip({ news }: { news: Storefront["news"] }) {
   };
 
   return (
-    <div className="news stack g5" role="region" data-edit="news" aria-labelledby="news-title">
-      <div className="row between" style={{ alignItems: "flex-end", gap: 16 }}>
-        <div className="stack g2">
-          <p className="eyebrow">{news.eyebrow}</p>
-          <h2 className="h2" id="news-title"><Rich text={news.title} /></h2>
-        </div>
-        {items.length > 2 && (
-          <div className="row g2 only-d">
-            <button className="news-nav" type="button" aria-label="Novedades anteriores" onClick={() => scroll(-1)}><IconChevronLeft size="sm" /></button>
-            <button className="news-nav" type="button" aria-label="Más novedades" onClick={() => scroll(1)}><IconChevronRight size="sm" /></button>
-          </div>
-        )}
+    // Va primero, justo debajo de la portada: lo más fresco de la marca.
+    <section className="section tight news-sec" data-edit="news" aria-labelledby="news-title">
+    <div className="wrap news stack g5">
+      <div className="stack g2 news-head">
+        <p className="eyebrow">{news.eyebrow}</p>
+        <h2 className="h2" id="news-title"><Rich text={news.title} /></h2>
       </div>
       <ul className="news-track" ref={track}>
         {items.map((n) => {
@@ -57,6 +51,14 @@ export function NewsStrip({ news }: { news: Storefront["news"] }) {
           );
         })}
       </ul>
+      {/* Las flechas solo hacen falta cuando no entran todas (en escritorio caben 4). */}
+      {items.length > 4 && (
+        <div className="row g2 only-d news-navs">
+          <button className="news-nav" type="button" aria-label="Novedades anteriores" onClick={() => scroll(-1)}><IconChevronLeft size="sm" /></button>
+          <button className="news-nav" type="button" aria-label="Más novedades" onClick={() => scroll(1)}><IconChevronRight size="sm" /></button>
+        </div>
+      )}
     </div>
+    </section>
   );
 }

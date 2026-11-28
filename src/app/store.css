@@ -636,3 +636,12 @@ body.no-scroll { overflow: hidden; }
 .news-nav:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
 @container page (max-width: 760px) { .news-track { grid-auto-columns: 62%; gap: 10px; margin: 0 -20px; padding: 4px 20px 8px; scroll-padding: 0 20px; } }
 @media (prefers-reduced-motion: reduce) { .news .ph img { transition: none; } }
+/* Novedades va pegada a los destacados que la siguen: sin doble espacio entre ambas secciones */
+.news-sec { padding-bottom: 0; }
+/* Novedades centrada: título al medio y, si entran todas, las fotos también (si no, se desliza desde el inicio) */
+.news-head { text-align: center; align-items: center; }
+.news-track { justify-content: safe center; }
+.news-navs { justify-content: center; }
+.news-cap { text-align: center; }
+.news-sec + .section { padding-top: 40px; }
+@container page (max-width: 760px) { .news-sec + .section { padding-top: 28px; } }
