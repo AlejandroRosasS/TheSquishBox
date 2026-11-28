@@ -9,8 +9,13 @@ import { AdminPage, DemoNote } from "../AdminPage";
 import { AICheck, AIChevron, AIPlay, AIRefresh } from "../AdminIcons";
 import { Logo } from "@/components/Logo";
 import { useIg, type IgAccount } from "./useIg";
+import { useStoredDoc } from "@/lib/admin/useStoredDoc";
+import { withDefaults } from "@/lib/defaults";
+import { newsId, todayLima } from "@/lib/news";
+import type { IgPost } from "@/lib/admin/types";
+import type { NewsItem, Storefront } from "@/lib/types";
 
-type Tab = "all" | "new" | "done" | "content";
+type Tab = "all" | "new" | "done" | "content" | "news";
 
 export function InstagramView() {
   const { bundle, toast } = useAdmin();
@@ -18,8 +23,12 @@ export function InstagramView() {
   const { posts, st, setSt, live, loading, account, hide, sync: runSync } = useIg();
   const [tab, setTab] = useState<Tab>("all");
   const [syncing, setSyncing] = useState(false);
-  const tabs: [Tab, string][] = [["all", "Todos"], ["new", "Nuevos"], ["done", "En tienda"], ["content", "Contenido"]];
-  const list = posts.filter((p) => tab === "all" || p.kind === tab);
+  const news = useNews();
+  const [newsOpen, setNewsOpen] = useState(false);
+  const [until, setUntil] = useState("");
+  const tabs: [Tab, string][] = [["all", "Todos"], ["new", "Nuevos"], ["done", "En tienda"], ["content", "Contenido"], ["news", "En Novedades"]];
+  const inTab = (p: IgPost, k: Tab) => k === "all" || (k === "news" ? news.ids.has(p.id) : p.kind === k);
+  const list = posts.filter((p) => inTab(p, tab));
   const sel = st.sel.filter((id) => posts.some((p) => p.id === id && p.kind !== "done"));
   const toggle = (id: string) => setSt((s) => ({ ...s, sel: s.sel.includes(id) ? s.sel.filter((x) => x !== id) : [...s.sel, id] }));
   const sync = async () => {
@@ -69,7 +78,7 @@ export function InstagramView() {
       <div className="a-scroll-x" role="group" aria-label="Filtrar posts">
         {tabs.map(([k, l]) => (
           <button key={k} className={`a-chip ${tab === k ? "on" : ""}`} type="button" aria-pressed={tab === k} onClick={() => setTab(k)}>
-            {l} <span className="n">{k === "all" ? posts.length : posts.filter((p) => p.kind === k).length}</span>
+            {l} <span className="n">{posts.filter((p) => inTab(p, k)).length}</span>
           </button>
         ))}
       </div>
@@ -88,21 +97,84 @@ export function InstagramView() {
               {p.kind === "new" && idx < 0 && <span className="new-tag">Nuevo</span>}
               {done && <span className="done-tag"><AICheck size="sm" style={{ width: 12, height: 12 }} />En tienda</span>}
               {p.kind === "content" && idx < 0 && <span className="cont-tag">{p.deleted ? "Borrado en IG" : "Contenido"}</span>}
+              {news.ids.has(p.id) && <span className="news-tag">Novedad</span>}
             </button>
           );
         })}
       </div>
       <p className="a-cap">Los posts «En tienda» ya son producto: sus fotos y texto se mantienen sincronizados. Los de «Contenido» (modelos, tips, sorteos) puedes <button type="button" className="a-btn sm ghost" style={{ minHeight: 0, padding: 0, textDecoration: "underline", display: "inline" }} onClick={hideContent}>ocultarlos de esta bandeja</button>.</p>
+      {newsOpen && sel.length > 0 && (
+        <section className="a-card stack g3" aria-labelledby="ig-news-h">
+          <div className="stack g1">
+            <h2 className="a-h3" id="ig-news-h">Poner en Novedades de Inicio</h2>
+            <p className="a-cap">{sel.length === 1 ? "La foto entra" : `Las ${sel.length} fotos entran`} adelante en la tira de Novedades y se publican al toque. Al tocarlas, el cliente va al post en Instagram. Textos, orden y fechas se cambian en <Link href="/admin/textos?seccion=news">Textos › Novedades</Link>.</p>
+          </div>
+          <div className="a-field">
+            <label htmlFor="ig-news-until">Se muestra hasta (opcional)</label>
+            <input id="ig-news-until" className="a-input" type="date" style={{ maxWidth: 200 }} min={todayLima()} value={until} onChange={(e) => setUntil(e.target.value)} />
+            <span className="a-cap">Ponle fecha a las promos (ej. Black Friday): al terminar ese día dejan de verse solas. Sin fecha, quedan hasta que las quites.</span>
+          </div>
+          <div className="row g2 wrap-row">
+            <button className="a-btn primary" type="button" disabled={news.busy} onClick={async () => {
+              const msg = await news.add(posts.filter((p) => sel.includes(p.id)).sort((a, b) => sel.indexOf(a.id) - sel.indexOf(b.id)), until);
+              toast(msg);
+              if (msg.startsWith("Listo")) { setNewsOpen(false); setUntil(""); setSt((s) => ({ ...s, sel: [] })); }
+            }}>{news.busy ? "Publicando…" : "Publicar en Novedades"}</button>
+            <button className="a-btn ghost" type="button" onClick={() => setNewsOpen(false)}>Cancelar</button>
+          </div>
+        </section>
+      )}
       {!live && <DemoNote>Demo: estos posts son de ejemplo. Conecta la base de datos para traer los posts reales de Instagram.</DemoNote>}
       <div className="a-sticky">
         <span><b>{sel.length}</b> <span className="a-cap">{sel.length === 1 ? "post seleccionado" : "posts seleccionados"}</span></span>
         <div className="row g2">
           <button className="a-btn ghost sm" type="button" disabled={!sel.length} onClick={() => setSt((s) => ({ ...s, sel: [] }))}>Limpiar</button>
+          <button className="a-btn" type="button" disabled={!sel.length || !news.ready} aria-expanded={newsOpen} onClick={() => setNewsOpen(true)}>Poner en Novedades</button>
           {sel.length ? <Link className="a-btn primary" href="/admin/instagram/convertir">Convertir en producto<AIChevron size="sm" /></Link> : <button className="a-btn primary" type="button" disabled>Convertir en producto</button>}
         </div>
       </div>
     </AdminPage>
   );
+}
+
+/** Novedades de Inicio (storefront.news): qué posts ya están y cómo agregar más publicando al toque. */
+function useNews() {
+  const { bundle } = useAdmin();
+  const [doc, save, ready] = useStoredDoc<Storefront>("texts");
+  const [busy, setBusy] = useState(false);
+  const base = bundle.storefront;
+  const published = doc.published ? withDefaults(base, doc.published) : base;
+  const ids = new Set((published.news?.items ?? []).map((n) => n.igPostId).filter(Boolean) as string[]);
+
+  const add = async (picked: IgPost[], until: string): Promise<string> => {
+    const fresh = picked.filter((p) => p.img);
+    if (!fresh.length) return "Esos posts no tienen foto";
+    const pickedIds = new Set(fresh.map((p) => p.id));
+    const items: NewsItem[] = fresh.map((p) => ({
+      id: newsId(),
+      image: p.img,
+      alt: p.name,
+      caption: "",
+      href: p.permalink ?? "",
+      igPostId: p.id,
+      ...(p.reel ? { reel: true } : {}),
+      ...(until ? { until } : {}),
+    }));
+    // Si ya estaba, se reemplaza (vuelve adelante con la fecha nueva).
+    const put = (sf: Storefront): Storefront => ({ ...sf, news: { ...sf.news, items: [...items, ...(sf.news?.items ?? []).filter((n) => !n.igPostId || !pickedIds.has(n.igPostId))] } });
+    setBusy(true);
+    try {
+      // Se publica directo y, si hay un borrador de Textos, también se suma ahí para no perderla al publicarlo.
+      await save({ ...doc, published: put(published), draft: doc.draft ? put(withDefaults(base, doc.draft)) : null });
+      return `Listo: ${items.length === 1 ? "1 foto publicada" : `${items.length} fotos publicadas`} en Novedades`;
+    } catch (e) {
+      return `No se pudo publicar: ${e instanceof Error ? e.message : "error de conexión"}`;
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return { ids, add, busy, ready };
 }
 
 const IG_RESULT: Record<string, string> = {

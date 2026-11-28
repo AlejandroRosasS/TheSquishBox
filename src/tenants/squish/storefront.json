@@ -102,6 +102,12 @@
       { "title": "Guárdalo bien", "text": "Lejos del sol y de objetos filosos." }
     ]
   },
+  "news": {
+    "showOnHome": true,
+    "eyebrow": "Novedades",
+    "title": "Lo *último* que publicamos",
+    "items": []
+  },
   "footer": {
     "about": "Mystery squishies para coleccionar. Abre, descubre, colecciona e intercambia. Lima, Perú.",
     "shop": [

@@ -140,6 +140,19 @@ export type Business = { legalName: string; ruc: string; address: string; email:
 export type LegalPageKey = "terms" | "returns" | "shipping" | "privacy";
 export type LegalDoc = { title: string; lead: string; sections: { title: string; text: string }[] };
 
+/** Una novedad de Inicio. `until` (AAAA-MM-DD, hora de Lima) = se muestra hasta ese día inclusive; sin fecha no vence. */
+export type NewsItem = {
+  id: string;
+  image: string;
+  alt: string;
+  caption: string;
+  href: string;
+  until?: string;
+  /** Post de Instagram del que salió (ig_posts.id). */
+  igPostId?: string;
+  reel?: boolean;
+};
+
 export type Storefront = {
   brand: {
     ink: string;
@@ -163,6 +176,8 @@ export type Storefront = {
   /** `photos`: fotos del recuadro de modelos. Si no hay, se usan los modelos del catálogo (`max` como tope). */
   models: { eyebrow: string; title: string; footnote: string; max: number; photos?: { image: string; alt: string }[] };
   tips: { eyebrow: string; title: string; items: { title: string; text: string }[] };
+  /** Novedades: tira tipo reel en Inicio con fotos del momento (posts de Instagram o subidas). */
+  news: { showOnHome: boolean; eyebrow: string; title: string; items: NewsItem[] };
   /** `legal` y `legalLinks` son de la versión anterior (antes de las páginas legales): ya no se muestran. */
   footer: { about: string; shop: Link[]; help: Link[]; legal?: string; legalLinks?: string };
   /** Datos de la empresa: se muestran en el pie, Contacto, páginas legales y Libro de reclamaciones. */

@@ -146,6 +146,12 @@
       }
     ]
   },
+  "news": {
+    "showOnHome": true,
+    "eyebrow": "Novedades",
+    "title": "Lo *último* que publicamos",
+    "items": []
+  },
   "footer": {
     "about": "Arreglos florales permanentes. Detalles que transforman espacios. Lima, Perú.",
     "shop": [
