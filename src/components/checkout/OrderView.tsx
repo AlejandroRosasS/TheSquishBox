@@ -8,6 +8,9 @@ import { Rich } from "@/components/Rich";
 import { asset } from "@/lib/assets";
 import { fill, formatPrice, whatsappLink } from "@/lib/format";
 import { findOrder, formatDate, type Order } from "@/lib/orders";
+import { CustomerReviewsOptIn } from "@/components/CustomerReviews";
+import { estimatedDeliveryDate, googleLang, merchantIdOf } from "@/lib/customerReviews";
+import { policiesOf } from "@/lib/policies";
 import { IconChat, IconCheck, IconInfo, IconList, IconTruck } from "@/components/Icons";
 
 /* eslint-disable @next/next/no-img-element */
@@ -16,7 +19,7 @@ const PAY_NAMES: Record<string, string> = { yape: "Yape", tarjeta: "tarjeta" };
 
 /** `demo`: pedido de ejemplo (vista previa del admin) en vez del guardado en el navegador. */
 export function OrderView({ id, demo }: { id: string; demo?: Order }) {
-  const { tenant, storefront: sf } = useStore();
+  const { tenant, storefront: sf, seo } = useStore();
   const [stored, setOrder] = useState<Order | null | undefined>(undefined);
   const order = demo ?? stored;
   const cur = tenant.currency;
@@ -62,11 +65,18 @@ export function OrderView({ id, demo }: { id: string; demo?: Order }) {
       ? `Hola, hice el pedido N.º ${order.id} en la web y te envío la captura de mi Yape por ${formatPrice(order.total, cur)}.`
       : `Hola, hice el pedido N.º ${order.id} en la web.`,
   );
+  // Google Customer Reviews: solo pedidos reales (no la vista previa del admin) y con correo.
+  const merchantId = demo ? null : merchantIdOf(seo.merchantId);
+  const country = tenant.locale.split("-")[1] ?? "";
+  const optIn = merchantId && order.customer.email && country
+    ? { merchantId, orderId: order.id, email: order.customer.email, country, deliveryDate: estimatedDeliveryDate(order.createdAt, s.date, policiesOf(sf)), lang: googleLang(tenant.locale) }
+    : null;
   const dateText = s.date ? formatDate(s.date, { weekday: "short", day: "numeric", month: "short" }) : "";
 
   return (
     <>
       {header}
+      {optIn && <CustomerReviewsOptIn data={optIn} onceKey={`gcr:${tenant.slug}:${order.id}`} />}
       <div className="wrap" style={{ paddingBlock: "56px 96px" }}>
         <div className="split wide-left">
           <div className="stack g5">

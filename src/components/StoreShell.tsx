@@ -9,6 +9,8 @@ import { PublishedTheme } from "@/components/PublishedTheme";
 import { themeBootScript } from "@/lib/publishedTheme";
 import { Analytics } from "@/components/Analytics";
 import { analyticsIdOf } from "@/lib/analytics";
+import { CustomerReviewsBadge } from "@/components/CustomerReviews";
+import { merchantIdOf } from "@/lib/customerReviews";
 
 /** Envoltura de la tienda pública: fuentes y tokens de la marca, carrito y tema publicado desde el admin. */
 export async function StoreShell({ children }: { children: React.ReactNode }) {
@@ -16,15 +18,22 @@ export async function StoreShell({ children }: { children: React.ReactNode }) {
   const demoTheme = bundle.source === "files";
   const { tenant, storefront } = bundle;
   // Los despliegues de prueba de Vercel (preview) no mandan visitas: ensuciarían las estadísticas.
-  const gaId = process.env.VERCEL_ENV === "preview" ? null : analyticsIdOf(bundle.seo.analyticsId);
+  const preview = process.env.VERCEL_ENV === "preview";
+  const gaId = preview ? null : analyticsIdOf(bundle.seo.analyticsId);
+  // Google Customer Reviews: tampoco en preview (la encuesta de un pedido de prueba llegaría a Google).
+  const merchantId = preview ? null : merchantIdOf(bundle.seo.merchantId);
+  const live = merchantId || !bundle.seo.merchantId ? bundle : { ...bundle, seo: { ...bundle.seo, merchantId: "" } };
   return (
     <>
       {gaId && <Analytics id={gaId} />}
+      {merchantId && bundle.seo.merchantBadge && (
+        <CustomerReviewsBadge merchantId={merchantId} position={bundle.seo.merchantBadge} region={tenant.locale.split("-")[1] ?? ""} />
+      )}
       {tenant.fonts.googleFontsUrl && <link rel="stylesheet" href={tenant.fonts.googleFontsUrl} precedence="default" />}
       {/* Modo demo (sin base de datos): la paleta publicada vive en este navegador y se aplica antes de pintar. */}
       {demoTheme && <script dangerouslySetInnerHTML={{ __html: themeBootScript(tenant.slug) }} />}
       <div className="store" style={storeStyle(tenant, storefront, undefined, bundle.appearance?.tokens)}>
-        <StoreProvider value={bundle} live>
+        <StoreProvider value={live} live>
         <MediaProvider slug={tenant.slug} media={bundle.media ?? {}}>
           <CartProvider>
             {children}

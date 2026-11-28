@@ -5,6 +5,7 @@ import type { LegalPageKey } from "@/lib/types";
 import { Rich } from "@/components/Rich";
 import { plainText } from "@/lib/format";
 import { analyticsIdOf } from "@/lib/analytics";
+import { merchantIdOf } from "@/lib/customerReviews";
 
 const slugify = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
@@ -13,16 +14,22 @@ const ANALYTICS_SECTION = {
   text: "Usamos Google Analytics para saber cuántas personas visitan la tienda, desde dónde llegan y qué productos miran. Para eso Google guarda cookies en tu navegador y recibe datos de navegación sin tu nombre, celular ni correo. Puedes bloquear las cookies desde la configuración de tu navegador o instalar el complemento de inhabilitación de Google Analytics.",
 };
 
+const CUSTOMER_REVIEWS_SECTION = {
+  title: "Encuesta de Google sobre tu compra",
+  text: "Participamos en Google Customer Reviews. Al confirmar tu pedido, Google te pregunta si quieres recibir por correo una encuesta sobre tu experiencia con la tienda. Para ofrecértela le enviamos tu correo, el número de pedido, el país y la fecha estimada de entrega. Google solo te escribe si aceptas, y sus respuestas se rigen por la política de privacidad de Google.",
+};
+
 /** Página legal (Términos, Cambios y devoluciones, Entregas, Privacidad). Sin datos del servidor: la usan la tienda y la vista previa del admin. */
 export function LegalView({ bundle, page }: { bundle: TenantBundle; page: LegalPageKey }) {
   const { tenant, storefront: sf } = bundle;
   const doc = sf.legalPages[page];
   const b = businessOf(tenant, sf);
   const fill = (t: string) => fillLegal(t, tenant, b, sf);
-  // Con Google Analytics activo, Privacidad lo informa (Ley 29733): la sección se agrega sola.
-  const sections = page === "privacy" && analyticsIdOf(bundle.seo.analyticsId)
-    ? [...doc.sections.slice(0, -1), ANALYTICS_SECTION, ...doc.sections.slice(-1)]
-    : doc.sections;
+  // Con Google Analytics o Google Customer Reviews activos, Privacidad lo informa (Ley 29733): las secciones se agregan solas.
+  const extra = page === "privacy"
+    ? [analyticsIdOf(bundle.seo.analyticsId) && ANALYTICS_SECTION, merchantIdOf(bundle.seo.merchantId) && CUSTOMER_REVIEWS_SECTION].filter((x): x is typeof ANALYTICS_SECTION => !!x)
+    : [];
+  const sections = extra.length ? [...doc.sections.slice(0, -1), ...extra, ...doc.sections.slice(-1)] : doc.sections;
   const others = (Object.keys(LEGAL_ROUTES) as LegalPageKey[]).filter((k) => k !== page);
   return (
     <div className="wrap legal-page">

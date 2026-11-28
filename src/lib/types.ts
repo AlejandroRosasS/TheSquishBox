@@ -320,4 +320,8 @@ export type Seo = {
   googleVerification: string;
   /** ID de medición de Google Analytics 4 («G-…»). Vacío = la tienda no carga Analytics. */
   analyticsId?: string;
+  /** ID de Google Merchant Center (solo números). Activa la encuesta de Google Customer Reviews al confirmar el pedido. */
+  merchantId?: string;
+  /** Insignia de Google Customer Reviews en la tienda. Vacío/ausente = oculta. */
+  merchantBadge?: "" | "BOTTOM_RIGHT" | "BOTTOM_LEFT";
 };
