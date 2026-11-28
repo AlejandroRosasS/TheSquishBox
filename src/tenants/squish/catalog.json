@@ -41,7 +41,7 @@
           "id": "unica",
           "label": "Caja completa",
           "price": 69,
-          "priceIsReference": true,
+          "priceIsReference": false,
           "stock": 24
         }
       ],
@@ -64,7 +64,7 @@
           "id": "unica",
           "label": "1 squishy grande",
           "price": 29,
-          "priceIsReference": true,
+          "priceIsReference": false,
           "stock": 3
         }
       ],
@@ -85,14 +85,14 @@
           "id": "2",
           "label": "2 squishies",
           "price": 18,
-          "priceIsReference": true,
+          "priceIsReference": false,
           "stock": 30
         },
         {
           "id": "3",
           "label": "3 squishies",
           "price": 24,
-          "priceIsReference": true,
+          "priceIsReference": false,
           "stock": 4
         }
       ],
@@ -114,14 +114,14 @@
           "id": "4",
           "label": "4 squishies",
           "price": 39,
-          "priceIsReference": true,
+          "priceIsReference": false,
           "stock": 15
         },
         {
           "id": "5",
           "label": "5 squishies",
           "price": 47,
-          "priceIsReference": true,
+          "priceIsReference": false,
           "stock": 10
         }
       ],
