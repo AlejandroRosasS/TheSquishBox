@@ -41,6 +41,8 @@ export function HomeView({ bundle }: { bundle: TenantBundle }) {
         </div>
       </section>
 
+      <NewsStrip news={sf.news} />
+
       <section className="section tight" data-edit="highlights">
         <div className="wrap stack g7">
           <nav className="hls" aria-label="Accesos rápidos">
@@ -51,7 +53,6 @@ export function HomeView({ bundle }: { bundle: TenantBundle }) {
               </Link>
             ))}
           </nav>
-          <NewsStrip news={sf.news} />
           <div className="tiles">
             {sf.tiles.map((t, i) => (
               <Link className="tile" href={t.href} key={i}>
