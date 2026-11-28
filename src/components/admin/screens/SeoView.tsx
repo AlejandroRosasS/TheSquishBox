@@ -12,6 +12,7 @@ import { AdminPage, DemoNote, Switch } from "../AdminPage";
 import { ImagePicker, type FieldCtx } from "../TextFields";
 import { AIAlert } from "../AdminIcons";
 import { analyticsIdOf } from "@/lib/analytics";
+import { BADGE_POSITIONS, merchantIdOf } from "@/lib/customerReviews";
 
 function Counted({ label, value, onChange, max, placeholder, long, hint }: { label: string; value: string; onChange: (v: string) => void; max: number; placeholder?: string; long?: boolean; hint?: string }) {
   const id = useId();
@@ -52,6 +53,7 @@ export function SeoView() {
   const set = (patch: Partial<Seo>) => doc.edit((p) => ({ ...p, ...patch }));
   const host = tenant.domain;
   const gaBad = !!seo.analyticsId && !analyticsIdOf(seo.analyticsId);
+  const mcBad = !!seo.merchantId && !merchantIdOf(seo.merchantId);
   const favicon = tenant.logo.image ? asset(tenant.slug, tenant.logo.image) : undefined;
   const ctx: FieldCtx = useMemo(() => {
     const imgs = new Set<string>([seo.shareImage, bundle.storefront.hero.image, ...catalog.products.flatMap((p) => p.images)].filter(Boolean));
@@ -162,6 +164,20 @@ export function SeoView() {
               {gaBad && <span className="a-err">El ID empieza con «G-» seguido de letras y números (ej.: G-AB12CD34EF).</span>}
               <span className="a-cap" id="seo-ga-h">Lo encuentras en analytics.google.com › Administrar › Flujos de datos › tu web. Mide visitas, de dónde llegan (Instagram, Google, WhatsApp), productos vistos, carritos, checkouts y pedidos en soles. Vacío = no se carga Analytics. El panel de admin nunca se mide.</span>
             </div>
+            <div className="a-field">
+              <label htmlFor="seo-mc">ID de Google Merchant Center (Google Customer Reviews)</label>
+              <input id="seo-mc" className="a-input" value={seo.merchantId ?? ""} placeholder="Ej.: 1234567890" inputMode="numeric" spellCheck={false} aria-describedby="seo-mc-h" aria-invalid={mcBad || undefined} onChange={(e) => set({ merchantId: e.target.value.replace(/\D/g, "") })} />
+              {mcBad && <span className="a-err">El ID son solo números (lo ves arriba a la derecha en Merchant Center).</span>}
+              <span className="a-cap" id="seo-mc-h">Al confirmar un pedido, Google le ofrece al cliente una encuesta por correo después de la entrega. Con esas respuestas arma la calificación de tu tienda en Google Shopping. Es aparte de las reseñas de productos de tu tienda. Vacío = no se muestra. Privacidad agrega sola el aviso.</span>
+            </div>
+            <div className="a-field">
+              <label htmlFor="seo-badge">Insignia de Google Customer Reviews</label>
+              <select id="seo-badge" className="a-select" value={seo.merchantBadge ?? ""} disabled={!merchantIdOf(seo.merchantId)} aria-describedby="seo-badge-h" onChange={(e) => set({ merchantBadge: e.target.value as Seo["merchantBadge"] })}>
+                <option value="">No mostrar</option>
+                {BADGE_POSITIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+              <span className="a-cap" id="seo-badge-h">Muestra tu calificación de vendedor en todas las páginas de la tienda. Mientras Google no tenga calificaciones dirá «no rating available»: conviene prenderla cuando ya tengas.</span>
+            </div>
             <div className="row between g3">
               <div>
                 <b>Mapa del sitio (sitemap.xml)</b>
@@ -194,7 +210,7 @@ export function SeoView() {
         <span className="a-cap">{doc.status === "live" ? "Publicado." : "Los cambios se aplican al publicar."}</span>
         <div className="row g2">
           <button className="a-btn" type="button" disabled={!doc.dirty} onClick={async () => { if (await doc.saveDraft()) toast("Borrador guardado"); }}>Guardar borrador</button>
-          <button className="a-btn primary" type="button" disabled={doc.status === "live" || !templateOk || gaBad} onClick={async () => { if (await doc.publish()) toast("SEO publicado"); }}>Publicar</button>
+          <button className="a-btn primary" type="button" disabled={doc.status === "live" || !templateOk || gaBad || mcBad} onClick={async () => { if (await doc.publish()) toast("SEO publicado"); }}>Publicar</button>
         </div>
       </div>
     </AdminPage>
